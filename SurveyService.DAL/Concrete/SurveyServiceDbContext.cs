@@ -5,7 +5,7 @@ namespace SurveyService.DAL
 {
     public class SurveyServiceDbContext : DbContext
     {
-        public SurveyServiceDbContext(DbContextOptions<SurveyServiceDbContext> options) : base(options) { }
+        public SurveyServiceDbContext(DbContextOptions<SurveyServiceDbContext> options) : base(options) {}
         public DbSet<Answer> Answers { get; set; }
         public DbSet<Option> Options { get; set; }
         public DbSet<OptionsForQuestion> OptionsForQuestions { get; set; }
@@ -18,6 +18,9 @@ namespace SurveyService.DAL
         {
             modelBuilder.Entity<OptionsForQuestion>().HasOne(x => x.Option).WithMany(x => x.OptionsForQuestions).HasForeignKey(x => x.OptionId);
             modelBuilder.Entity<OptionsForQuestion>().HasOne(x => x.Question).WithMany(x => x.OptionsForQuestions).HasForeignKey(x => x.QuestionId);
+            modelBuilder.Entity<SurveyQuestion>().HasKey(x => new { x.QuestionId, x.SurveyId });
+            modelBuilder.Entity<SurveyQuestion>().HasOne(x => x.Question).WithMany(x => x.SurveyQuestion).HasForeignKey(x => x.QuestionId);
+            modelBuilder.Entity<SurveyQuestion>().HasOne(x => x.Survey).WithMany(x => x.SurveyQuestion).HasForeignKey(x => x.SurveyId);
         }
     }
 }

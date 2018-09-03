@@ -6,6 +6,7 @@ using System.Text;
 
 namespace SurveyService.Models
 {
+    [Table("SurveyQuestion")]
     public class SurveyQuestion
     {
         [Key]
@@ -13,13 +14,15 @@ namespace SurveyService.Models
 
         [ForeignKey(nameof(Survey))]
         public string SurveyId { get; set; }
+        [ForeignKey("SurveyId")]
+        public Survey Survey { get; set; }
 
         [ForeignKey(nameof(Question))]
         public string QuestionId { get; set; }
+        [ForeignKey("QuestionId")]
+        public Question Question { get; set; }
+
         public int Order { get; set; }
         public bool IsRequired { get; set; }
-
-        public Survey Survey { get; set; }
-        public Question Question { get; set; }
     }
 }

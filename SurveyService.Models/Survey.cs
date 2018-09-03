@@ -16,5 +16,7 @@ namespace SurveyService.Models
         public DateTime DateExpires { get; set; }
         public DateTime DateCreated { get; set; }
         public string CreatedBy { get; set; }
+        public ICollection<SurveyQuestion> SurveyQuestion { get; set; }
+
     }
 }
