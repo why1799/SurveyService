@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SurveyService.DAL;
 
 namespace SurveyService.DAL.Migrations
 {
     [DbContext(typeof(SurveyServiceDbContext))]
-    partial class SurveyServiceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180903080628_mytest")]
+    partial class mytest
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -107,20 +109,20 @@ namespace SurveyService.DAL.Migrations
 
             modelBuilder.Entity("SurveyService.Models.SurveyQuestion", b =>
                 {
-                    b.Property<string>("QuestionId");
-
-                    b.Property<string>("SurveyId");
-
                     b.Property<string>("Id")
-                        .IsRequired();
+                        .ValueGeneratedOnAdd();
 
                     b.Property<bool>("IsRequired");
 
                     b.Property<int>("Order");
 
-                    b.HasKey("QuestionId", "SurveyId");
+                    b.Property<string>("QuestionId");
 
-                    b.HasAlternateKey("Id");
+                    b.Property<string>("SurveyId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuestionId");
 
                     b.HasIndex("SurveyId");
 
@@ -166,14 +168,12 @@ namespace SurveyService.DAL.Migrations
             modelBuilder.Entity("SurveyService.Models.SurveyQuestion", b =>
                 {
                     b.HasOne("SurveyService.Models.Question", "Question")
-                        .WithMany("SurveyQuestion")
-                        .HasForeignKey("QuestionId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .WithMany()
+                        .HasForeignKey("QuestionId");
 
                     b.HasOne("SurveyService.Models.Survey", "Survey")
-                        .WithMany("SurveyQuestion")
-                        .HasForeignKey("SurveyId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .WithMany()
+                        .HasForeignKey("SurveyId");
                 });
 #pragma warning restore 612, 618
         }

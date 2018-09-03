@@ -12,5 +12,6 @@ namespace SurveyService.Models
         public string Text { get; set; }
         public int Type { get; set; }
         public ICollection<OptionsForQuestion> OptionsForQuestions { get; set; }
+        public ICollection<SurveyQuestion> SurveyQuestion { get; set; }
     }
 }
