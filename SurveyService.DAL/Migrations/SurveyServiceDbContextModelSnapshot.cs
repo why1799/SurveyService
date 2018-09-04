@@ -2,7 +2,6 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SurveyService.DAL;
 
@@ -16,8 +15,7 @@ namespace SurveyService.DAL.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "2.1.2-rtm-30932")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             modelBuilder.Entity("SurveyService.Models.Answer", b =>
                 {
@@ -55,8 +53,6 @@ namespace SurveyService.DAL.Migrations
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("OptionId");
-
-                    b.Property<int>("Order");
 
                     b.Property<string>("QuestionId");
 
@@ -111,8 +107,6 @@ namespace SurveyService.DAL.Migrations
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
-
-                    b.Property<bool>("IsCustomAnswer");
 
                     b.Property<bool>("IsRequired");
 
@@ -170,11 +164,11 @@ namespace SurveyService.DAL.Migrations
             modelBuilder.Entity("SurveyService.Models.SurveyQuestion", b =>
                 {
                     b.HasOne("SurveyService.Models.Question", "Question")
-                        .WithMany("SurveyQuestion")
+                        .WithMany()
                         .HasForeignKey("QuestionId");
 
                     b.HasOne("SurveyService.Models.Survey", "Survey")
-                        .WithMany("SurveyQuestion")
+                        .WithMany()
                         .HasForeignKey("SurveyId");
                 });
 #pragma warning restore 612, 618

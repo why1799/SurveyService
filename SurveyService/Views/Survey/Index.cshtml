@@ -7,19 +7,19 @@
     <div>
         @foreach (var item in Model.SurveyQuestion)
         {
-            <div style="margin-top: 30px;">
-                <h4>@item.Question.Text</h4>
-                <ul class="list-unstyled">
-                    @foreach (var Option in item.Question.OptionsForQuestions)
-                    {
-                        <li><input type=@(item.Question.Type == 1 ? "radio" : "checkbox") name=@item.Id value=@Option.Id /> @Option.Option.Text</li>
-                    }
-                    @if (item.IsCustomAnswer)
-                    {
-                        <li><input type=@(item.Question.Type == 1 ? "radio" : "checkbox") name=@item.Id value="custom" data-questionid="@item.Question.Id" for="@("customAnswer" + item.Id)" /> <input id=@("customAnswer" + item.Id) type="text" /></li>
-                    }
-                </ul>
-            </div>
+        <div style="margin-top: 30px;">
+            @*<h4>@item.Question.Text</h4>
+        <ul class="list-unstyled">
+            @foreach (var Option in item.Question.OptionsForQuestions)
+            {
+                <li><input type=@(item.Question.Type == 1 ? "radio" : "checkbox") name=@item.Id value=@Option.Id /> @Option.Option.Text</li>
+            }
+            @if (item.IsCustomAnswer)
+            {
+                <li><input type="@item.Question.Type" name=@item.Id value="custom" data-questionid="@item.Question.Id" for="@("customAnswer" + item.Id)" /> <input id=@("customAnswer" + item.Id) type="text" /></li>
+            }
+        </ul>*@
+        </div>
         }
     </div>
     <input type="submit" id="submitButton" value="Отправить" style="margin-top:30px;" />
@@ -32,13 +32,13 @@
             var json = '{ ';
             var inputArr = $('input:radio, input:checkbox');
             for (var i = 0, index = 0; i < inputArr.length; i++) {
-                if (inputArr[i].checked == true) {
+                @*if (inputArr[i].checked == true) {
                     if (inputArr[i].value == 'custom') {
                         json += ' "' + index++ + '": { "userId": "@Model.CreatedBy", "type": "custom", "questionId": "' + inputArr[i].getAttribute('data-questionid') +'", "text": "' + $('#' + inputArr[i].getAttribute('for')).val() + '"}, ';
                     } else {
                         json += ' "' + index++ + '": { "userId": "@Model.CreatedBy", "type": "standart", "optionId": "' + inputArr[i].value + '"}, ';
                     }
-                }
+                }*@
             }
             if (json.length < 3) {
                 alert("error");

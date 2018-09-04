@@ -6,38 +6,38 @@ using System.Linq;
 
 namespace SurveyService.DAL.Concrete
 {
-    public class SurveyServiceOptionsForQuestionRepository : IOptionsForQuestionRepository
+    public class SurveyServiceOptionsForAnswerRepository : IOptionsForAnswerRepository
     {
         private SurveyServiceDbContext context;
-        public SurveyServiceOptionsForQuestionRepository(SurveyServiceDbContext context)
+        public SurveyServiceOptionsForAnswerRepository(SurveyServiceDbContext context)
         {
             this.context = context;
         }
-        public async Task<OptionsForQuestion> Create(OptionsForQuestion item)
+        public async Task<OptionsForAnswer> Create(OptionsForAnswer item)
         {
             var result = await context.OptionsForQuestions.AddAsync(item);
             await context.SaveChangesAsync();
             return result.Entity;
         }
 
-        public async Task Delete(OptionsForQuestion item)
+        public async Task Delete(OptionsForAnswer item)
         {
             context.OptionsForQuestions.Remove(item);
             await context.SaveChangesAsync();
         }
 
-        public async Task<OptionsForQuestion> GetItem(string id)
+        public async Task<OptionsForAnswer> GetItem(string id)
         {
             var result = await context.OptionsForQuestions.FindAsync(id);
             return result;
         }
 
-        public IQueryable<OptionsForQuestion> GetItems()
+        public IQueryable<OptionsForAnswer> GetItems()
         {
             return context.OptionsForQuestions;
         }
 
-        public async Task<OptionsForQuestion> Update(OptionsForQuestion item)
+        public async Task<OptionsForAnswer> Update(OptionsForAnswer item)
         {
             var result = context.OptionsForQuestions.Update(item);
             await context.SaveChangesAsync();

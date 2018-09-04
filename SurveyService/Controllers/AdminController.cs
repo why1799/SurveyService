@@ -16,10 +16,10 @@ namespace SurveyService.WebUI.Controllers
     {
         private IUserRepository userRepository;
         private ISurveyRepository surveyRepository;
-        private IQuestionRepository questionRepository;
+        private IUserAnswerRepository questionRepository;
         private ISurveyQuestionRepository surveyQuestionRepository;
 
-        public AdminController(IUserRepository userRepository, ISurveyRepository surveyRepository, IQuestionRepository questionRepository, ISurveyQuestionRepository surveyQuestionRepository)
+        public AdminController(IUserRepository userRepository, ISurveyRepository surveyRepository, IUserAnswerRepository questionRepository, ISurveyQuestionRepository surveyQuestionRepository)
         {
             this.userRepository = userRepository;
             this.surveyRepository = surveyRepository;
@@ -83,8 +83,8 @@ namespace SurveyService.WebUI.Controllers
             var survey = waitingTask0.Result;*/
 
 
-            var question = await questionRepository.Create(new Question { Text = "Новый вопрос", Type = 0 });
-            var surveyquestion = await surveyQuestionRepository.Create(new SurveyQuestion { SurveyId = surveyid, QuestionId = question.Id, IsRequired = false, Order = 0/*Тут сделать нормальную нумерацию*/});
+            var question = await questionRepository.Create(new UserAnswer());//{ Text = "Новый вопрос", Type = 0 });
+            var surveyquestion = await surveyQuestionRepository.Create(new SurveyQuestion()); //{ SurveyId = surveyid, QuestionId = question.Id, IsRequired = false, Order = 0/*Тут сделать нормальную нумерацию*/});
             //var surveyquestion = waitingTask2.Result;//;.  .Where(ob => ob.SurveyId == surveyid).ToList();
 
             //var sth = surveyquestion.Survey.Id;

@@ -6,18 +6,17 @@ using System.Text;
 
 namespace SurveyService.Models
 {
-    public class OptionsForQuestion
+    public class OptionsForAnswer
     {
         [Key]
         public string Id { get; set; }
-        [ForeignKey(nameof(Question))]
-        public string QuestionId { get; set; }
-        public Question Question { get; set; }
+
+        [ForeignKey(nameof(UserAnswer))]
+        public string UserAnswerId { get; set; }
+        public UserAnswer UserAnswer { get; set; }
 
         [ForeignKey(nameof(Option))]
         public string OptionId { get; set; }
         public Option Option { get; set; }
-
-        public int Order { get; set; }
     }
 }

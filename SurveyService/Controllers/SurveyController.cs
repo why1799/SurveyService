@@ -11,32 +11,30 @@ namespace SurveyService.WebUI.Controllers
     public class SurveyController : Controller
     {
         ISurveyRepository survey;
-        IAnswerRepository answer;
         IOptionRepository option;
-        IOptionsForQuestionRepository optionsForQuestion;
+        IOptionsForAnswerRepository optionsForQuestion;
 
-        public SurveyController(ISurveyRepository survey, IAnswerRepository answer, ISurveyQuestionRepository surveyQuestion, 
-            IOptionRepository option, IOptionsForQuestionRepository optionsForQuestion)
+        public SurveyController(ISurveyRepository survey, ISurveyQuestionRepository surveyQuestion, 
+            IOptionRepository option, IOptionsForAnswerRepository optionsForQuestion)
         {
             this.survey = survey;
-            this.answer = answer;
             this.option = option;
             this.optionsForQuestion = optionsForQuestion;
         }
         //GET: /Survey/Index?id=SurveyId
         public IActionResult Index(int? id)
         {
-            var model = survey.GetItems()
-                    .Include(ob => ob.SurveyQuestion)
-                        .ThenInclude(ob => ob.Question)
-                            .ThenInclude(ob => ob.OptionsForQuestions)
-                                .ThenInclude(ob => ob.Option)
-                    .Where(ob => ob.Id == id.ToString()).FirstOrDefault();
-            model.SurveyQuestion = model.SurveyQuestion.OrderBy(ob => ob.Order).ToList();
-            foreach (var item in model.SurveyQuestion)
-            {
-                item.Question.OptionsForQuestions = item.Question.OptionsForQuestions.OrderBy(ob => ob.Order).ToList();
-            }
+            var model = survey.GetItems();
+            //        .Include(ob => ob.SurveyQuestion)
+            //            .ThenInclude(ob => ob.Question)
+            //                .ThenInclude(ob => ob.OptionsForQuestions)
+            //                    .ThenInclude(ob => ob.Option)
+            //        .Where(ob => ob.Id == id.ToString()).FirstOrDefault();
+            //model.SurveyQuestion = model.SurveyQuestion.OrderBy(ob => ob.Order).ToList();
+            //foreach (var item in model.SurveyQuestion)
+            //{
+            //    item.Question.OptionsForQuestions = item.Question.OptionsForQuestions.OrderBy(ob => ob.Order).ToList();
+            //}
             return View(model);
         }
         [HttpPost]
@@ -60,7 +58,7 @@ namespace SurveyService.WebUI.Controllers
                 else
                 {
                     //optionId = item.Value["optionId"].ToString();
-                    answer.Create(new SurveyService.Models.Answer() { SelectedOptionId = item.Value["optionId"].ToString(), UserId = userId }).Wait();
+                    //answer.Create(new SurveyService.Models.Answer() { SelectedOptionId = item.Value["optionId"].ToString(), UserId = userId }).Wait();
                 }
             }
 

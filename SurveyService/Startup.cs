@@ -41,10 +41,10 @@ namespace SurveyService
 
             services.AddDbContext<SurveyServiceDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddTransient<IAnswerRepository, SurveyServiceAnswerRepository>();
+            //services.AddTransient<IAnswerRepository, SurveyServiceAnswerRepository>();
             services.AddTransient<IOptionRepository, SurveyServiceOptionRepository>();
-            services.AddTransient<IOptionsForQuestionRepository, SurveyServiceOptionsForQuestionRepository>();
-            services.AddTransient<IQuestionRepository, SurveyServiceQuestionRepository>();
+            services.AddTransient<IOptionsForAnswerRepository, SurveyServiceOptionsForAnswerRepository>();
+            services.AddTransient<IUserAnswerRepository, SurveyServiceUserAnswerRepository>();
             services.AddTransient<ISurveyRepository, SurveyServiceSurveyRepository>();
             services.AddTransient<ISurveyQuestionRepository, SurveyServiceSurveyQuestionRepository>();
             services.AddTransient<IUserRepository, SurveyServiceUserRepository>();

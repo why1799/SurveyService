@@ -6,17 +6,20 @@ using System.Text;
 
 namespace SurveyService.Models
 {
-    public class Answer
+    public class UserAnswer
     {
         [Key]
         public string Id { get; set; }
+
         [ForeignKey(nameof(User))]
         public string UserId { get; set; }
-
-        [ForeignKey(nameof(OptionsForQuestion))]
-        public string SelectedOptionId { get; set; }
-
         public User User { get; set; }
-        public OptionsForQuestion OptionsForQuestion { get;set;}
+
+        [ForeignKey(nameof(SurveyQuestion))]
+        public string QuestionId { get; set; }
+        public SurveyQuestion SurveyQuestion { get; set; }
+
+        public string OwnAnswerText { get; set; }
+        public ICollection<OptionsForAnswer> OptionsForAnswers { get; set; }
     }
 }
