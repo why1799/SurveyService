@@ -32,7 +32,7 @@ namespace SurveyService.WebUI.Controllers
             return View(model);
         }
         [HttpPost]
-        public void SetResult([FromBody]Newtonsoft.Json.Linq.JObject data)
+        public RedirectResult SetResult([FromBody]Newtonsoft.Json.Linq.JObject data)
         {
             foreach (var item in data)
             {
@@ -40,8 +40,8 @@ namespace SurveyService.WebUI.Controllers
                 string userId = item.Value["userId"].ToString();
                 string optionId = item.Value["optionId"].ToString();
                 answer.Create(new SurveyService.Models.Answer() { SelectedOptionId = optionId, UserId = userId }).Wait();
-                // TODO добавить редирект 
             }
+            return Redirect("SurveyCompleted");
         }
     }
 }

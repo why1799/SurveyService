@@ -20,5 +20,6 @@ namespace SurveyService.Models
 
         public int Order { get; set; }
         public bool IsRequired { get; set; }
+        public bool IsCustomAnswer { get; set; }
     }
 }

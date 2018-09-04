@@ -14,6 +14,10 @@
                     {
                         <li><input type=@(item.Question.Type == 1 ? "radio" : "checkbox") name=@item.Id value=@Option.Id /> @Option.Option.Text</li>
                     }
+                    @if (item.IsCustomAnswer)
+                    {
+                        <li><input type=@(item.Question.Type == 1 ? "radio" : "checkbox") name=@item.Id value="custom" for=@("customAnswer" + item.Id) /> <input id=@("customAnswer" + item.Id) type="text"/></li>
+                    }
                 </ul>
             </div>
         }
