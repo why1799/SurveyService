@@ -6,6 +6,7 @@ using System.Text;
 
 namespace SurveyService.Models
 {
+    [Table("OptionsForQuestions")]
     public class OptionsForQuestion
     {
         [Key]

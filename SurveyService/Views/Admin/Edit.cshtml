@@ -25,9 +25,15 @@
     .rightdiv {
         width: 70%;
     }
+
+    .box {
+        border: 1px solid;
+        width: 700px;
+        margin-top: 1em;
+    }
 </style>
 
-<div style="border:1px solid;width: 700px; margin-top: 1em;">
+<div class="box">
 
     <div class="separate">
         <div class="leftdiv">
@@ -50,9 +56,89 @@
 </div>
 
 <div id="questions">
+    @{
+        var surveyquestions = Model.SurveyQuestion.Where(x => x.SurveyId == Model.Id);
+        for (int i = 0; i < surveyquestions.Count(); ++i)
+        {
+            var surveyquestion = surveyquestions.First(x => x.Order == i);
+    <div id="@surveyquestion.Id" class="box">
+        <div class="separate">
+            <div class="leftdiv">
+                <label class="h4">Название вопроса: </label>
+            </div>
+            <div class="rightdiv">
+                <input class="" style="width:90%;height: 36px;font-size: 20px;" type="text" value="@surveyquestion.Question.Text">
+            </div>
+        </div>
+
+        <div class="separate">
+            <div class="leftdiv">
+                <label class="h5">Выберите тип вопроса: </label>
+            </div>
+            <div class="rightdiv">
+                <select>
+                    @if (surveyquestion.Question.Type == 1)
+                    {
+                        <option selected="selected">Выбор одного ответа из списка</option>
+                        <option>Выбор нескольких ответов из списка</option>
+                    }
+                    else if (surveyquestion.Question.Type == 2)
+                    {
+                        <option>Выбор одного ответа из списка</option>
+                        <option selected="selected">Выбор нескольких ответов из списка</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <div class="separate">
+            <div class="leftdiv">
+                <label class="h5">Добавить вариант другой: </label>
+            </div>
+            <div class="rightdiv">
+                <select>
+                    @if (surveyquestion.IsRequired)
+                    {
+                        <option selected="selected">Да</option>
+                        <option>Нет</option>
+                    }
+                    else
+                    {
+                        <option>Да</option>
+                        <option selected="selected">Нет</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <div id="options">
+            @{
+                var optionsforquestions = surveyquestion.Question.OptionsForQuestions;
+                @foreach (var x in optionsforquestions)
+                {
+                    <div id="@x.OptionId" class="separate">
+                        <div class="leftdiv">
+                            <button type="button" class="btn btn-default" style="margin-right:0.25em;height: 30px;" onclick="RemoveOption('@x.OptionId')">Удалить</button>
+                            <button type="button" class="btn btn-default" style="margin-right: 0.25em;height: 30px;">&#8593;</button>
+                            <button type="button" class="btn btn-default" style="margin-right: 0.25em;height: 30px;">&#8595;</button>
+                            <label class="h5">Ответ: </label>
+                        </div>
+                        <div class="rightdiv">
+                            <input style="width:90%;height: 30px;font-size: 15px;" type="text" value="@x.Option.Text">
+                        </div>
+                    </div>
+                }
+            }
+        </div>
 
 
-
+        <button type="button" class="btn btn-default" style="margin-left:1em" onclick="AddOption('@surveyquestion.QuestionId')">Добавить ответ</button>
+        <button type="button" class="btn btn-default" style="margin-left:0em" onclick="RemoveQuestion('@surveyquestion.Id')">Удалить вопрос</button>
+        <button type="button" class="btn btn-default" style="margin-left:0em">&#8593;</button>
+        <button type="button" class="btn btn-default" style="margin-left:0em">&#8595;</button>
+    </div>
+        }
+    }
 </div>
 
 
@@ -78,9 +164,56 @@
                     }
                 });
             });
+
+            
+
+
         });
 
+        function RemoveQuestion(surveyquestionid) {
+            $.ajax({
+                url: "/Admin/RemoveQuestion",
+                type: "GET",
+                data: { surveyquestionid: surveyquestionid },
+                success: function (data) {
+                    $("#" + data).remove();
+                }
+            });
+        }
 
+        function AddOption(questionid) {
+            $.ajax({
+                url: "/Admin/AddOption",
+                type: "GET",
+                data: { questionid: questionid },
+                success: function (data) {
+
+                    var newoption = "<div id=\"{OPTIONID}\" class=\"separate\">\
+                        <div class=\"leftdiv\">\
+                            <button type=\"button\" class=\"btn btn-default\" style=\"margin-right:1em;height: 30px;\" onclick=\"RemoveOption('{OPTIONID}')\">Удалить</button>\
+                            <label class=\"h5\">Ответ: </label>\
+                        </div>\
+                        <div class=\"rightdiv\">\
+                            <input style=\"width:90%;height: 30px;font-size: 15px;\" type=\"text\" value=\"{TEXT}\">\
+                        </div>\
+                    </div>";
+
+                    newoption = newoption.replace("{OPTIONID}", data.option.id).replace("{OPTIONID}", data.option.id).replace("{TEXT}", data.option.text);
+                    $("#" + data.surveyquestionid).children("#options").append(newoption);
+                }
+            });
+        }
+
+        function RemoveOption(optionid) {
+            $.ajax({
+                url: "/Admin/RemoveOption",
+                type: "GET",
+                data: { optionid: optionid },
+                success: function (data) {
+                    $("#" + data).remove();
+                }
+            });
+        }
 
 
     </script>
