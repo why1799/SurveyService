@@ -1,6 +1,54 @@
-﻿
+﻿@model Survey
 @{
     ViewData["Title"] = "Опрос";
 }
+<h2>@Model.Title</h2>
+<form id="questonForm" asp-controller="Survey" asp-action="SetResult" method="post">
+    <div>
+        @foreach (var item in Model.SurveyQuestion)
+        {
+            <div style="margin-top: 30px;">
+                <h4>@item.Question.Text</h4>
+                <ul class="list-unstyled">
+                    @foreach (var Option in item.Question.OptionsForQuestions)
+                    {
+                        <li><input type=@(item.Question.Type == 1 ? "radio" : "checkbox") name=@item.Id value=@Option.Id /> @Option.Option.Text</li>
+                    }
+                </ul>
+            </div>
+        }
+    </div>
+    <input type="submit" id="submitButton" value="Отправить" style="margin-top:30px;" />
 
-
+</form>
+<script type="text/javascript">
+    $(function () {
+        $('#questonForm').submit(function () {
+            event.preventDefault();
+            var json = '{ ';
+            var inputArr = $('input:radio, input:checkbox');
+            for (var i = 0, index = 0; i < inputArr.length; i++) {
+                if (inputArr[i].checked == true) {
+                    json += ' "' + index++ + '": { "userId": "@Model.CreatedBy", "optionId": "' + inputArr[i].value + '"}, ';
+                }
+            }
+            if (json.length < 3) {
+                alert("error");
+            }
+            json = json.substring(0, json.length - 2) + '}';
+            $.ajax({
+                type: 'POST',
+                url: 'SetResult',
+                data: json,
+                contentType: "application/json",
+                dataType: 'text',
+                success: function () {
+                    alert("Ответы сохранены");
+                },
+                error: function () {
+                    alert("Произошел сбой");
+                }
+            });
+        })
+    })
+</script>

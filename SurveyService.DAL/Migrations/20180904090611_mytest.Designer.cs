@@ -10,8 +10,8 @@ using SurveyService.DAL;
 namespace SurveyService.DAL.Migrations
 {
     [DbContext(typeof(SurveyServiceDbContext))]
-    [Migration("20180903101949_mytest3")]
-    partial class mytest3
+    [Migration("20180904090611_mytest")]
+    partial class mytest
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -109,20 +109,20 @@ namespace SurveyService.DAL.Migrations
 
             modelBuilder.Entity("SurveyService.Models.SurveyQuestion", b =>
                 {
-                    b.Property<string>("QuestionId");
-
-                    b.Property<string>("SurveyId");
-
                     b.Property<string>("Id")
-                        .IsRequired();
+                        .ValueGeneratedOnAdd();
 
                     b.Property<bool>("IsRequired");
 
                     b.Property<int>("Order");
 
-                    b.HasKey("QuestionId", "SurveyId");
+                    b.Property<string>("QuestionId");
 
-                    b.HasAlternateKey("Id");
+                    b.Property<string>("SurveyId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuestionId");
 
                     b.HasIndex("SurveyId");
 
@@ -169,13 +169,11 @@ namespace SurveyService.DAL.Migrations
                 {
                     b.HasOne("SurveyService.Models.Question", "Question")
                         .WithMany("SurveyQuestion")
-                        .HasForeignKey("QuestionId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("QuestionId");
 
                     b.HasOne("SurveyService.Models.Survey", "Survey")
                         .WithMany("SurveyQuestion")
-                        .HasForeignKey("SurveyId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("SurveyId");
                 });
 #pragma warning restore 612, 618
         }

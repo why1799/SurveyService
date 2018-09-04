@@ -11,15 +11,11 @@ namespace SurveyService.Models
     {
         [Key]
         public string Id { get; set; }
-
         [ForeignKey(nameof(Survey))]
         public string SurveyId { get; set; }
-        [ForeignKey("SurveyId")]
         public Survey Survey { get; set; }
-
         [ForeignKey(nameof(Question))]
         public string QuestionId { get; set; }
-        [ForeignKey("QuestionId")]
         public Question Question { get; set; }
 
         public int Order { get; set; }

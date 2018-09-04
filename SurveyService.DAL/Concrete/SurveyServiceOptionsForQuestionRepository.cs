@@ -32,7 +32,7 @@ namespace SurveyService.DAL.Concrete
             return result;
         }
 
-        public IEnumerable<OptionsForQuestion> GetItems()
+        public IQueryable<OptionsForQuestion> GetItems()
         {
             return context.OptionsForQuestions;
         }
