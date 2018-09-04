@@ -10,8 +10,8 @@ using SurveyService.DAL;
 namespace SurveyService.DAL.Migrations
 {
     [DbContext(typeof(SurveyServiceDbContext))]
-    [Migration("20180903080628_mytest")]
-    partial class mytest
+    [Migration("20180904110700_mytest3")]
+    partial class mytest3
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -57,6 +57,8 @@ namespace SurveyService.DAL.Migrations
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("OptionId");
+
+                    b.Property<int>("Order");
 
                     b.Property<string>("QuestionId");
 
@@ -111,6 +113,8 @@ namespace SurveyService.DAL.Migrations
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("IsCustomAnswer");
 
                     b.Property<bool>("IsRequired");
 
@@ -168,11 +172,11 @@ namespace SurveyService.DAL.Migrations
             modelBuilder.Entity("SurveyService.Models.SurveyQuestion", b =>
                 {
                     b.HasOne("SurveyService.Models.Question", "Question")
-                        .WithMany()
+                        .WithMany("SurveyQuestion")
                         .HasForeignKey("QuestionId");
 
                     b.HasOne("SurveyService.Models.Survey", "Survey")
-                        .WithMany()
+                        .WithMany("SurveyQuestion")
                         .HasForeignKey("SurveyId");
                 });
 #pragma warning restore 612, 618

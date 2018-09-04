@@ -11,26 +11,37 @@ namespace SurveyService.WebUI.Controllers
     public class SurveyController : Controller
     {
         ISurveyRepository survey;
+        IAnswerRepository answer;
         ISurveyQuestionRepository surveyQuestion;
-        IQuestionRepository question;
-        IOptionsForQuestionRepository optionsForQuestion;
-        IOptionRepository option;
 
-        public SurveyController(ISurveyRepository survey, ISurveyQuestionRepository surveyQuestion, IQuestionRepository question,
-        IOptionsForQuestionRepository optionsForQuestion, IOptionRepository option)
+        public SurveyController(ISurveyRepository survey, IAnswerRepository answer, ISurveyQuestionRepository surveyQuestion)
         {
             this.survey = survey;
+            this.answer = answer;
             this.surveyQuestion = surveyQuestion;
-            this.question = question;
-            this.optionsForQuestion = optionsForQuestion;
-            this.option = option;
         }
         //GET: /Survey/Index?id=SurveyId
         public IActionResult Index(int? id)
         {
-            var sur = survey.GetItems().Include(ob => ob.SurveyQuestion).Include(ob => ob.SurveyQuestion.First().Question).Where(ob => ob.Id == id.ToString()).FirstOrDefault();
-            //var surq = surveyQuestion.GetItems().Include(ob => ob.Question).Include(ob => ob.Survey).Where(ob => ob.SurveyId == id.ToString()).ToList();
-            return View();
+            var model = survey.GetItems()
+                    .Include(ob => ob.SurveyQuestion)
+                        .ThenInclude(ob => ob.Question)
+                            .ThenInclude(ob => ob.OptionsForQuestions)
+                                .ThenInclude(ob => ob.Option)
+                    .Where(ob => ob.Id == id.ToString()).FirstOrDefault();
+            return View(model);
+        }
+        [HttpPost]
+        public RedirectResult SetResult([FromBody]Newtonsoft.Json.Linq.JObject data)
+        {
+            foreach (var item in data)
+            {
+                
+                string userId = item.Value["userId"].ToString();
+                string optionId = item.Value["optionId"].ToString();
+                answer.Create(new SurveyService.Models.Answer() { SelectedOptionId = optionId, UserId = userId }).Wait();
+            }
+            return Redirect("SurveyCompleted");
         }
     }
 }
