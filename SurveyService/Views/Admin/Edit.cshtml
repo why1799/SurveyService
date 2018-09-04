@@ -1,0 +1,86 @@
+﻿@model Survey
+
+@{
+    ViewData["Title"] = "Редактирование опроса";
+}
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+<style>
+
+    .separate {
+        display: flex;
+        align-items: center;
+        margin: 1em;
+    }
+
+    .leftdiv {
+        width: 30%;
+        float: left;
+        display: flex;
+        justify-content: flex-end;
+        margin-right: 0.5em;
+    }
+
+    .rightdiv {
+        width: 70%;
+    }
+</style>
+
+<div style="border:1px solid;width: 700px; margin-top: 1em;">
+
+    <div class="separate">
+        <div class="leftdiv">
+            <label class="h4">Название опроса: </label>
+        </div>
+        <div class="rightdiv">
+            <input id="SurveyName" class="" style="width:90%;height: 36px;font-size: 20px;" type="text" value="@Model.Title">
+        </div>
+    </div>
+
+    <div class="separate">
+        <div class="leftdiv">
+            <label class="h5">Описание: </label>
+        </div>
+        <div class="rightdiv">
+            <textarea id="SurveyDescription" class="h4" style="width:90%;height:60px;resize:none;">@Model.Description</textarea>
+        </div>
+    </div>
+
+</div>
+
+<div id="questions">
+
+
+
+</div>
+
+
+
+
+    <button id="addquestion" type="button" class="btn btn-default" style="margin:1em">Добавить вопрос</button>
+    <button type="button" class="btn btn-default" style="margin:0em">Сохранить</button>
+
+
+    <script>
+        $(document).ready(function () {
+            $("#addquestion").click(function () {
+                $.ajax({
+                    url: "/Admin/AddQuestion",
+                    type: "GET",
+                    data: { surveyid : "@Model.Id" },
+                    success: function (data) {
+
+                        // alert(JSON.stringify(data)); show entire object in JSON format
+                        /*$.each(data, function (i, obj) {
+                            alert(obj.DivisionId);
+                        });*/
+                    }
+                });
+            });
+        });
+
+
+
+
+    </script>
