@@ -16,7 +16,7 @@
                     }
                     @if (item.IsCustomAnswer)
                     {
-                        <li><input type=@(item.Question.Type == 1 ? "radio" : "checkbox") name=@item.Id value="custom" for=@("customAnswer" + item.Id) /> <input id=@("customAnswer" + item.Id) type="text"/></li>
+                        <li><input type=@(item.Question.Type == 1 ? "radio" : "checkbox") name=@item.Id value="custom" data-questionid="@item.Question.Id" for="@("customAnswer" + item.Id)" /> <input id=@("customAnswer" + item.Id) type="text" /></li>
                     }
                 </ul>
             </div>
@@ -33,7 +33,11 @@
             var inputArr = $('input:radio, input:checkbox');
             for (var i = 0, index = 0; i < inputArr.length; i++) {
                 if (inputArr[i].checked == true) {
-                    json += ' "' + index++ + '": { "userId": "@Model.CreatedBy", "optionId": "' + inputArr[i].value + '"}, ';
+                    if (inputArr[i].value == 'custom') {
+                        json += ' "' + index++ + '": { "userId": "@Model.CreatedBy", "type": "custom", "questionId": "' + inputArr[i].getAttribute('data-questionid') +'", "text": "' + $('#' + inputArr[i].getAttribute('for')).val() + '"}, ';
+                    } else {
+                        json += ' "' + index++ + '": { "userId": "@Model.CreatedBy", "type": "standart", "optionId": "' + inputArr[i].value + '"}, ';
+                    }
                 }
             }
             if (json.length < 3) {
@@ -42,12 +46,17 @@
             json = json.substring(0, json.length - 2) + '}';
             $.ajax({
                 type: 'POST',
-                url: 'SetResult',
+                url: 'SaveResult',
                 data: json,
                 contentType: "application/json",
                 dataType: 'text',
-                success: function () {
-                    alert("Ответы сохранены");
+                success: function (data) {
+                    var res = JSON.parse(data);
+                    if (res.ok) {
+                        window.location = res.newUrl;
+                    } else {
+                        alert("Произошел сбой");
+                    }
                 },
                 error: function () {
                     alert("Произошел сбой");

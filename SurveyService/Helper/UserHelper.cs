@@ -14,7 +14,7 @@ namespace SurveyService.WebUI.Helper
     {
         static public User GetUser(HttpContext context)
         {
-            var user = (WindowsIdentity)context.User.Identity;
+            //var user = (WindowsIdentity)context.User.Identity;
             string DisplayName, Email;
 
             ClaimsPrincipal principal = context.User as ClaimsPrincipal;

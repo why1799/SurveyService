@@ -53,9 +53,9 @@ namespace SurveyService.WebUI.Controllers
             {
                 user = finduser;
             }
-            //var survey = await surveyRepository.Create(new Models.Survey { CreatedBy = user.Id, Title="Новый опрос", DateCreated = DateTime.Now });
+            //var survey = await surveyRepository.Create(new Models.Survey 1{ CreatedBy = user.Id, Title="Новый опрос", DateCreated = DateTime.Now });
 
-            return RedirectToAction("Edit", new { id = "ee76b75c-f8e5-480c-8686-5f319e4d29dd"/*survey.Id*/ });
+            return RedirectToAction("Edit", new { id = "1"/*survey.Id*/ });
         }
 
         public async Task<ActionResult> Edit(string id)
