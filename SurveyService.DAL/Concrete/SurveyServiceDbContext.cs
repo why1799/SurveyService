@@ -7,8 +7,8 @@ namespace SurveyService.DAL
     {
         public SurveyServiceDbContext(DbContextOptions<SurveyServiceDbContext> options) : base(options) {}
         public DbSet<Option> Options { get; set; }
-        public DbSet<OptionsForAnswer> OptionsForQuestions { get; set; }
-        public DbSet<UserAnswer> Questions { get; set; }
+        public DbSet<OptionsForAnswer> OptionsForAnswers { get; set; }
+        public DbSet<UserAnswer> UserAnswers { get; set; }
         public DbSet<Survey> Surveys { get; set; }
         public DbSet<SurveyQuestion> SurveyQuestions { get; set; }
         public DbSet<User> Users { get; set; }

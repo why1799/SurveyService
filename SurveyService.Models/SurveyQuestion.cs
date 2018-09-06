@@ -6,7 +6,6 @@ using System.Text;
 
 namespace SurveyService.Models
 {
-    [Table("SurveyQuestion")]
     public class SurveyQuestion
     {
         [Key]

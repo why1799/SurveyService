@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\20180823171401_Initial.cs" />
     <Compile Remove="Migrations\20180903080021_mytest.cs" />
     <Compile Remove="Migrations\20180903080628_mytest.cs" />
     <Compile Remove="Migrations\20180903091428_mytest2.cs" />

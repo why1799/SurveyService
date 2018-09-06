@@ -10,76 +10,51 @@ using SurveyService.DAL;
 namespace SurveyService.DAL.Migrations
 {
     [DbContext(typeof(SurveyServiceDbContext))]
-    [Migration("20180823171401_Initial")]
-    partial class Initial
+    [Migration("20180906081356_test1")]
+    partial class test1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "2.1.2-rtm-30932")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
-
-            modelBuilder.Entity("SurveyService.Models.Answer", b =>
-                {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("SelectedOptionId");
-
-                    b.Property<string>("UserId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SelectedOptionId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Answers");
-                });
+                .HasAnnotation("Relational:MaxIdentifierLength", 128)
+                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
             modelBuilder.Entity("SurveyService.Models.Option", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<int>("Order");
+
+                    b.Property<string>("QuestionId");
+
                     b.Property<string>("Text");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("QuestionId");
+
                     b.ToTable("Options");
                 });
 
-            modelBuilder.Entity("SurveyService.Models.OptionsForQuestion", b =>
+            modelBuilder.Entity("SurveyService.Models.OptionsForAnswer", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("OptionId");
 
-                    b.Property<string>("QuestionId");
+                    b.Property<string>("UserAnswerId");
 
                     b.HasKey("Id");
 
                     b.HasIndex("OptionId");
 
-                    b.HasIndex("QuestionId");
+                    b.HasIndex("UserAnswerId");
 
                     b.ToTable("OptionsForQuestions");
-                });
-
-            modelBuilder.Entity("SurveyService.Models.Question", b =>
-                {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("Text");
-
-                    b.Property<int>("Type");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Questions");
                 });
 
             modelBuilder.Entity("SurveyService.Models.Survey", b =>
@@ -89,7 +64,9 @@ namespace SurveyService.DAL.Migrations
 
                     b.Property<string>("BannerUrl");
 
-                    b.Property<string>("CreatedBy");
+                    b.Property<string>("CreatedById");
+
+                    b.Property<string>("CreategById");
 
                     b.Property<DateTime>("DateCreated");
 
@@ -99,9 +76,13 @@ namespace SurveyService.DAL.Migrations
 
                     b.Property<string>("Description");
 
+                    b.Property<bool>("IsActive");
+
                     b.Property<string>("Title");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreategById");
 
                     b.ToTable("Surveys");
                 });
@@ -111,21 +92,23 @@ namespace SurveyService.DAL.Migrations
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<bool>("HasOwnAnswer");
+
                     b.Property<bool>("IsRequired");
 
                     b.Property<int>("Order");
 
-                    b.Property<string>("QuestionId");
+                    b.Property<string>("QuestionText");
 
                     b.Property<string>("SurveyId");
 
-                    b.HasKey("Id");
+                    b.Property<int>("Type");
 
-                    b.HasIndex("QuestionId");
+                    b.HasKey("Id");
 
                     b.HasIndex("SurveyId");
 
-                    b.ToTable("SurveyQuestion");
+                    b.ToTable("SurveyQuestions");
                 });
 
             modelBuilder.Entity("SurveyService.Models.User", b =>
@@ -142,37 +125,67 @@ namespace SurveyService.DAL.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("SurveyService.Models.Answer", b =>
+            modelBuilder.Entity("SurveyService.Models.UserAnswer", b =>
                 {
-                    b.HasOne("SurveyService.Models.OptionsForQuestion", "OptionsForQuestion")
-                        .WithMany()
-                        .HasForeignKey("SelectedOptionId");
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd();
 
-                    b.HasOne("SurveyService.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
+                    b.Property<string>("OwnAnswerText");
+
+                    b.Property<string>("QuestionId");
+
+                    b.Property<string>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuestionId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Questions");
                 });
 
-            modelBuilder.Entity("SurveyService.Models.OptionsForQuestion", b =>
+            modelBuilder.Entity("SurveyService.Models.Option", b =>
+                {
+                    b.HasOne("SurveyService.Models.SurveyQuestion", "SurveyQuestion")
+                        .WithMany("Options")
+                        .HasForeignKey("QuestionId");
+                });
+
+            modelBuilder.Entity("SurveyService.Models.OptionsForAnswer", b =>
                 {
                     b.HasOne("SurveyService.Models.Option", "Option")
-                        .WithMany("OptionsForQuestions")
+                        .WithMany("OptionsForAnswers")
                         .HasForeignKey("OptionId");
 
-                    b.HasOne("SurveyService.Models.Question", "Question")
-                        .WithMany("OptionsForQuestions")
-                        .HasForeignKey("QuestionId");
+                    b.HasOne("SurveyService.Models.UserAnswer", "UserAnswer")
+                        .WithMany("OptionsForAnswers")
+                        .HasForeignKey("UserAnswerId");
+                });
+
+            modelBuilder.Entity("SurveyService.Models.Survey", b =>
+                {
+                    b.HasOne("SurveyService.Models.User", "CreategBy")
+                        .WithMany()
+                        .HasForeignKey("CreategById");
                 });
 
             modelBuilder.Entity("SurveyService.Models.SurveyQuestion", b =>
                 {
-                    b.HasOne("SurveyService.Models.Question", "Question")
-                        .WithMany()
+                    b.HasOne("SurveyService.Models.Survey", "Survey")
+                        .WithMany("SurveyQuestion")
+                        .HasForeignKey("SurveyId");
+                });
+
+            modelBuilder.Entity("SurveyService.Models.UserAnswer", b =>
+                {
+                    b.HasOne("SurveyService.Models.SurveyQuestion", "SurveyQuestion")
+                        .WithMany("UserAnswers")
                         .HasForeignKey("QuestionId");
 
-                    b.HasOne("SurveyService.Models.Survey", "Survey")
-                        .WithMany()
-                        .HasForeignKey("SurveyId");
+                    b.HasOne("SurveyService.Models.User", "User")
+                        .WithMany("UserAnswers")
+                        .HasForeignKey("UserId");
                 });
 #pragma warning restore 612, 618
         }
