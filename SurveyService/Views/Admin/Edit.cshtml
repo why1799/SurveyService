@@ -57,7 +57,7 @@
 
 <div id="questions">
     @{
-        var surveyquestions = Model.SurveyQuestion.Where(x => x.SurveyId == Model.Id);
+        var surveyquestions = Model.SurveyQuestion;
         for (int i = 0; i < surveyquestions.Count(); ++i)
         {
             var surveyquestion = surveyquestions.First(x => x.Order == i);
@@ -67,7 +67,7 @@
                 <label class="h4">Название вопроса: </label>
             </div>
             <div class="rightdiv">
-                <input style="width:90%;height: 36px;font-size: 20px;" type="text" value="@surveyquestion.Question.Text">
+                <input style="width:90%;height: 36px;font-size: 20px;" type="text" value="@surveyquestion.QuestionText">
             </div>
         </div>
 
@@ -77,15 +77,23 @@
             </div>
             <div class="rightdiv">
                 <select>
-                    @if (surveyquestion.Question.Type == 1)
+                    @if (surveyquestion.Type == 0)
                     {
                         <option selected="selected">Выбор одного ответа из списка</option>
                         <option>Выбор нескольких ответов из списка</option>
+                        <option>Текстовый ответ</option>
                     }
-                    else if (surveyquestion.Question.Type == 2)
+                    else if (surveyquestion.Type == 1)
                     {
                         <option>Выбор одного ответа из списка</option>
                         <option selected="selected">Выбор нескольких ответов из списка</option>
+                        <option>Текстовый ответ</option>
+                    }
+                    else if (surveyquestion.Type == 2)
+                    {
+                        <option>Выбор одного ответа из списка</option>
+                        <option >Выбор нескольких ответов из списка</option>
+                        <option selected="selected">Текстовый ответ</option>
                     }
                 </select>
             </div>
@@ -97,7 +105,7 @@
             </div>
             <div class="rightdiv">
                 <select>
-                    @if (surveyquestion.IsCustomAnswer)
+                    @if (surveyquestion.HasOwnAnswer)
                     {
                         <option selected="selected">Да</option>
                         <option>Нет</option>
@@ -133,19 +141,19 @@
 
         <div id="options">
             @{
-                var thisoptionsforquestions = surveyquestion.Question.OptionsForQuestions;
-                @for (int j = 0; j < thisoptionsforquestions.Count; ++j)
+                var options = surveyquestion.Options;
+                @for (int j = 0; j < options.Count; ++j)
                 {
-                    var optionsforquestion = thisoptionsforquestions.First(x => x.Order == j);
-                    <div id="@optionsforquestion.OptionId" class="separate">
+                    var option = options.First(x => x.Order == j);
+                    <div id="@option.Id" class="separate">
                         <div class="leftdiv">
-                            <button type="button" class="btn btn-default" style="margin-right:0.25em;height: 30px;" onclick="RemoveOption('@optionsforquestion.OptionId')">Удалить</button>
-                            <button type="button" class="btn btn-default" style="margin-right: 0.25em;height: 30px;" onclick="UpOption('@optionsforquestion.OptionId')">&#8593;</button>
-                            <button type="button" class="btn btn-default" style="margin-right: 0.25em;height: 30px;" onclick="DownOption('@optionsforquestion.OptionId')">&#8595;</button>
+                            <button type="button" class="btn btn-default" style="margin-right:0.25em;height: 30px;" onclick="RemoveOption('@option.Id')">Удалить</button>
+                            <button type="button" class="btn btn-default" style="margin-right: 0.25em;height: 30px;" onclick="UpOption('@option.Id')">&#8593;</button>
+                            <button type="button" class="btn btn-default" style="margin-right: 0.25em;height: 30px;" onclick="DownOption('@option.Id')">&#8595;</button>
                             <label class="h5">Ответ: </label>
                         </div>
                         <div class="rightdiv">
-                            <input style="width:90%;height: 30px;font-size: 15px;" type="text" value="@optionsforquestion.Option.Text">
+                            <input style="width:90%;height: 30px;font-size: 15px;" type="text" value="@option.Text">
                         </div>
                     </div>
                 }
@@ -153,10 +161,10 @@
         </div>
 
 
-        <button type="button" class="btn btn-default" style="margin-left:1em" onclick="AddOption('@surveyquestion.QuestionId')">Добавить ответ</button>
+        <button type="button" class="btn btn-default" style="margin-left:1em" onclick="AddOption('@surveyquestion.Id')">Добавить ответ</button>
         <button type="button" class="btn btn-default" style="margin-left:0em" onclick="RemoveQuestion('@surveyquestion.Id')">Удалить вопрос</button>
-        <button type="button" class="btn btn-default" style="margin-left:0em" onclick="UpQuestion('@surveyquestion.QuestionId')">&#8593;</button>
-        <button type="button" class="btn btn-default" style="margin-left:0em" onclick="DownQuestion('@surveyquestion.QuestionId')">&#8595;</button>
+        <button type="button" class="btn btn-default" style="margin-left:0em" onclick="UpQuestion('@surveyquestion.Id')">&#8593;</button>
+        <button type="button" class="btn btn-default" style="margin-left:0em" onclick="DownQuestion('@surveyquestion.Id')">&#8595;</button>
     </div>
         }
     }

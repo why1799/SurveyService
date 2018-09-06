@@ -16,24 +16,18 @@ namespace SurveyService.WebUI.Controllers
     {
         private IUserRepository userRepository;
         private ISurveyRepository surveyRepository;
-        private IQuestionRepository questionRepository;
         private ISurveyQuestionRepository surveyQuestionRepository;
         private IOptionRepository optionRepository;
-        private IOptionsForQuestionRepository optionsForQuestionRepository;
 
         public AdminController(IUserRepository userRepository,
             ISurveyRepository surveyRepository,
-            IQuestionRepository questionRepository,
             ISurveyQuestionRepository surveyQuestionRepository,
-            IOptionRepository optionRepository,
-            IOptionsForQuestionRepository optionsForQuestionRepository)
+            IOptionRepository optionRepository)
         {
             this.userRepository = userRepository;
             this.surveyRepository = surveyRepository;
-            this.questionRepository = questionRepository;
             this.surveyQuestionRepository = surveyQuestionRepository;
             this.optionRepository = optionRepository;
-            this.optionsForQuestionRepository = optionsForQuestionRepository;
         }
 
         // GET: Admin
@@ -82,9 +76,7 @@ namespace SurveyService.WebUI.Controllers
 
             var sur = surveyRepository.GetItems()
                     .Include(ob => ob.SurveyQuestion)
-                        .ThenInclude(ob => ob.Question)
-                            .ThenInclude(ob => ob.OptionsForQuestions)
-                                .ThenInclude(ob => ob.Option)
+                                .ThenInclude(ob => ob.Options)
                     .Where(ob => ob.Id == id).FirstOrDefault();
 
 
@@ -94,15 +86,16 @@ namespace SurveyService.WebUI.Controllers
 
         public async Task<JsonResult> AddQuestion(string surveyid)
         {
-            var question = await questionRepository.Create(new Question { Text = "Новый вопрос", Type = 1 });
+            /*var question = await questionRepository.Create(new Question { Text = "Новый вопрос", Type = 1 });
             int order = surveyQuestionRepository.GetItems().Where(x => x.SurveyId == surveyid).Count();
             var surveyquestion = await surveyQuestionRepository.Create(new SurveyQuestion { QuestionId = question.Id, IsRequired = false, Order = order, SurveyId = surveyid, IsCustomAnswer = false });
-             return new JsonResult(new { questionid = question.Id, surveyquestionid = surveyquestion.Id, text = question.Text });
+             return new JsonResult(new { questionid = question.Id, surveyquestionid = surveyquestion.Id, text = question.Text });*/
+            return null;
         }
 
         public async Task<JsonResult> RemoveQuestion(string surveyquestionid)
         {
-            var surveyquestion = surveyQuestionRepository.GetItems()
+            /*var surveyquestion = surveyQuestionRepository.GetItems()
                 .Include(x => x.Question)
                 .ThenInclude(x => x.OptionsForQuestions)
                 .ThenInclude(x => x.Option).FirstOrDefault(x => x.Id == surveyquestionid);
@@ -129,12 +122,13 @@ namespace SurveyService.WebUI.Controllers
                 await surveyQuestionRepository.Update(surveyques);
             }
 
-            return new JsonResult(surveyquestionid);
+            return new JsonResult(surveyquestionid);*/
+            return null;
         }
 
         public async Task<JsonResult> UpQuestion(string questionid)
         {
-            var question = questionRepository.GetItems().Include(x => x.SurveyQuestion).FirstOrDefault(x => x.Id == questionid);
+            /*var question = questionRepository.GetItems().Include(x => x.SurveyQuestion).FirstOrDefault(x => x.Id == questionid);
             var thissurveyquestion = question.SurveyQuestion.First(x => x.QuestionId == questionid);
             var surveyquestion = surveyQuestionRepository.GetItems().Include(x => x.Question).FirstOrDefault(x => x.SurveyId == thissurveyquestion.SurveyId && x.Order + 1 == thissurveyquestion.Order);
 
@@ -154,12 +148,13 @@ namespace SurveyService.WebUI.Controllers
             {
                 firstid = thissurveyquestion.Id,
                 secondid = surveyquestion.Id
-            });
+            });*/
+            return null;
         }
 
         public async Task<JsonResult> DownQuestion(string questionid)
         {
-            var question = questionRepository.GetItems().Include(x => x.SurveyQuestion).FirstOrDefault(x => x.Id == questionid);
+            /*var question = questionRepository.GetItems().Include(x => x.SurveyQuestion).FirstOrDefault(x => x.Id == questionid);
             var thissurveyquestion = question.SurveyQuestion.First(x => x.QuestionId == questionid);
             var surveyquestion = surveyQuestionRepository.GetItems().Include(x => x.Question).FirstOrDefault(x => x.SurveyId == thissurveyquestion.SurveyId && x.Order - 1 == thissurveyquestion.Order);
 
@@ -179,21 +174,23 @@ namespace SurveyService.WebUI.Controllers
             {
                 firstid = thissurveyquestion.Id,
                 secondid = surveyquestion.Id
-            });
+            });*/
+            return null;
         }
 
         public async Task<JsonResult> AddOption(string questionid)
         {
-            var option = await optionRepository.Create(new Option {Text = "Вариант ответа" });
+            /*var option = await optionRepository.Create(new Option {Text = "Вариант ответа" });
             var order = optionsForQuestionRepository.GetItems().Where(x => x.QuestionId == questionid).Count();
             await optionsForQuestionRepository.Create(new OptionsForQuestion {OptionId = option.Id, QuestionId = questionid, Order = order });
             var surveyquestion = questionRepository.GetItems().Include(x => x.SurveyQuestion).FirstOrDefault(x => x.Id == questionid).SurveyQuestion.FirstOrDefault(x => x.QuestionId == questionid);
-            return Json(new { option = new Option { Id = option.Id, Text = option.Text }, surveyquestionid = surveyquestion.Id});
+            return Json(new { option = new Option { Id = option.Id, Text = option.Text }, surveyquestionid = surveyquestion.Id});*/
+            return null;
         }
 
         public async Task<JsonResult> RemoveOption(string optionid)
         {
-            var option = optionRepository.GetItems().Include(x => x.OptionsForQuestions).FirstOrDefault(x => x.Id == optionid);
+            /*var option = optionRepository.GetItems().Include(x => x.OptionsForQuestions).FirstOrDefault(x => x.Id == optionid);
             var thisoptionsforquestion = option.OptionsForQuestions.First(x => x.OptionId == optionid);
             await optionRepository.Delete(option);
             await optionsForQuestionRepository.Delete(thisoptionsforquestion);
@@ -205,12 +202,13 @@ namespace SurveyService.WebUI.Controllers
                 await optionsForQuestionRepository.Update(optionsforquestion);
             }
 
-            return new JsonResult(optionid);
+            return new JsonResult(optionid);*/
+            return null;
         }
 
         public async Task<JsonResult> UpOption(string optionid)
         {
-            var option = optionRepository.GetItems().Include(x => x.OptionsForQuestions).FirstOrDefault(x => x.Id == optionid);
+            /*var option = optionRepository.GetItems().Include(x => x.OptionsForQuestions).FirstOrDefault(x => x.Id == optionid);
             var thisoptionsforquestion = option.OptionsForQuestions.First(x => x.OptionId == optionid);
             var optionsforquestion = optionsForQuestionRepository.GetItems().Include(x => x.Option).FirstOrDefault(x => x.QuestionId == thisoptionsforquestion.QuestionId && x.Order + 1 == thisoptionsforquestion.Order);
 
@@ -229,12 +227,13 @@ namespace SurveyService.WebUI.Controllers
             return new JsonResult(new {
                 firstid = thisoptionsforquestion.OptionId,
                 secondid = optionsforquestion.OptionId
-            });
+            });*/
+            return null;
         }
 
         public async Task<JsonResult> DownOption(string optionid)
         {
-            var option = optionRepository.GetItems().Include(x => x.OptionsForQuestions).FirstOrDefault(x => x.Id == optionid);
+            /*var option = optionRepository.GetItems().Include(x => x.OptionsForQuestions).FirstOrDefault(x => x.Id == optionid);
             var thisoptionsforquestion = option.OptionsForQuestions.First(x => x.OptionId == optionid);
             var optionsforquestion = optionsForQuestionRepository.GetItems().Include(x => x.Option).FirstOrDefault(x => x.QuestionId == thisoptionsforquestion.QuestionId && x.Order - 1 == thisoptionsforquestion.Order);
 
@@ -254,7 +253,8 @@ namespace SurveyService.WebUI.Controllers
             {
                 firstid = thisoptionsforquestion.OptionId,
                 secondid = optionsforquestion.OptionId
-            });
+            });*/
+            return null;
         }
 
         /*// POST: Admin/Create
