@@ -18,7 +18,6 @@ namespace SurveyService.Models
         [ForeignKey(nameof(Option))]
         public string OptionId { get; set; }
         public Option Option { get; set; }
-
         public int Order { get; set; }
     }
 }

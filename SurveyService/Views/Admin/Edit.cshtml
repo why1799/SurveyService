@@ -67,7 +67,7 @@
                 <label class="h4">Название вопроса: </label>
             </div>
             <div class="rightdiv">
-                <input class="" style="width:90%;height: 36px;font-size: 20px;" type="text" value="@surveyquestion.Question.Text">
+                <input style="width:90%;height: 36px;font-size: 20px;" type="text" value="@surveyquestion.Question.Text">
             </div>
         </div>
 
@@ -97,6 +97,26 @@
             </div>
             <div class="rightdiv">
                 <select>
+                    @if (surveyquestion.IsCustomAnswer)
+                    {
+                        <option selected="selected">Да</option>
+                        <option>Нет</option>
+                    }
+                    else
+                    {
+                        <option>Да</option>
+                        <option selected="selected">Нет</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        <div class="separate">
+            <div class="leftdiv">
+                <label class="h5">Вопрос обязательный: </label>
+            </div>
+            <div class="rightdiv">
+                <select>
                     @if (surveyquestion.IsRequired)
                     {
                         <option selected="selected">Да</option>
@@ -113,18 +133,19 @@
 
         <div id="options">
             @{
-                var optionsforquestions = surveyquestion.Question.OptionsForQuestions;
-                @foreach (var x in optionsforquestions)
+                var thisoptionsforquestions = surveyquestion.Question.OptionsForQuestions;
+                @for (int j = 0; j < thisoptionsforquestions.Count; ++j)
                 {
-                    <div id="@x.OptionId" class="separate">
+                    var optionsforquestion = thisoptionsforquestions.First(x => x.Order == j);
+                    <div id="@optionsforquestion.OptionId" class="separate">
                         <div class="leftdiv">
-                            <button type="button" class="btn btn-default" style="margin-right:0.25em;height: 30px;" onclick="RemoveOption('@x.OptionId')">Удалить</button>
-                            <button type="button" class="btn btn-default" style="margin-right: 0.25em;height: 30px;">&#8593;</button>
-                            <button type="button" class="btn btn-default" style="margin-right: 0.25em;height: 30px;">&#8595;</button>
+                            <button type="button" class="btn btn-default" style="margin-right:0.25em;height: 30px;" onclick="RemoveOption('@optionsforquestion.OptionId')">Удалить</button>
+                            <button type="button" class="btn btn-default" style="margin-right: 0.25em;height: 30px;" onclick="UpOption('@optionsforquestion.OptionId')">&#8593;</button>
+                            <button type="button" class="btn btn-default" style="margin-right: 0.25em;height: 30px;" onclick="DownOption('@optionsforquestion.OptionId')">&#8595;</button>
                             <label class="h5">Ответ: </label>
                         </div>
                         <div class="rightdiv">
-                            <input style="width:90%;height: 30px;font-size: 15px;" type="text" value="@x.Option.Text">
+                            <input style="width:90%;height: 30px;font-size: 15px;" type="text" value="@optionsforquestion.Option.Text">
                         </div>
                     </div>
                 }
@@ -134,8 +155,8 @@
 
         <button type="button" class="btn btn-default" style="margin-left:1em" onclick="AddOption('@surveyquestion.QuestionId')">Добавить ответ</button>
         <button type="button" class="btn btn-default" style="margin-left:0em" onclick="RemoveQuestion('@surveyquestion.Id')">Удалить вопрос</button>
-        <button type="button" class="btn btn-default" style="margin-left:0em">&#8593;</button>
-        <button type="button" class="btn btn-default" style="margin-left:0em">&#8595;</button>
+        <button type="button" class="btn btn-default" style="margin-left:0em" onclick="UpQuestion('@surveyquestion.QuestionId')">&#8593;</button>
+        <button type="button" class="btn btn-default" style="margin-left:0em" onclick="DownQuestion('@surveyquestion.QuestionId')">&#8595;</button>
     </div>
         }
     }
@@ -144,31 +165,78 @@
 
 
 
-    <button id="addquestion" type="button" class="btn btn-default" style="margin:1em">Добавить вопрос</button>
+    <button type="button" class="btn btn-default" style="margin:1em" onclick="AddQuestion()">Добавить вопрос</button>
     <button type="button" class="btn btn-default" style="margin:0em">Сохранить</button>
 
 
     <script>
         $(document).ready(function () {
-            $("#addquestion").click(function () {
-                $.ajax({
-                    url: "/Admin/AddQuestion",
-                    type: "GET",
-                    data: { surveyid : "@Model.Id" },
-                    success: function (data) {
-
-                        // alert(JSON.stringify(data)); show entire object in JSON format
-                        /*$.each(data, function (i, obj) {
-                            alert(obj.DivisionId);
-                        });*/
-                    }
-                });
-            });
-
-            
-
-
         });
+
+        function AddQuestion() {
+            $.ajax({
+                url: "/Admin/AddQuestion",
+                type: "GET",
+                data: { surveyid: "@Model.Id" },
+                success: function (data) {
+                    var newquestion = "<div id=\"{SURVEYQUESTIONID}\" class=\"box\">\
+        <div class=\"separate\">\
+            <div class=\"leftdiv\">\
+                <label class=\"h4\">Название вопроса: </label>\
+            </div>\
+            <div class=\"rightdiv\">\
+                <input style=\"width:90%;height: 36px;font-size: 20px;\" type=\"text\" value=\"{TEXT}\">\
+            </div>\
+        </div>\
+        <div class=\"separate\">\
+            <div class=\"leftdiv\">\
+                <label class=\"h5\">Выберите тип вопроса: </label>\
+            </div>\
+            <div class=\"rightdiv\">\
+                <select>\
+                    <option selected=\"selected\">Выбор одного ответа из списка</option>\
+                    <option>Выбор нескольких ответов из списка</option>\
+                </select>\
+            </div>\
+        </div>\
+        <div class=\"separate\">\
+            <div class=\"leftdiv\">\
+                <label class=\"h5\">Добавить вариант другой: </label>\
+            </div>\
+            <div class=\"rightdiv\">\
+                <select>\
+                    <option>Да</option>\
+                    <option selected=\"selected\">Нет</option>\
+                </select>\
+            </div>\
+        </div>\
+        <div class=\"separate\">\
+            <div class=\"leftdiv\">\
+                <label class=\"h5\">Вопрос обязательный: </label>\
+            </div>\
+            <div class=\"rightdiv\">\
+                <select>\
+                    <option>Да</option>\
+                    <option selected=\"selected\">Нет</option>\
+                </select>\
+            </div>\
+        </div>\
+        <div id=\"options\">\
+        </div>\
+        <button type=\"button\" class=\"btn btn-default\" style=\"margin-left:1em\" onclick=\"AddOption('{QUESTIONID}')\">Добавить ответ</button>\
+        <button type=\"button\" class=\"btn btn-default\" style=\"margin-left:0em\" onclick=\"RemoveQuestion('{SURVEYQUESTIONID}')\">Удалить вопрос</button>\
+        <button type=\"button\" class=\"btn btn-default\" style=\"margin-left:0em\" onclick=\"UpQuestion('{QUESTIONID}')\">&#8593;</button>\
+        <button type=\"button\" class=\"btn btn-default\" style=\"margin-left:0em\" onclick=\"DownQuestion('{QUESTIONID}')\">&#8595;</button>";
+                    newquestion = newquestion.replace("{SURVEYQUESTIONID}", data.surveyquestionid)
+                        .replace("{SURVEYQUESTIONID}", data.surveyquestionid)
+                        .replace("{QUESTIONID}", data.questionid)
+                        .replace("{QUESTIONID}", data.questionid)
+                        .replace("{QUESTIONID}", data.questionid)
+                        .replace("{TEXT}", data.text);
+                    $("#questions").append(newquestion);
+                }
+            });
+        }
 
         function RemoveQuestion(surveyquestionid) {
             $.ajax({
@@ -177,6 +245,32 @@
                 data: { surveyquestionid: surveyquestionid },
                 success: function (data) {
                     $("#" + data).remove();
+                }
+            });
+        }
+
+        function UpQuestion(questionid) {
+            $.ajax({
+                url: "/Admin/UpQuestion",
+                type: "GET",
+                data: { questionid: questionid },
+                success: function (data) {
+                    if (data != null) {
+                        ChangeDivs(data.firstid, data.secondid);
+                    }
+                }
+            });
+        }
+
+        function DownQuestion(questionid) {
+            $.ajax({
+                url: "/Admin/DownQuestion",
+                type: "GET",
+                data: { questionid: questionid },
+                success: function (data) {
+                    if (data != null) {
+                        ChangeDivs(data.firstid, data.secondid);
+                    }
                 }
             });
         }
@@ -190,7 +284,9 @@
 
                     var newoption = "<div id=\"{OPTIONID}\" class=\"separate\">\
                         <div class=\"leftdiv\">\
-                            <button type=\"button\" class=\"btn btn-default\" style=\"margin-right:1em;height: 30px;\" onclick=\"RemoveOption('{OPTIONID}')\">Удалить</button>\
+                            <button type=\"button\" class=\"btn btn-default\" style=\"margin-right:0.25em;height: 30px;\" onclick=\"RemoveOption('{OPTIONID}')\">Удалить</button>\
+                            <button type=\"button\" class=\"btn btn-default\" style=\"margin-right: 0.25em;height: 30px;\" onclick=\"UpOption('{OPTIONID}')\">&#8593;</button>\
+                            <button type=\"button\" class=\"btn btn-default\" style=\"margin-right: 0.25em;height: 30px;\" onclick=\"DownOption('{OPTIONID}')\">&#8595;</button>\
                             <label class=\"h5\">Ответ: </label>\
                         </div>\
                         <div class=\"rightdiv\">\
@@ -198,7 +294,7 @@
                         </div>\
                     </div>";
 
-                    newoption = newoption.replace("{OPTIONID}", data.option.id).replace("{OPTIONID}", data.option.id).replace("{TEXT}", data.option.text);
+                    newoption = newoption.replace("{OPTIONID}", data.option.id).replace("{OPTIONID}", data.option.id).replace("{OPTIONID}", data.option.id).replace("{OPTIONID}", data.option.id).replace("{TEXT}", data.option.text);
                     $("#" + data.surveyquestionid).children("#options").append(newoption);
                 }
             });
@@ -213,6 +309,43 @@
                     $("#" + data).remove();
                 }
             });
+        }
+
+        function UpOption(optionid) {
+            $.ajax({
+                url: "/Admin/UpOption",
+                type: "GET",
+                data: { optionid: optionid },
+                success: function (data) {
+                    if (data != null) {
+                        ChangeDivs(data.firstid, data.secondid);
+                    }
+                }
+            });
+        }
+
+        function DownOption(optionid) {
+            $.ajax({
+                url: "/Admin/DownOption",
+                type: "GET",
+                data: { optionid: optionid },
+                success: function (data) {
+                    if (data != null) {
+                        ChangeDivs(data.firstid, data.secondid);
+                    }
+                }
+            });
+        }
+
+        function ChangeDivs(firstid, secondid) {
+            var div1 = document.getElementById(firstid);
+            var innerdiv1 = div1.innerHTML;
+            var div2 = document.getElementById(secondid);
+            var innerdiv2 = div2.innerHTML;
+            div1.id = secondid;
+            div2.id = firstid;
+            div1.innerHTML = innerdiv2;
+            div2.innerHTML = innerdiv1;
         }
 
 
