@@ -19,12 +19,13 @@ namespace SurveyService.Controllers
 {
     public class HomeController : Controller
     {
-        private IAnswerRepository answerRepository;
+        //private IAnswerRepository answerRepository;
         private IUserRepository userRepository;
 
-        public HomeController(IAnswerRepository answerRepository, IUserRepository userRepository)
+        public HomeController(//IAnswerRepository answerRepository, 
+            IUserRepository userRepository)
         {
-            this.answerRepository = answerRepository;
+            //this.answerRepository = answerRepository;
             this.userRepository = userRepository;
         }
         public async Task<IActionResult> Index()

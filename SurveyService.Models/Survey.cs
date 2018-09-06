@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace SurveyService.Models
@@ -15,7 +16,12 @@ namespace SurveyService.Models
         public DateTime DateStart { get; set; }
         public DateTime DateExpires { get; set; }
         public DateTime DateCreated { get; set; }
-        public string CreatedBy { get; set; }
+        public bool IsActive { get; set; }
+
+        [ForeignKey(nameof(User))]
+        public string CreatedById { get; set; }
+        public User CreategBy { get; set; }
+
         public ICollection<SurveyQuestion> SurveyQuestion { get; set; }
 
     }

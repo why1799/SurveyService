@@ -11,5 +11,6 @@ namespace SurveyService.Models
         public string Id { get; set; }
         public string Login { get; set; }
         public string DisplayName { get; set; }
+        public ICollection<UserAnswer> UserAnswers { get; set; }
     }
 }

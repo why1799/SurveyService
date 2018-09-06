@@ -11,37 +11,62 @@ namespace SurveyService.WebUI.Controllers
     public class SurveyController : Controller
     {
         ISurveyRepository survey;
-        IAnswerRepository answer;
-        ISurveyQuestionRepository surveyQuestion;
+        IOptionRepository option;
+        IOptionsForAnswerRepository optionsForQuestion;
 
-        public SurveyController(ISurveyRepository survey, IAnswerRepository answer, ISurveyQuestionRepository surveyQuestion)
+        public SurveyController(ISurveyRepository survey, ISurveyQuestionRepository surveyQuestion, 
+            IOptionRepository option, IOptionsForAnswerRepository optionsForQuestion)
         {
             this.survey = survey;
-            this.answer = answer;
-            this.surveyQuestion = surveyQuestion;
+            this.option = option;
+            this.optionsForQuestion = optionsForQuestion;
         }
         //GET: /Survey/Index?id=SurveyId
         public IActionResult Index(int? id)
         {
-            var model = survey.GetItems()
-                    .Include(ob => ob.SurveyQuestion)
-                        .ThenInclude(ob => ob.Question)
-                            .ThenInclude(ob => ob.OptionsForQuestions)
-                                .ThenInclude(ob => ob.Option)
-                    .Where(ob => ob.Id == id.ToString()).FirstOrDefault();
+            var model = survey.GetItems();
+            //        .Include(ob => ob.SurveyQuestion)
+            //            .ThenInclude(ob => ob.Question)
+            //                .ThenInclude(ob => ob.OptionsForQuestions)
+            //                    .ThenInclude(ob => ob.Option)
+            //        .Where(ob => ob.Id == id.ToString()).FirstOrDefault();
+            //model.SurveyQuestion = model.SurveyQuestion.OrderBy(ob => ob.Order).ToList();
+            //foreach (var item in model.SurveyQuestion)
+            //{
+            //    item.Question.OptionsForQuestions = item.Question.OptionsForQuestions.OrderBy(ob => ob.Order).ToList();
+            //}
             return View(model);
         }
         [HttpPost]
-        public RedirectResult SetResult([FromBody]Newtonsoft.Json.Linq.JObject data)
+        public IActionResult SaveResult([FromBody]Newtonsoft.Json.Linq.JObject data)
         {
             foreach (var item in data)
             {
-                
                 string userId = item.Value["userId"].ToString();
-                string optionId = item.Value["optionId"].ToString();
-                answer.Create(new SurveyService.Models.Answer() { SelectedOptionId = optionId, UserId = userId }).Wait();
+                if (item.Value["type"].ToString() == "custom")
+                {
+                //    answer.Create(new SurveyService.Models.Answer() {
+                //        OptionsForQuestion = new SurveyService.Models.OptionsForQuestion()
+                //        {
+                //            Option = new SurveyService.Models.Option() { Text = item.Value["text"].ToString() },
+                //            Order = 999,
+                //            QuestionId = item.Value["questionId"].ToString()
+                //        },
+                //        UserId = userId
+                //    }).Wait();
+                }
+                else
+                {
+                    //optionId = item.Value["optionId"].ToString();
+                    //answer.Create(new SurveyService.Models.Answer() { SelectedOptionId = item.Value["optionId"].ToString(), UserId = userId }).Wait();
+                }
             }
-            return Redirect("SurveyCompleted");
+
+            return Json(new { ok = true, newUrl = Url.Action("SurveyCompleted") });
+        }
+        public IActionResult SurveyCompleted()
+        {
+            return View();
         }
     }
 }

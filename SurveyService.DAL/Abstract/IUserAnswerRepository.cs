@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace SurveyService.DAL.Abstract
 {
-    public interface IQuestionRepository : IRepository<Question>
+    public interface IUserAnswerRepository : IRepository<UserAnswer>
     {
     }
 }
