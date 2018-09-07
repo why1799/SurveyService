@@ -72,13 +72,18 @@ namespace SurveyService
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
-
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Admin}/{action=Create}/{id?}");
+                    template: "{controller=Admin}/{action=Create}");
             });
+            //app.UseMvc(routes =>
+            //{
+            //    routes.MapRoute(
+            //        name: "redirectToSurvey",
+            //        template: "{controller=Survey}/{action=index}/{id?}/{anew?}");
+            //});
         }
     }
 }

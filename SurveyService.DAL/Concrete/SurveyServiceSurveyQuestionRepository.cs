@@ -24,9 +24,21 @@ namespace SurveyService.DAL.Concrete
                 .FirstOrDefaultAsync(x => x.Id == result.Entity.Id);
         }
 
+        public void CreateRange(ICollection<SurveyQuestion> item)
+        {
+            context.SurveyQuestions.AddRangeAsync(item).Wait();
+            context.SaveChangesAsync().Wait();
+        }
+
         public async Task Delete(SurveyQuestion item)
         {
             context.SurveyQuestions.Remove(item);
+            await context.SaveChangesAsync();
+        }
+
+        public async Task DeleteRange(ICollection<SurveyQuestion> item)
+        {
+            context.SurveyQuestions.RemoveRange(item);
             await context.SaveChangesAsync();
         }
 

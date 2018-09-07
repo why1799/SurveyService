@@ -1,3 +1,13 @@
 ﻿<div>
-<h3 style="margin-top: 20%;text-align: center;">Опрос пройден!</h3>
+    <h3 style="margin-top: 20%;text-align: center;">Опрос пройден!</h3>
+    @{
+        var data = new Dictionary<string, string> {
+        {"id", ViewBag.surveyId},
+        {"anew", "true"}
+    };
+    }
+    <div style="text-align:center;">
+        <input type="button" value="Пройти заного" onclick="$('#surveyRef')[0].click();" />
+        <a id="surveyRef" asp-controller="Survey" asp-action="Index" asp-all-route-data="data"></a>
+    </div>
 </div>

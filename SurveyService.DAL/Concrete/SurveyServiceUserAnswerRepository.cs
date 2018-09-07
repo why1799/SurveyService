@@ -20,9 +20,25 @@ namespace SurveyService.DAL.Concrete
             return result.Entity;
         }
 
+        public void CreateRange(ICollection<UserAnswer> item)
+        {
+            context.UserAnswers.AddRangeAsync(item).Wait();
+            context.SaveChangesAsync().Wait();
+        }
+
         public async Task Delete(UserAnswer item)
         {
             context.UserAnswers.Remove(item);
+            await context.SaveChangesAsync();
+        }
+
+        public async Task DeleteRange(ICollection<UserAnswer> item)
+        {
+            foreach (var answer in item)
+            {
+                context.OptionsForAnswers.RemoveRange(context.OptionsForAnswers.Where(ob => ob.UserAnswerId == answer.Id));
+            }
+            context.UserAnswers.RemoveRange(item);
             await context.SaveChangesAsync();
         }
 
