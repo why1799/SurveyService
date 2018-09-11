@@ -24,7 +24,10 @@ namespace SurveyService.WebUI.Controllers
         //GET: /Survey/Index?id=SurveyId
         public IActionResult Index(int? id)
         {
-            var model = survey.GetItems();
+            var model = survey.GetItems()
+                    .Include(ob => ob.SurveyQuestion.OrderBy(u => u.Order))
+                        .ThenInclude(ob => ob.Options.OrderBy(u => u.Order))
+                    .Where(ob => ob.Id == id.ToString()).FirstOrDefault();
             //        .Include(ob => ob.SurveyQuestion)
             //            .ThenInclude(ob => ob.Question)
             //                .ThenInclude(ob => ob.OptionsForQuestions)

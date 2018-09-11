@@ -15,31 +15,31 @@ namespace SurveyService.DAL.Concrete
         }
         public async Task<UserAnswer> Create(UserAnswer item)
         {
-            var result = await context.Questions.AddAsync(item);
+            var result = await context.UserAnswers.AddAsync(item);
             await context.SaveChangesAsync();
             return result.Entity;
         }
 
         public async Task Delete(UserAnswer item)
         {
-            context.Questions.Remove(item);
+            context.UserAnswers.Remove(item);
             await context.SaveChangesAsync();
         }
 
         public async Task<UserAnswer> GetItem(string id)
         {
-            var result = await context.Questions.FindAsync(id);
+            var result = await context.UserAnswers.FindAsync(id);
             return result;
         }
 
         public IQueryable<UserAnswer> GetItems()
         {
-            return context.Questions;
+            return context.UserAnswers;
         }
 
         public async Task<UserAnswer> Update(UserAnswer item)
         {
-            var result = context.Questions.Update(item);
+            var result = context.UserAnswers.Update(item);
             await context.SaveChangesAsync();
             return result.Entity;
         }
