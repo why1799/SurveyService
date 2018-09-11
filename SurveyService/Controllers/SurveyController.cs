@@ -30,7 +30,7 @@ namespace SurveyService.WebUI.Controllers
             {
                 return RedirectToAction("SurveyCompleted", new { @surveyId = id });
             }
-            Models.Survey model;
+            SurveyService.Models.Survey model;
             // Не очень красивый кусок кода с выборкой из базы ( узнать как сделать лучше) 
             if (anew)
             {
@@ -90,13 +90,13 @@ namespace SurveyService.WebUI.Controllers
             {
                 userAnswer.DeleteRange(userAnswer.GetItems().Where(ob => ob.UserId == user.Id).ToList()).Wait();
             }
-            List<Models.UserAnswer> answersList = new List<Models.UserAnswer>(); 
+            List<SurveyService.Models.UserAnswer> answersList = new List<SurveyService.Models.UserAnswer>(); 
             foreach (var item in data.GetValue("data"))
             {
                 var answer = answersList.Where(ob => ob.QuestionId == item.First["questionId"].ToString()).FirstOrDefault();
                 if (answer == null)
                 {
-                    answer = new Models.UserAnswer() { QuestionId = item.First["questionId"].ToString(), UserId = user.Id, OptionsForAnswers = new List<Models.OptionsForAnswer>() };
+                    answer = new SurveyService.Models.UserAnswer() { QuestionId = item.First["questionId"].ToString(), UserId = user.Id, OptionsForAnswers = new List<SurveyService.Models.OptionsForAnswer>() };
                     answersList.Add(answer);
                 }
                 if (item.First["type"].ToString() == "custom") // кастомный ответ (пользователь вводит текст в поле ответа)
@@ -105,7 +105,7 @@ namespace SurveyService.WebUI.Controllers
                 }
                 else // стандартный ответ (выбран из списка ответов)
                 {
-                    answer.OptionsForAnswers.Add(new Models.OptionsForAnswer() { OptionId = item.First["optionId"].ToString() });
+                    answer.OptionsForAnswers.Add(new SurveyService.Models.OptionsForAnswer() { OptionId = item.First["optionId"].ToString() });
                 }
             }
             userAnswer.CreateRange(answersList);

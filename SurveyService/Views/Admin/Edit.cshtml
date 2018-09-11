@@ -28,7 +28,7 @@
 
     .box {
         border: 1px solid;
-        width: 700px;
+        width: 742px;
         margin-top: 1em;
     }
 </style>
@@ -172,15 +172,29 @@
 
 
 
-
-<button type="button" class="btn btn-default" style="margin:1em" onclick="AddQuestion()">Добавить вопрос</button>
+@Html.ActionLink("Вернуться к списку опросов", "Surveys", "Admin", new { id = Model.Id}, new { @class = "btn btn-default", @style = "margin-left:0em" })
+<button type="button" class="btn btn-default" style="margin:0.5em" onclick="RemoveSurvey('@Model.Id')">Удалить опрос</button>
+<button type="button" class="btn btn-default" style="margin:0em" onclick="AddQuestion()">Добавить вопрос</button>
 <button type="button" class="btn btn-default" style="margin:0em" onclick="Save()">Сохранить</button>
-@Html.ActionLink("Посмотреть опрос", "Index", "Survey", new { Model.Id }, new { @class = "btn btn-default", @style = "margin-left:1em" }) 
+@Html.ActionLink("Посмотреть опрос", "Index", "Survey", new { Model.Id }, new { @class = "btn btn-default", @style = "margin-left:0.5em" })
 
 
 <script>
         $(document).ready(function () {
+    });
+
+    function RemoveSurvey(surveyid) {
+        $.ajax({
+            url: "/Admin/RemoveSurvey",
+            type: "GET",
+            data: { id: surveyid },
+            success: function (data) {
+                window.location.href = '@Url.Action("Surveys", "Admin")';
+            }
         });
+    }
+
+    
 
         function AddQuestion() {
             $.ajax({

@@ -1,0 +1,100 @@
+﻿@model SurveyService.WebUI.Models.SurveysModel
+
+
+@{
+    ViewData["Title"] = "Опросы";
+}
+
+<style>
+    .box {
+        border: 1px solid;
+        width: 700px;
+        margin-top: 1em;
+    }
+</style>
+
+@Html.ActionLink("Создать опрос", "Create", "Admin", new { }, new { @class = "btn btn-default", @style = "margin:1em" })
+<br>
+
+@foreach (var survey in Model.surveys)
+{
+    <div id="@survey.Id" class="box">
+        <a href='@Url.Action("Edit", "Admin", new { id = survey.Id })' class="h3" style="margin:1em">@survey.Title</a><br>
+        <p style="margin-left:1.75em;margin-top:0.5em;margin-bottom:0.2em;">Создатель: @survey.CreatedBy.DisplayName</p>
+        <p style="margin-left:1.75em;margin-bottom:0em;">Дата создания: @survey.DateCreated.ToString("dd.MM.yyyy HH:mm")</p>
+        @Html.ActionLink("Редактировать опрос", "Edit", "Admin", new { id = @survey.Id }, new { @class = "btn btn-default", @style = "margin:1em" })
+        <button type="button" class="btn btn-default" style="margin:0em" onclick="RemoveSurvey('@survey.Id')">Удалить опрос</button>
+        @Html.ActionLink("Посмотреть опрос", "Index", "Survey", new { survey.Id }, new { @class = "btn btn-default", @style = "margin-left:0.5em" })
+    </div>
+}
+
+@if (Model.pages > 1)
+{
+    <br>
+    <div id="paging" class="btn-group pull-left">
+
+        @if (Model.page == 1)
+        {
+            <a href="#" class="btn btn-default">&lt;- Предыдущая</a>
+        }
+        else
+        {
+            <a href='@Url.Action("Surveys", "Admin", new { page = Model.page - 1 })' class="btn btn-default">&lt;- Предыдущая</a>
+        }
+
+        @if (Model.page == Model.pages)
+        {
+            <a href="#" class="btn btn-default">Следующая -&gt;</a>
+        }
+        else
+        {
+            <a href='@Url.Action("Surveys", "Admin", new { page = Model.page + 1 })' class="btn btn-default">Следующая -&gt;</a>
+        }
+        <br><br>
+        @{
+            bool firtsspace = false;
+            bool secondspace = false;
+            for (int i = 1; i <= Model.pages; i++)
+            {
+                if (i == 1 || i == 2 || i == Model.pages || i == Model.pages - 1 || i == Model.page - 1 || i == Model.page || i == Model.page + 1)
+                {
+                    if (i == Model.page)
+                    {
+                        <a href="#" class="selected btn-primary btn btn-default">@i.ToString()</a>
+                    }
+                    else
+                    {
+                        <a href='@Url.Action("Surveys", "Admin", new { page = i })' class="btn btn-default">@i.ToString()</a>
+                    }
+                }
+                else
+                {
+                    bool wasfirst = i < Model.page && !firtsspace;
+                    bool wassecond = i > Model.page && !secondspace;
+                    if (wasfirst || wassecond)
+                    {
+                        firtsspace = wasfirst ? true : firtsspace;
+                        secondspace = wassecond ? true : secondspace;
+                        <a href="#" class="btn btn-default">...</a>
+                    }
+                }
+            }
+        }
+
+
+    </div><br><br><br>
+            }
+
+
+<script>
+    function RemoveSurvey(surveyid) {
+        $.ajax({
+            url: "/Admin/RemoveSurvey",
+            type: "GET",
+            data: { id: surveyid },
+            success: function (data) {
+                location = location;
+            }
+        });
+    }
+</script>

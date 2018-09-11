@@ -30,19 +30,6 @@ namespace SurveyService.WebUI.Controllers
             this.optionRepository = optionRepository;
         }
 
-        // GET: Admin
-        public ActionResult Index()
-        {
-
-            return View();
-        }
-
-        // GET: Admin/Details/5
-        public ActionResult Details(int id)
-        {
-            return View();
-        }
-
         // GET: Admin/Create
         public async Task<ActionResult> Create()
         {
@@ -56,9 +43,20 @@ namespace SurveyService.WebUI.Controllers
             {
                 user = finduser;
             }
-            //var survey = await surveyRepository.Create(new Models.Survey { CreatedById = user.Id, Title="Новый опрос", DateCreated = DateTime.Now });
 
-            return RedirectToAction("Edit", new { id = "c7f0f21e-7c7c-45bf-a149-aa7602db9432"/*survey.Id*/ });
+            var survey = await surveyRepository.Create(new Survey { CreatedById = user.Id, Title="Новый опрос", DateCreated = DateTime.Now });
+            return RedirectToAction("Edit", new { id = survey.Id });
+        }
+
+        public async Task<JsonResult> RemoveSurvey(string id)
+        {
+            var survey = surveyRepository.GetItems().Include(x => x.SurveyQuestion).FirstOrDefault(x => x.Id == id);
+            foreach(var x in survey.SurveyQuestion.ToList())
+            {
+                await RemoveQuestion(x.Id);
+            }
+            await surveyRepository.Delete(survey);
+            return new JsonResult(id);
         }
 
         public async Task<ActionResult> Edit(string id)
@@ -87,7 +85,7 @@ namespace SurveyService.WebUI.Controllers
         public async Task<JsonResult> AddQuestion(string surveyid)
         {
             int order = surveyQuestionRepository.GetItems().Where(x => x.SurveyId == surveyid).Count();
-            var question = await surveyQuestionRepository.Create(new SurveyQuestion { QuestionText = "Новый вопрос", HasOwnAnswer = false, IsRequired = false, SurveyId = surveyid, Type = 0, Order = order});
+            var question = await surveyQuestionRepository.Create(new SurveyQuestion { QuestionText = "Новый вопрос", HasOwnAnswer = false, IsRequired = false, SurveyId = surveyid, Type = 0, Order = order });
             return new JsonResult(new { surveyquestionid = question.Id, text = question.QuestionText });
         }
 
@@ -103,7 +101,7 @@ namespace SurveyService.WebUI.Controllers
             }
 
             var questions = surveyQuestionRepository.GetItems().Where(x => x.SurveyId == question.SurveyId && x.Order > question.Order).ToList();
-            foreach(var curquestion in questions)
+            foreach (var curquestion in questions)
             {
                 curquestion.Order--;
                 await surveyQuestionRepository.Update(curquestion);
@@ -163,7 +161,7 @@ namespace SurveyService.WebUI.Controllers
         public async Task<JsonResult> AddOption(string surveyquestionid)
         {
             var order = optionRepository.GetItems().Where(x => x.QuestionId == surveyquestionid).Count();
-            var option = await optionRepository.Create(new Option {Text = "Вариант ответа", Order = order, QuestionId = surveyquestionid });
+            var option = await optionRepository.Create(new Option { Text = "Вариант ответа", Order = order, QuestionId = surveyquestionid });
             return Json(new { option = new Option { Id = option.Id, Text = option.Text }, surveyquestionid });
         }
 
@@ -199,7 +197,8 @@ namespace SurveyService.WebUI.Controllers
             await optionRepository.Update(secondoption);
 
 
-            return new JsonResult(new {
+            return new JsonResult(new
+            {
                 firstid = firstoption.Id,
                 secondid = secondoption.Id
             });
@@ -234,14 +233,10 @@ namespace SurveyService.WebUI.Controllers
         {
             var survey = await surveyRepository.GetItem(id);
             survey.Title = title;
-            if(description == null)
-            {
-                description = "";
-            }
             survey.Description = description;
             await surveyRepository.Update(survey);
 
-            for(int i = 0; i < lines.Length; i++)
+            for (int i = 0; i < lines.Length; i++)
             {
                 var question = await surveyQuestionRepository.GetItem(lines[i][0]);
                 question.QuestionText = lines[i][1];
@@ -249,7 +244,7 @@ namespace SurveyService.WebUI.Controllers
                 question.HasOwnAnswer = bool.Parse(lines[i][3]);
                 question.IsRequired = bool.Parse(lines[i][4]);
                 await surveyQuestionRepository.Update(question);
-                for(int j = 5; j < lines[i].Length; j += 2)
+                for (int j = 5; j < lines[i].Length; j += 2)
                 {
                     var option = await optionRepository.GetItem(lines[i][j]);
                     option.Text = lines[i][j + 1];
@@ -259,71 +254,27 @@ namespace SurveyService.WebUI.Controllers
             return Json(new { data = 0 });
         }
 
-        /*// POST: Admin/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public ActionResult Surveys(int page = 1, string id = "")
         {
-            try
+            int surveysperpage = 10;
+            var surveys = surveyRepository.GetItems().Include(x => x.CreatedBy).OrderBy(x => x.DateCreated).ToList();
+            surveys.Reverse();
+            if(id != "")
             {
-                // TODO: Add insert logic here
-
-                return RedirectToAction(nameof(Index));
+                int index = surveys.FindIndex(x => x.Id == id) + 1;
+                page = (int)Math.Ceiling(index / (double)surveysperpage);
             }
-            catch
+            if (page < 1)
             {
-                return View();
+                page = 1;
             }
-        }*/
-
-        /* // GET: Admin/Edit/5
-         public ActionResult Edit(int id)
-         {
-             return View();
-         }
-
-         // POST: Admin/Edit/5
-         [HttpPost]
-         [ValidateAntiForgeryToken]
-         public ActionResult Edit(int id, IFormCollection collection)
-         {
-             try
-             {
-                 // TODO: Add update logic here
-
-                 return RedirectToAction(nameof(Index));
-             }
-             catch
-             {
-                 return View();
-             }
-         }*/
-
-        // GET: Admin/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
+            int pages = (int)Math.Ceiling(surveys.Count / (double)surveysperpage);
+            if(page > pages)
+            {
+                page = pages;
+            }
+            return View(new Models.SurveysModel { page = page, pages = pages, surveys = surveys.Skip((page - 1) * surveysperpage).Take(surveysperpage).ToList() });
         }
 
-        // POST: Admin/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                // TODO: Add delete logic here
-
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
-    }
-    public class TestLines
-    {
-        public string[] lines { get; set; }
     }
 }
