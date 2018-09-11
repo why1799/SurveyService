@@ -20,9 +20,21 @@ namespace SurveyService.DAL.Concrete
             return result.Entity;
         }
 
+        public void CreateRange(ICollection<OptionsForAnswer> item)
+        {
+            context.OptionsForAnswers.AddRangeAsync(item).Wait();
+            context.SaveChangesAsync().Wait();
+        }
+
         public async Task Delete(OptionsForAnswer item)
         {
             context.OptionsForAnswers.Remove(item);
+            await context.SaveChangesAsync();
+        }
+
+        public async Task DeleteRange(ICollection<OptionsForAnswer> item)
+        {
+            context.OptionsForAnswers.RemoveRange(item);
             await context.SaveChangesAsync();
         }
 

@@ -2,51 +2,79 @@
 @{
     ViewData["Title"] = "Опрос";
 }
-<h2>@Model.Title</h2>
-<form id="questonForm" asp-controller="Survey" asp-action="SetResult" method="post">
-    <div>
-        @foreach (var item in Model.SurveyQuestion)
-        {
-        <div style="margin-top: 30px;">
-            @*<h4>@item.Question.Text</h4>
-        <ul class="list-unstyled">
-            @foreach (var Option in item.Question.OptionsForQuestions)
-            {
-                <li><input type=@(item.Question.Type == 1 ? "radio" : "checkbox") name=@item.Id value=@Option.Id /> @Option.Option.Text</li>
-            }
-            @if (item.IsCustomAnswer)
-            {
-                <li><input type="@item.Question.Type" name=@item.Id value="custom" data-questionid="@item.Question.Id" for="@("customAnswer" + item.Id)" /> <input id=@("customAnswer" + item.Id) type="text" /></li>
-            }
-        </ul>*@
-        </div>
-        }
-    </div>
-    <input type="submit" id="submitButton" value="Отправить" style="margin-top:30px;" />
+<style>
+    .contentBox div:nth-child(2n) {
+        background-color: #D2D2D2;
+    }
 
-</form>
+    .container.body-content { /*убрал отступы в мастерстранице*/
+        margin: 0;
+        padding: 0;
+        width: 100%;
+    }
+</style>
+<div>
+    <h2 style="text-align: center;">@Model.Title</h2>
+    <form id="questonForm" asp-controller="Survey" asp-action="SetResult" method="post">
+        <div class="contentBox">
+            @foreach (var question in Model.SurveyQuestion)
+            {
+                <div style="padding: 15px 30px;">
+                    <h4>
+                        @question.QuestionText@if (question.IsRequired)
+                        {
+                            <span class="IsRequired" id="@question.Id" style="color:red;">*</span>
+                        }
+                    </h4>
+                    <ul class="list-unstyled">
+                        @foreach (var Option in question.Options)
+                        {
+                            <li>
+                                <input type=@(question.Type == 0 ? "radio" : "checkbox") name=@question.Id value=@Option.Id
+                                       @(question.UserAnswers?.SingleOrDefault()?.OptionsForAnswers?.Any(ob => ob.OptionId == Option.Id) == true ? "checked" : "") /> @Option.Text
+                                </li>
+                            }
+                        @if (question.HasOwnAnswer)
+                        {
+                            <li>
+                                <input type="@(question.Type == 0 ? "radio" : "checkbox")" name=@question.Id value="custom" data-questionid="@question.Id"
+                                       for="@("customAnswer" + question.Id)" @(string.IsNullOrEmpty(question.UserAnswers?.SingleOrDefault()?.OwnAnswerText) == false ? "checked" : "") />
+                                <input id=@("customAnswer" + question.Id) type="text" value="@(question.UserAnswers?.SingleOrDefault()?.OwnAnswerText)" />
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+        </div>
+        <input type="submit" id="submitButton" value="Отправить" style="margin-top:30px;" />
+    </form>
+</div>
 <script type="text/javascript">
     $(function () {
         $('#questonForm').submit(function () {
             event.preventDefault();
-            var json = '{ ';
+            if (!validate()) {
+                alert('Пожалуйста ответьте на все обязательные вопросы.');
+                return;
+            }
+            var json = '{ "surveyId": "@Model.Id", "anew": "@ViewBag.anew", "data": { ';
             var inputArr = $('input:radio, input:checkbox');
             for (var i = 0, index = 0; i < inputArr.length; i++) {
-                @*if (inputArr[i].checked == true) {
+                if (inputArr[i].checked == true) {
                     if (inputArr[i].value == 'custom') {
-                        json += ' "' + index++ + '": { "userId": "@Model.CreatedBy", "type": "custom", "questionId": "' + inputArr[i].getAttribute('data-questionid') +'", "text": "' + $('#' + inputArr[i].getAttribute('for')).val() + '"}, ';
+                        json += ' "' + index++ + '": { "type": "custom", "questionId": "' + inputArr[i].getAttribute('name') +'", "text": "' + $('#' + inputArr[i].getAttribute('for')).val() + '"}, ';
                     } else {
-                        json += ' "' + index++ + '": { "userId": "@Model.CreatedBy", "type": "standart", "optionId": "' + inputArr[i].value + '"}, ';
+                        json += ' "' + index++ + '": { "type": "standart", "questionId": "' + inputArr[i].getAttribute('name') +'", "optionId": "' + inputArr[i].value + '"}, ';
                     }
-                }*@
+                }
             }
             if (json.length < 3) {
                 alert("error");
             }
-            json = json.substring(0, json.length - 2) + '}';
+            json = json.substring(0, json.length - 2) + '}}';
             $.ajax({
                 type: 'POST',
-                url: 'SaveResult',
+                url:  '@Url.Action("SaveResult", "Survey")',//'SaveResult',
                 data: json,
                 contentType: "application/json",
                 dataType: 'text',
@@ -63,5 +91,14 @@
                 }
             });
         })
+        function validate() {
+            var question = $('.IsRequired');
+            for (var i = 0; i < question.length; i++) {
+                if ($('input[name="' + question[i].id + '"]:checked').length < 1) {
+                    return false;
+                }
+            }
+            return true;
+        }
     })
 </script>
