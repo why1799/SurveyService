@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SurveyService.DAL.Abstract;
@@ -23,6 +24,7 @@ namespace SurveyService.WebUI.Controllers
             this.userRepository = userRepository;
         }
         //GET: /Survey/Index?id=SurveyId
+        [Authorize(Roles = "admin")]
         public IActionResult Index(string id, bool anew = false)
         {
             var user = userRepository.GetItems().SingleOrDefault(x => x.Login == Helper.UserHelper.GetUser(HttpContext).Login);

@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SurveyService.DAL;
 
 namespace SurveyService.DAL.Migrations
 {
     [DbContext(typeof(SurveyServiceDbContext))]
-    partial class SurveyServiceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180911122125_test51")]
+    partial class test51
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
