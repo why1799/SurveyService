@@ -25,9 +25,15 @@
     .rightdiv {
         width: 70%;
     }
+
+    .box {
+        border: 1px solid;
+        width: 742px;
+        margin-top: 1em;
+    }
 </style>
 
-<div style="border:1px solid;width: 700px; margin-top: 1em;">
+<div class="box">
 
     <div class="separate">
         <div class="leftdiv">
@@ -50,37 +56,384 @@
 </div>
 
 <div id="questions">
+    @{
+        var surveyquestions = Model.SurveyQuestion;
+        for (int i = 0; i < surveyquestions.Count(); ++i)
+        {
+            var surveyquestion = surveyquestions.First(x => x.Order == i);
+            <div id="@surveyquestion.Id" class="box">
+                <div class="separate">
+                    <div class="leftdiv">
+                        <label class="h4">Название вопроса: </label>
+                    </div>
+                    <div class="rightdiv">
+                        <input style="width:90%;height: 36px;font-size: 20px;" type="text" value="@surveyquestion.QuestionText">
+                    </div>
+                </div>
+
+                <div class="separate">
+                    <div class="leftdiv">
+                        <label class="h5">Выберите тип вопроса: </label>
+                    </div>
+                    <div class="rightdiv">
+                        <select>
+                            @if (surveyquestion.Type == 0)
+                            {
+                                <option selected="selected">Выбор одного ответа из списка</option>
+                                <option>Выбор нескольких ответов из списка</option>
+                                <option>Текстовый ответ</option>
+                            }
+                            else if (surveyquestion.Type == 1)
+                            {
+                                <option>Выбор одного ответа из списка</option>
+                                <option selected="selected">Выбор нескольких ответов из списка</option>
+                                <option>Текстовый ответ</option>
+                            }
+                            else if (surveyquestion.Type == 2)
+                            {
+                                <option>Выбор одного ответа из списка</option>
+                                <option>Выбор нескольких ответов из списка</option>
+                                <option selected="selected">Текстовый ответ</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="separate">
+                    <div class="leftdiv">
+                        <label class="h5">Добавить вариант другой: </label>
+                    </div>
+                    <div class="rightdiv">
+                        <select>
+                            @if (surveyquestion.HasOwnAnswer)
+                            {
+                                <option selected="selected">Да</option>
+                                <option>Нет</option>
+                            }
+                            else
+                            {
+                                <option>Да</option>
+                                <option selected="selected">Нет</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="separate">
+                    <div class="leftdiv">
+                        <label class="h5">Вопрос обязательный: </label>
+                    </div>
+                    <div class="rightdiv">
+                        <select>
+                            @if (surveyquestion.IsRequired)
+                            {
+                                <option selected="selected">Да</option>
+                                <option>Нет</option>
+                            }
+                            else
+                            {
+                                <option>Да</option>
+                                <option selected="selected">Нет</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div id="options">
+                    @{
+                        var options = surveyquestion.Options;
+                        @for (int j = 0; j < options.Count; ++j)
+                        {
+                            var option = options.First(x => x.Order == j);
+                            <div id="@option.Id" class="separate">
+                                <div class="leftdiv">
+                                    <button type="button" class="btn btn-default" style="margin-right:0.25em;height: 30px;" onclick="RemoveOption('@option.Id')">Удалить</button>
+                                    <button type="button" class="btn btn-default" style="margin-right: 0.25em;height: 30px;" onclick="UpOption('@option.Id')">&#8593;</button>
+                                    <button type="button" class="btn btn-default" style="margin-right: 0.25em;height: 30px;" onclick="DownOption('@option.Id')">&#8595;</button>
+                                    <label class="h5">Ответ: </label>
+                                </div>
+                                <div class="rightdiv">
+                                    <input style="width:90%;height: 30px;font-size: 15px;" type="text" value="@option.Text">
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
 
 
-
+                <button type="button" class="btn btn-default" style="margin-left:1em" onclick="AddOption('@surveyquestion.Id')">Добавить ответ</button>
+                <button type="button" class="btn btn-default" style="margin-left:0em" onclick="RemoveQuestion('@surveyquestion.Id')">Удалить вопрос</button>
+                <button type="button" class="btn btn-default" style="margin-left:0em" onclick="UpQuestion('@surveyquestion.Id')">&#8593;</button>
+                <button type="button" class="btn btn-default" style="margin-left:0em" onclick="DownQuestion('@surveyquestion.Id')">&#8595;</button>
+            </div>
+        }
+    }
 </div>
 
 
 
+@Html.ActionLink("Вернуться к списку опросов", "Surveys", "Admin", new { id = Model.Id}, new { @class = "btn btn-default", @style = "margin-left:0em" })
+<button type="button" class="btn btn-default" style="margin:0.5em" onclick="RemoveSurvey('@Model.Id')">Удалить опрос</button>
+<button type="button" class="btn btn-default" style="margin:0em" onclick="AddQuestion()">Добавить вопрос</button>
+<button type="button" class="btn btn-default" style="margin:0em" onclick="Save()">Сохранить</button>
+@Html.ActionLink("Посмотреть опрос", "Index", "Survey", new { Model.Id }, new { @class = "btn btn-default", @style = "margin-left:0.5em" })
 
-    <button id="addquestion" type="button" class="btn btn-default" style="margin:1em">Добавить вопрос</button>
-    <button type="button" class="btn btn-default" style="margin:0em">Сохранить</button>
 
-
-    <script>
+<script>
         $(document).ready(function () {
-            $("#addquestion").click(function () {
-                $.ajax({
-                    url: "/Admin/AddQuestion",
-                    type: "GET",
-                    data: { surveyid : "@Model.Id" },
-                    success: function (data) {
+    });
 
-                        // alert(JSON.stringify(data)); show entire object in JSON format
-                        /*$.each(data, function (i, obj) {
-                            alert(obj.DivisionId);
-                        });*/
+    function RemoveSurvey(surveyid) {
+        $.ajax({
+            url: "/Admin/RemoveSurvey",
+            type: "GET",
+            data: { id: surveyid },
+            success: function (data) {
+                window.location.href = '@Url.Action("Surveys", "Admin")';
+            }
+        });
+    }
+
+    
+
+        function AddQuestion() {
+            $.ajax({
+                url: "/Admin/AddQuestion",
+                type: "GET",
+                data: { surveyid: "@Model.Id" },
+                success: function (data) {
+                    var newquestion = "<div id=\"{SURVEYQUESTIONID}\" class=\"box\">\
+        <div class=\"separate\">\
+            <div class=\"leftdiv\">\
+                <label class=\"h4\">Название вопроса: </label>\
+            </div>\
+            <div class=\"rightdiv\">\
+                <input style=\"width:90%;height: 36px;font-size: 20px;\" type=\"text\" value=\"{TEXT}\">\
+            </div>\
+        </div>\
+        <div class=\"separate\">\
+            <div class=\"leftdiv\">\
+                <label class=\"h5\">Выберите тип вопроса: </label>\
+            </div>\
+            <div class=\"rightdiv\">\
+                <select>\
+                    <option selected=\"selected\">Выбор одного ответа из списка</option>\
+                    <option>Выбор нескольких ответов из списка</option>\
+                    <option>Текстовый ответ</option>\
+                </select>\
+            </div>\
+        </div>\
+        <div class=\"separate\">\
+            <div class=\"leftdiv\">\
+                <label class=\"h5\">Добавить вариант другой: </label>\
+            </div>\
+            <div class=\"rightdiv\">\
+                <select>\
+                    <option>Да</option>\
+                    <option selected=\"selected\">Нет</option>\
+                </select>\
+            </div>\
+        </div>\
+        <div class=\"separate\">\
+            <div class=\"leftdiv\">\
+                <label class=\"h5\">Вопрос обязательный: </label>\
+            </div>\
+            <div class=\"rightdiv\">\
+                <select>\
+                    <option>Да</option>\
+                    <option selected=\"selected\">Нет</option>\
+                </select>\
+            </div>\
+        </div>\
+        <div id=\"options\">\
+        </div>\
+        <button type=\"button\" class=\"btn btn-default\" style=\"margin-left:1em\" onclick=\"AddOption('{SURVEYQUESTIONID}')\">Добавить ответ</button>\
+        <button type=\"button\" class=\"btn btn-default\" style=\"margin-left:0em\" onclick=\"RemoveQuestion('{SURVEYQUESTIONID}')\">Удалить вопрос</button>\
+        <button type=\"button\" class=\"btn btn-default\" style=\"margin-left:0em\" onclick=\"UpQuestion('{SURVEYQUESTIONID}')\">&#8593;</button>\
+        <button type=\"button\" class=\"btn btn-default\" style=\"margin-left:0em\" onclick=\"DownQuestion('{SURVEYQUESTIONID}')\">&#8595;</button>";
+                    newquestion = newquestion.replace("{SURVEYQUESTIONID}", data.surveyquestionid)
+                        .replace("{SURVEYQUESTIONID}", data.surveyquestionid)
+                        .replace("{SURVEYQUESTIONID}", data.surveyquestionid)
+                        .replace("{SURVEYQUESTIONID}", data.surveyquestionid)
+                        .replace("{SURVEYQUESTIONID}", data.surveyquestionid)
+                        .replace("{TEXT}", data.text);
+                    $("#questions").append(newquestion);
+                }
+            });
+        }
+
+        function RemoveQuestion(surveyquestionid) {
+            $.ajax({
+                url: "/Admin/RemoveQuestion",
+                type: "GET",
+                data: { surveyquestionid: surveyquestionid },
+                success: function (data) {
+                    $("#" + data).remove();
+                }
+            });
+        }
+
+        function UpQuestion(questionid) {
+            $.ajax({
+                url: "/Admin/UpQuestion",
+                type: "GET",
+                data: { questionid: questionid },
+                success: function (data) {
+                    if (data != null) {
+                        ChangeDivs(data.firstid, data.secondid);
+                    }
+                }
+            });
+        }
+
+        function DownQuestion(questionid) {
+            $.ajax({
+                url: "/Admin/DownQuestion",
+                type: "GET",
+                data: { questionid: questionid },
+                success: function (data) {
+                    if (data != null) {
+                        ChangeDivs(data.firstid, data.secondid);
+                    }
+                }
+            });
+        }
+
+        function AddOption(surveyquestionid) {
+            $.ajax({
+                url: "/Admin/AddOption",
+                type: "GET",
+                data: { surveyquestionid: surveyquestionid },
+                success: function (data) {
+
+                    var newoption = "<div id=\"{OPTIONID}\" class=\"separate\">\
+                        <div class=\"leftdiv\">\
+                            <button type=\"button\" class=\"btn btn-default\" style=\"margin-right:0.25em;height: 30px;\" onclick=\"RemoveOption('{OPTIONID}')\">Удалить</button>\
+                            <button type=\"button\" class=\"btn btn-default\" style=\"margin-right: 0.25em;height: 30px;\" onclick=\"UpOption('{OPTIONID}')\">&#8593;</button>\
+                            <button type=\"button\" class=\"btn btn-default\" style=\"margin-right: 0.25em;height: 30px;\" onclick=\"DownOption('{OPTIONID}')\">&#8595;</button>\
+                            <label class=\"h5\">Ответ: </label>\
+                        </div>\
+                        <div class=\"rightdiv\">\
+                            <input style=\"width:90%;height: 30px;font-size: 15px;\" type=\"text\" value=\"{TEXT}\">\
+                        </div>\
+                    </div>";
+
+                    newoption = newoption.replace("{OPTIONID}", data.option.id).replace("{OPTIONID}", data.option.id).replace("{OPTIONID}", data.option.id).replace("{OPTIONID}", data.option.id).replace("{TEXT}", data.option.text);
+                    $("#" + data.surveyquestionid).children("#options").append(newoption);
+                }
+            });
+        }
+
+        function RemoveOption(optionid) {
+            $.ajax({
+                url: "/Admin/RemoveOption",
+                type: "GET",
+                data: { optionid: optionid },
+                success: function (data) {
+                    $("#" + data).remove();
+                }
+            });
+        }
+
+        function UpOption(optionid) {
+            $.ajax({
+                url: "/Admin/UpOption",
+                type: "GET",
+                data: { optionid: optionid },
+                success: function (data) {
+                    if (data != null) {
+                        ChangeDivs(data.firstid, data.secondid);
+                    }
+                }
+            });
+        }
+
+        function DownOption(optionid) {
+            $.ajax({
+                url: "/Admin/DownOption",
+                type: "GET",
+                data: { optionid: optionid },
+                success: function (data) {
+                    if (data != null) {
+                        ChangeDivs(data.firstid, data.secondid);
+                    }
+                }
+            });
+        }
+
+        function ChangeDivs(firstid, secondid) {
+            var div1 = document.getElementById(firstid);
+            var innerdiv1 = div1.innerHTML;
+            var div2 = document.getElementById(secondid);
+            var innerdiv2 = div2.innerHTML;
+            div1.id = secondid;
+            div2.id = firstid;
+            div1.innerHTML = innerdiv2;
+            div2.innerHTML = innerdiv1;
+        }
+
+        function Save() {
+            var title = $("#SurveyName").val();
+            var description = $("#SurveyDescription").val();
+
+            var questions = [];
+
+            var questiondivs = $("#questions").children();
+
+            for (var i = 0; i < questiondivs.length; i++) {
+                var question = [];
+                var id = questiondivs[i].id;
+                question.push(id);
+                question.push($("#" + id + " div div input").val());
+
+                //Добавление 3 select
+                var selects = $("#" + id + " select option:selected");
+
+                var type;
+                if (selects[0].text == "Выбор одного ответа из списка") {
+                    type = "0";
+                }
+                else if (selects[0].text == "Выбор нескольких ответов из списка") {
+                    type = "1";
+                }
+                else if (selects[0].text == "Текстовый ответ") {
+                    type = "2";
+                }
+                question.push(type);
+
+                if (selects[1].text == "Да") {
+                    question.push("True");
+                }
+                else if (selects[1].text == "Нет") {
+                    question.push("False");
+                }
+
+                if (selects[2].text == "Да") {
+                    question.push("True");
+                }
+                else if (selects[2].text == "Нет") {
+                    question.push("False");
+                }
+
+                var options = $("#" + id + " #options").children();
+                for (var j = 0; j < options.length; j++) {
+                    var optionid = options[j].id;
+                    question.push(optionid);
+                    question.push($("#" + optionid + " div input").val());
+                }
+                questions.push(question);
+            }
+
+            $.ajax(
+                {
+                    url: '/Admin/Save',
+                    type: "POST",
+                    data: { 'id': "@Model.Id",'title': title, 'description': description, 'lines': questions },
+                    success: function (data) {
+                        console.log(data);
                     }
                 });
-            });
-        });
+        }
 
 
-
-
-    </script>
+</script>

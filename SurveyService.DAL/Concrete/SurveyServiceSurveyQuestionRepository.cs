@@ -4,6 +4,7 @@ using SurveyService.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
+using System;
 
 namespace SurveyService.DAL.Concrete
 {
@@ -18,10 +19,7 @@ namespace SurveyService.DAL.Concrete
         {
             var result = await context.SurveyQuestions.AddAsync(item);
             await context.SaveChangesAsync();
-            return await context.SurveyQuestions
-                //.Include(x => x.Question)
-                .Include(x => x.Survey)
-                .FirstOrDefaultAsync(x => x.Id == result.Entity.Id);
+            return result.Entity;
         }
 
         public void CreateRange(ICollection<SurveyQuestion> item)

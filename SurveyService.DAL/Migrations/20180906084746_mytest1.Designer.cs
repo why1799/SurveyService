@@ -10,8 +10,8 @@ using SurveyService.DAL;
 namespace SurveyService.DAL.Migrations
 {
     [DbContext(typeof(SurveyServiceDbContext))]
-    [Migration("20180906081356_test1")]
-    partial class test1
+    [Migration("20180906084746_mytest1")]
+    partial class mytest1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -54,7 +54,7 @@ namespace SurveyService.DAL.Migrations
 
                     b.HasIndex("UserAnswerId");
 
-                    b.ToTable("OptionsForQuestions");
+                    b.ToTable("OptionsForAnswers");
                 });
 
             modelBuilder.Entity("SurveyService.Models.Survey", b =>
@@ -65,8 +65,6 @@ namespace SurveyService.DAL.Migrations
                     b.Property<string>("BannerUrl");
 
                     b.Property<string>("CreatedById");
-
-                    b.Property<string>("CreategById");
 
                     b.Property<DateTime>("DateCreated");
 
@@ -82,7 +80,7 @@ namespace SurveyService.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreategById");
+                    b.HasIndex("CreatedById");
 
                     b.ToTable("Surveys");
                 });
@@ -142,7 +140,7 @@ namespace SurveyService.DAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Questions");
+                    b.ToTable("UserAnswers");
                 });
 
             modelBuilder.Entity("SurveyService.Models.Option", b =>
@@ -165,9 +163,9 @@ namespace SurveyService.DAL.Migrations
 
             modelBuilder.Entity("SurveyService.Models.Survey", b =>
                 {
-                    b.HasOne("SurveyService.Models.User", "CreategBy")
+                    b.HasOne("SurveyService.Models.User", "CreatedBy")
                         .WithMany()
-                        .HasForeignKey("CreategById");
+                        .HasForeignKey("CreatedById");
                 });
 
             modelBuilder.Entity("SurveyService.Models.SurveyQuestion", b =>

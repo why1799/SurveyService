@@ -86,7 +86,7 @@ namespace SurveyService
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Admin}/{action=Create}");
+                    template: "{controller=Admin}/{action=Surveys}");
             });
             //app.UseMvc(routes =>
             //{
