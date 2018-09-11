@@ -18,9 +18,9 @@ namespace SurveyService.Models
         public DateTime DateCreated { get; set; }
         public bool IsActive { get; set; }
 
-        [ForeignKey(nameof(User))]
+        [ForeignKey(nameof(CreatedBy))]
         public string CreatedById { get; set; }
-        public User CreategBy { get; set; }
+        public User CreatedBy { get; set; }
 
         public ICollection<SurveyQuestion> SurveyQuestion { get; set; }
 

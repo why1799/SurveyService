@@ -56,9 +56,9 @@ namespace SurveyService.WebUI.Controllers
             {
                 user = finduser;
             }
-            //var survey = await surveyRepository.Create(new Models.Survey { CreatedBy = user.Id, Title="Новый опрос", DateCreated = DateTime.Now });
+            //var survey = await surveyRepository.Create(new Models.Survey { CreatedById = user.Id, Title="Новый опрос", DateCreated = DateTime.Now });
 
-            return RedirectToAction("Edit", new { id = "ee76b75c-f8e5-480c-8686-5f319e4d29dd"/*survey.Id*/ });
+            return RedirectToAction("Edit", new { id = "c7f0f21e-7c7c-45bf-a149-aa7602db9432"/*survey.Id*/ });
         }
 
         public async Task<ActionResult> Edit(string id)
@@ -86,175 +86,177 @@ namespace SurveyService.WebUI.Controllers
 
         public async Task<JsonResult> AddQuestion(string surveyid)
         {
-            /*var question = await questionRepository.Create(new Question { Text = "Новый вопрос", Type = 1 });
             int order = surveyQuestionRepository.GetItems().Where(x => x.SurveyId == surveyid).Count();
-            var surveyquestion = await surveyQuestionRepository.Create(new SurveyQuestion { QuestionId = question.Id, IsRequired = false, Order = order, SurveyId = surveyid, IsCustomAnswer = false });
-             return new JsonResult(new { questionid = question.Id, surveyquestionid = surveyquestion.Id, text = question.Text });*/
-            return null;
+            var question = await surveyQuestionRepository.Create(new SurveyQuestion { QuestionText = "Новый вопрос", HasOwnAnswer = false, IsRequired = false, SurveyId = surveyid, Type = 0, Order = order});
+            return new JsonResult(new { surveyquestionid = question.Id, text = question.QuestionText });
         }
 
         public async Task<JsonResult> RemoveQuestion(string surveyquestionid)
         {
-            /*var surveyquestion = surveyQuestionRepository.GetItems()
-                .Include(x => x.Question)
-                .ThenInclude(x => x.OptionsForQuestions)
-                .ThenInclude(x => x.Option).FirstOrDefault(x => x.Id == surveyquestionid);
+            var question = surveyQuestionRepository.GetItems().Include(x => x.Options).FirstOrDefault(x => x.Id == surveyquestionid);
+            await surveyQuestionRepository.Delete(question);
 
-            string surveyid = surveyquestion.SurveyId;
-
-            var question = surveyquestion.Question;
-            var optionsforquestions = question.OptionsForQuestions;
-
-            await surveyQuestionRepository.Delete(surveyquestion);
-            await questionRepository.Delete(question);
-            foreach(var optionsforquestion in optionsforquestions)
+            var options = question.Options;
+            foreach (var option in options)
             {
-                var option = optionsforquestion.Option;
                 await optionRepository.Delete(option);
-                await optionsForQuestionRepository.Delete(optionsforquestion);
             }
-            
-            var surveyquestions = surveyQuestionRepository.GetItems().Where(x => x.SurveyId == surveyid && x.Order > surveyquestion.Order).ToList();
 
-            foreach(var surveyques in surveyquestions)
+            var questions = surveyQuestionRepository.GetItems().Where(x => x.SurveyId == question.SurveyId && x.Order > question.Order).ToList();
+            foreach(var curquestion in questions)
             {
-                surveyques.Order--;
-                await surveyQuestionRepository.Update(surveyques);
+                curquestion.Order--;
+                await surveyQuestionRepository.Update(curquestion);
             }
 
-            return new JsonResult(surveyquestionid);*/
-            return null;
+            return new JsonResult(surveyquestionid);
         }
 
         public async Task<JsonResult> UpQuestion(string questionid)
         {
-            /*var question = questionRepository.GetItems().Include(x => x.SurveyQuestion).FirstOrDefault(x => x.Id == questionid);
-            var thissurveyquestion = question.SurveyQuestion.First(x => x.QuestionId == questionid);
-            var surveyquestion = surveyQuestionRepository.GetItems().Include(x => x.Question).FirstOrDefault(x => x.SurveyId == thissurveyquestion.SurveyId && x.Order + 1 == thissurveyquestion.Order);
+            var firstquestion = await surveyQuestionRepository.GetItem(questionid);
+            var secondquestion = surveyQuestionRepository.GetItems().FirstOrDefault(x => x.SurveyId == firstquestion.SurveyId && x.Order + 1 == firstquestion.Order);
 
-            if (surveyquestion == null)
+            if (secondquestion == null)
             {
                 return new JsonResult(null);
             }
 
-            thissurveyquestion.Order--;
-            await surveyQuestionRepository.Update(thissurveyquestion);
+            firstquestion.Order--;
+            await surveyQuestionRepository.Update(firstquestion);
 
-            surveyquestion.Order++;
-            await surveyQuestionRepository.Update(surveyquestion);
+            secondquestion.Order++;
+            await surveyQuestionRepository.Update(secondquestion);
 
 
             return new JsonResult(new
             {
-                firstid = thissurveyquestion.Id,
-                secondid = surveyquestion.Id
-            });*/
-            return null;
+                firstid = firstquestion.Id,
+                secondid = secondquestion.Id
+            });
         }
 
         public async Task<JsonResult> DownQuestion(string questionid)
         {
-            /*var question = questionRepository.GetItems().Include(x => x.SurveyQuestion).FirstOrDefault(x => x.Id == questionid);
-            var thissurveyquestion = question.SurveyQuestion.First(x => x.QuestionId == questionid);
-            var surveyquestion = surveyQuestionRepository.GetItems().Include(x => x.Question).FirstOrDefault(x => x.SurveyId == thissurveyquestion.SurveyId && x.Order - 1 == thissurveyquestion.Order);
+            var firstquestion = await surveyQuestionRepository.GetItem(questionid);
+            var secondquestion = surveyQuestionRepository.GetItems().FirstOrDefault(x => x.SurveyId == firstquestion.SurveyId && x.Order - 1 == firstquestion.Order);
 
-            if (surveyquestion == null)
+            if (secondquestion == null)
             {
                 return new JsonResult(null);
             }
 
-            thissurveyquestion.Order++;
-            await surveyQuestionRepository.Update(thissurveyquestion);
+            firstquestion.Order++;
+            await surveyQuestionRepository.Update(firstquestion);
 
-            surveyquestion.Order--;
-            await surveyQuestionRepository.Update(surveyquestion);
+            secondquestion.Order--;
+            await surveyQuestionRepository.Update(secondquestion);
 
 
             return new JsonResult(new
             {
-                firstid = thissurveyquestion.Id,
-                secondid = surveyquestion.Id
-            });*/
-            return null;
+                firstid = firstquestion.Id,
+                secondid = secondquestion.Id
+            });
         }
 
-        public async Task<JsonResult> AddOption(string questionid)
+        public async Task<JsonResult> AddOption(string surveyquestionid)
         {
-            /*var option = await optionRepository.Create(new Option {Text = "Вариант ответа" });
-            var order = optionsForQuestionRepository.GetItems().Where(x => x.QuestionId == questionid).Count();
-            await optionsForQuestionRepository.Create(new OptionsForQuestion {OptionId = option.Id, QuestionId = questionid, Order = order });
-            var surveyquestion = questionRepository.GetItems().Include(x => x.SurveyQuestion).FirstOrDefault(x => x.Id == questionid).SurveyQuestion.FirstOrDefault(x => x.QuestionId == questionid);
-            return Json(new { option = new Option { Id = option.Id, Text = option.Text }, surveyquestionid = surveyquestion.Id});*/
-            return null;
+            var order = optionRepository.GetItems().Where(x => x.QuestionId == surveyquestionid).Count();
+            var option = await optionRepository.Create(new Option {Text = "Вариант ответа", Order = order, QuestionId = surveyquestionid });
+            return Json(new { option = new Option { Id = option.Id, Text = option.Text }, surveyquestionid });
         }
 
         public async Task<JsonResult> RemoveOption(string optionid)
         {
-            /*var option = optionRepository.GetItems().Include(x => x.OptionsForQuestions).FirstOrDefault(x => x.Id == optionid);
-            var thisoptionsforquestion = option.OptionsForQuestions.First(x => x.OptionId == optionid);
+            var option = await optionRepository.GetItem(optionid);
             await optionRepository.Delete(option);
-            await optionsForQuestionRepository.Delete(thisoptionsforquestion);
 
-            var optionsforquestions = optionsForQuestionRepository.GetItems().Where(x => x.QuestionId == thisoptionsforquestion.QuestionId && x.Order > thisoptionsforquestion.Order).ToList();
-            foreach (var optionsforquestion in optionsforquestions)
+            var options = optionRepository.GetItems().Where(x => x.QuestionId == option.QuestionId && x.Order > option.Order).ToList();
+            foreach (var curoption in options)
             {
-                optionsforquestion.Order--;
-                await optionsForQuestionRepository.Update(optionsforquestion);
+                curoption.Order--;
+                await optionRepository.Update(curoption);
             }
 
-            return new JsonResult(optionid);*/
-            return null;
+            return new JsonResult(optionid);
         }
 
         public async Task<JsonResult> UpOption(string optionid)
         {
-            /*var option = optionRepository.GetItems().Include(x => x.OptionsForQuestions).FirstOrDefault(x => x.Id == optionid);
-            var thisoptionsforquestion = option.OptionsForQuestions.First(x => x.OptionId == optionid);
-            var optionsforquestion = optionsForQuestionRepository.GetItems().Include(x => x.Option).FirstOrDefault(x => x.QuestionId == thisoptionsforquestion.QuestionId && x.Order + 1 == thisoptionsforquestion.Order);
+            var firstoption = await optionRepository.GetItem(optionid);
+            var secondoption = optionRepository.GetItems().FirstOrDefault(x => x.QuestionId == firstoption.QuestionId && x.Order + 1 == firstoption.Order);
 
-            if (optionsforquestion == null)
+            if (secondoption == null)
             {
                 return new JsonResult(null);
             }
 
-            thisoptionsforquestion.Order--;
-            await optionsForQuestionRepository.Update(thisoptionsforquestion);
+            firstoption.Order--;
+            await optionRepository.Update(firstoption);
 
-            optionsforquestion.Order++;
-            await optionsForQuestionRepository.Update(optionsforquestion);
+            secondoption.Order++;
+            await optionRepository.Update(secondoption);
 
 
             return new JsonResult(new {
-                firstid = thisoptionsforquestion.OptionId,
-                secondid = optionsforquestion.OptionId
-            });*/
-            return null;
+                firstid = firstoption.Id,
+                secondid = secondoption.Id
+            });
         }
 
         public async Task<JsonResult> DownOption(string optionid)
         {
-            /*var option = optionRepository.GetItems().Include(x => x.OptionsForQuestions).FirstOrDefault(x => x.Id == optionid);
-            var thisoptionsforquestion = option.OptionsForQuestions.First(x => x.OptionId == optionid);
-            var optionsforquestion = optionsForQuestionRepository.GetItems().Include(x => x.Option).FirstOrDefault(x => x.QuestionId == thisoptionsforquestion.QuestionId && x.Order - 1 == thisoptionsforquestion.Order);
+            var firstoption = await optionRepository.GetItem(optionid);
+            var secondoption = optionRepository.GetItems().FirstOrDefault(x => x.QuestionId == firstoption.QuestionId && x.Order - 1 == firstoption.Order);
 
-            if (optionsforquestion == null)
+            if (secondoption == null)
             {
                 return new JsonResult(null);
             }
 
-            thisoptionsforquestion.Order++;
-            await optionsForQuestionRepository.Update(thisoptionsforquestion);
+            firstoption.Order++;
+            await optionRepository.Update(firstoption);
 
-            optionsforquestion.Order--;
-            await optionsForQuestionRepository.Update(optionsforquestion);
+            secondoption.Order--;
+            await optionRepository.Update(secondoption);
 
 
             return new JsonResult(new
             {
-                firstid = thisoptionsforquestion.OptionId,
-                secondid = optionsforquestion.OptionId
-            });*/
-            return null;
+                firstid = firstoption.Id,
+                secondid = secondoption.Id
+            });
+        }
+
+        [HttpPost]
+        public async Task<JsonResult> Save(string id, string title, string description, string[][] lines)
+        {
+            var survey = await surveyRepository.GetItem(id);
+            survey.Title = title;
+            if(description == null)
+            {
+                description = "";
+            }
+            survey.Description = description;
+            await surveyRepository.Update(survey);
+
+            for(int i = 0; i < lines.Length; i++)
+            {
+                var question = await surveyQuestionRepository.GetItem(lines[i][0]);
+                question.QuestionText = lines[i][1];
+                question.Type = int.Parse(lines[i][2]);
+                question.HasOwnAnswer = bool.Parse(lines[i][3]);
+                question.IsRequired = bool.Parse(lines[i][4]);
+                await surveyQuestionRepository.Update(question);
+                for(int j = 5; j < lines[i].Length; j += 2)
+                {
+                    var option = await optionRepository.GetItem(lines[i][j]);
+                    option.Text = lines[i][j + 1];
+                    await optionRepository.Update(option);
+                }
+            }
+            return Json(new { data = 0 });
         }
 
         /*// POST: Admin/Create
@@ -319,5 +321,9 @@ namespace SurveyService.WebUI.Controllers
                 return View();
             }
         }
+    }
+    public class TestLines
+    {
+        public string[] lines { get; set; }
     }
 }

@@ -64,8 +64,6 @@ namespace SurveyService.DAL.Migrations
 
                     b.Property<string>("CreatedById");
 
-                    b.Property<string>("CreategById");
-
                     b.Property<DateTime>("DateCreated");
 
                     b.Property<DateTime>("DateExpires");
@@ -80,7 +78,7 @@ namespace SurveyService.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreategById");
+                    b.HasIndex("CreatedById");
 
                     b.ToTable("Surveys");
                 });
@@ -163,9 +161,9 @@ namespace SurveyService.DAL.Migrations
 
             modelBuilder.Entity("SurveyService.Models.Survey", b =>
                 {
-                    b.HasOne("SurveyService.Models.User", "CreategBy")
+                    b.HasOne("SurveyService.Models.User", "CreatedBy")
                         .WithMany()
-                        .HasForeignKey("CreategById");
+                        .HasForeignKey("CreatedById");
                 });
 
             modelBuilder.Entity("SurveyService.Models.SurveyQuestion", b =>
