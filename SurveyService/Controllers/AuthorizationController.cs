@@ -8,7 +8,7 @@ using System.DirectoryServices.AccountManagement;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-
+using Microsoft.AspNetCore.Identity;
 
 namespace SurveyService.WebUI.Controllers
 {
@@ -20,12 +20,9 @@ namespace SurveyService.WebUI.Controllers
         {
             this.userRepository = userRepository;
         }
-
-        [ValidateAntiForgeryToken]
-        public IActionResult Index()
+        public IActionResult Index(string ReturnUrl)
         {
             string DisplayName, Email;
-
             ClaimsPrincipal principal = HttpContext.User as ClaimsPrincipal;
             using (PrincipalContext pc = new PrincipalContext(ContextType.Domain))
             {
@@ -36,18 +33,21 @@ namespace SurveyService.WebUI.Controllers
                 var user = userRepository.GetItems().SingleOrDefault(x => x.Login == Email);
                 if (user == null)
                 {
-                    user = new Models.User() { DisplayName = DisplayName, Login = Email, Role = "user" };
+                    user = new SurveyService.Models.User() { DisplayName = DisplayName, Login = Email, Role = "user" };
                     userRepository.Create(user).Wait();
                 }
                 var claims = new List<Claim>
                 {
-                    new Claim(ClaimsIdentity.DefaultNameClaimType, user.DisplayName),
-                    new Claim(ClaimsIdentity.DefaultRoleClaimType, user.Role)
+                    new Claim("isAdmin","true")
+
                 };
-                ClaimsIdentity id = new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
-                HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id)).Wait();
+
+                //ClaimsIdentity id = new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
+                HttpContext.User.AddIdentity(new ClaimsIdentity(claims));
+                //HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id)).Wait();
+
             }
-            return View();
+            return Redirect(ReturnUrl);
         }
     }
 }

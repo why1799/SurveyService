@@ -5,15 +5,11 @@
 <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
 <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
 <style>
-    .contentBox div:nth-child(2n) {
-        background-color: #D2D2D2;
+    .contentBox div:nth-child(n + 2) {
+        border-top-style: groove;
+        border-top-width: thin;
     }
 
-    .container.body-content { /*убрал отступы в мастерстранице*/
-        margin: 0;
-        padding: 0;
-        width: 100%;
-    }
     input[type=text] {
         transition: 0.6s;
         border: none;
@@ -24,7 +20,7 @@
 <div>
     <h2 style="text-align: center;">@Model.Title</h2>
     <form id="questonForm" asp-controller="Survey" asp-action="SetResult" method="post">
-        <div class="contentBox">
+        <div class="contentBox" style="border-style: groove; border-width: thin;">
             @foreach (var question in Model.SurveyQuestion)
             {
                 <div style="padding: 15px 30px;">
@@ -36,22 +32,63 @@
                     </div>
 
                     <ul class="list-unstyled">
-                        @foreach (var Option in question.Options)
+                        @switch (question.Type)
                         {
-                            <li>
-                                <input type=@(question.Type == 0 ? "radio" : "checkbox") name=@question.Id value=@Option.Id
-                                       @(question.UserAnswers?.SingleOrDefault()?.OptionsForAnswers?.Any(ob => ob.OptionId == Option.Id) == true ? "checked" : "")
-                                       data-val-required="The IsSelected field is required." data-rule-customv="@question.Id" class="input-validation-error" /> @Option.Text
-                                </li>
-                            }
-                        @if (question.HasOwnAnswer)
-                        {
-                            <li>
-                                <input type="@(question.Type == 0 ? "radio" : "checkbox")" name=@question.Id value="custom" data-questionid="@question.Id"
-                                       for="@("customAnswer" + question.Id)" @(string.IsNullOrEmpty(question.UserAnswers?.SingleOrDefault()?.OwnAnswerText) == false ? "checked" : "") />
-                                    <input id=@("customAnswer" + question.Id) type="text" value="@(question.UserAnswers?.SingleOrDefault()?.OwnAnswerText)" placeholder="Свой вариант."/>
-                            </li>
+                            case 0: /*Радиобаттон*/
+                                {
+                                    @foreach (var Option in question.Options)
+                                    {
+                                        <li>
+                                            <input type="radio" name=@question.Id value=@Option.Id
+                                                   @(question.UserAnswers?.SingleOrDefault()?.OptionsForAnswers?.Any(ob => ob.OptionId == Option.Id) == true ? "checked" : "")
+                                                   @(question.IsRequired == true ? "data-val-required = The IsSelected field is required. data-rule-customv = " + question.Id + " class=input-validation-error" : "") />
+                                            <span>@Option.Text</span>
+                                        </li>
+                                    }
+                                    @if (question.HasOwnAnswer)
+                                    {
+                                        <li>
+                                            <input type="radio" name=@question.Id value="custom" data-questionid="@question.Id"
+                                                   for="@("customAnswer" + question.Id)" @(string.IsNullOrEmpty(question.UserAnswers?.SingleOrDefault()?.OwnAnswerText) == false ? "checked" : "")
+                                                   @(question.IsRequired == true ? "data-val-required = The IsSelected field is required. data-rule-customv = " + question.Id + " class=input-validation-error" : "") />
+                                            <input id=@("customAnswer" + question.Id) type="text" value="@(question.UserAnswers?.SingleOrDefault()?.OwnAnswerText)" placeholder="Свой вариант." />
+                                        </li>
+                                    }
+                                    break;
+                                }
+                            case 1: /*чекбокс*/
+                                {
+                                    @foreach (var Option in question.Options)
+                                    {
+                                        <li>
+                                            <input type="checkbox" name=@question.Id value=@Option.Id
+                                                   @(question.UserAnswers?.SingleOrDefault()?.OptionsForAnswers?.Any(ob => ob.OptionId == Option.Id) == true ? "checked" : "")
+                                                   @(question.IsRequired == true ? "data-val-required = The IsSelected field is required. data-rule-customv = " + question.Id + " class=input-validation-error" : "") />
+                                            <span>@Option.Text</span>
+                                        </li>
+                                    }
+                                    @if (question.HasOwnAnswer)
+                                    {
+                                        <li>
+                                            <input type="checkbox" name=@question.Id value="custom" data-questionid="@question.Id"
+                                                   for="@("customAnswer" + question.Id)" @(string.IsNullOrEmpty(question.UserAnswers?.SingleOrDefault()?.OwnAnswerText) == false ? "checked" : "")
+                                                   @(question.IsRequired == true ? "data-val-required = The IsSelected field is required. data-rule-customv = " + question.Id + " class=input-validation-error" : "") />
+                                            <input id=@("customAnswer" + question.Id) type="text" value="@(question.UserAnswers?.SingleOrDefault()?.OwnAnswerText)" placeholder="Свой вариант." />
+                                        </li>
+                                    }
+                                    break;
+                                }
+                            case 2: /*Только текстовый ответ*/
+                                {
+                                    <li>
+                                        <input id="@question.Id" data-mycastomtextanswer="trye" type="text" value="@(question.UserAnswers?.SingleOrDefault()?.OwnAnswerText)" placeholder="" />
+                                    </li>
+                                    break;
+                                }
+                            default:
+                                break;
                         }
+
                     </ul>
                     <span id="@("ErrorMessage" + question.Id)" style="color:red; display:none;">Необходимо дать ответ на этот вопрос!</span>
                 </div>
@@ -64,7 +101,7 @@
     $(function () {
         // Валидатор
         jQuery.validator.addMethod("customv", function (value, element, params) {
-            var errMessageBox = $('#ErrorMessage' + params);
+            let errMessageBox = $('#ErrorMessage' + params);
             if ($('input[name="' + params + '"]:checked').length > 0) {
                 errMessageBox.hide();
                 return true;
@@ -78,9 +115,11 @@
             if (!$('form').validate().form()) { // проверили валидацию
                 return;
             }
-            var json = '{ "surveyId": "@Model.Id", "anew": "@ViewBag.anew", "data": { '; // формируем тело запроса
-            var inputArr = $('input:radio, input:checkbox');
-            for (var i = 0, index = 0; i < inputArr.length; i++) {
+            let json = '{ "surveyId": "@Model.Id", "anew": "@ViewBag.anew", "data": { '; // формируем тело запроса
+            // ищем все радиобаттоны и чекбоксы(типы 0 и 1)
+            let inputArr = $('input:radio, input:checkbox');
+            let index = 0;
+            for (let i = 0; i < inputArr.length; i++) {
                 if (inputArr[i].checked == true) {
                     if (inputArr[i].value == 'custom') {
                         json += ' "' + index++ + '": { "type": "custom", "questionId": "' + inputArr[i].getAttribute('name') +'", "text": "' + $('#' + inputArr[i].getAttribute('for')).val() + '"}, ';
@@ -89,10 +128,14 @@
                     }
                 }
             }
-            if (json.length < 3) { // проверка на правильность формирования
-                alert("error");
+            // проверяем текстовые ответы(тип 2)
+            let textBoxArr = $('input[data-mycastomtextanswer="trye"]');
+            for (let i = 0; i < textBoxArr.length; i++) {
+                json += ' "' + index++ + '": { "type": "custom", "questionId": "' + textBoxArr[i].id + '", "text": "' + textBoxArr[i].value + '"}, ';
+
             }
-            json = json.substring(0, json.length - 2) + '}}';
+            
+            json = json.substring(0, json.length - 2) + '}}'; // заканчиваем формирование json
             $.ajax({ // отправляем запрос
                 type: 'POST',
                 url:  '@Url.Action("SaveResult", "Survey")',//'SaveResult',
@@ -100,7 +143,7 @@
                 contentType: "application/json",
                 dataType: 'text',
                 success: function (data) {
-                    var res = JSON.parse(data);
+                    let res = JSON.parse(data);
                     if (res.ok) {
                         window.location = res.newUrl;
                     } else {
