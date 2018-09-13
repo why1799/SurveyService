@@ -44,9 +44,12 @@ namespace SurveyService.WebUI.Controllers
                     .Include(ob => ob.SurveyQuestion)
                         .ThenInclude(ob => ob.Options)
                     .SingleOrDefault(ob => ob.Id == id);
-                foreach (var item in model.SurveyQuestion)
-                { // Узнать как сделать выборку правильно!
-                    item.UserAnswers = item.UserAnswers.Where(ob => ob.UserId == user.Id).ToList();
+                if (model != null) // TODO Отрефакторить
+                {
+                    foreach (var item in model?.SurveyQuestion)
+                    { // Узнать как сделать выборку правильно!
+                        item.UserAnswers = item.UserAnswers.Where(ob => ob.UserId == user.Id).ToList();
+                    }
                 }
             }
             else
@@ -60,6 +63,8 @@ namespace SurveyService.WebUI.Controllers
 
             if(model == null) // Не найден опрос
             {
+                Response.StatusCode = 500;
+                return View();
                 // TODO redirect
                 return RedirectToAction("Error");
             }

@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using SurveyService.DAL.Abstract;
+using SurveyService.Models;
 using System;
 using System.Collections.Generic;
 using System.DirectoryServices.AccountManagement;
@@ -10,6 +12,10 @@ using System.Threading.Tasks;
 
 namespace SurveyService.WebUI.Helper
 {
+    //public class MyUserStore : IUserStore<User>
+    //{
+
+    //}
 
    public class ClaimsTransformer : IClaimsTransformation
     {

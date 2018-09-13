@@ -22,6 +22,7 @@ namespace SurveyService.WebUI.Controllers
         }
         public IActionResult Index(string ReturnUrl)
         {
+            
             string DisplayName, Email;
             ClaimsPrincipal principal = HttpContext.User as ClaimsPrincipal;
             using (PrincipalContext pc = new PrincipalContext(ContextType.Domain))
