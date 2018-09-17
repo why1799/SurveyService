@@ -19,6 +19,7 @@ namespace SurveyService
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+            .UseUrls("http://172.26.18.178:5000")
                 .UseStartup<Startup>();
     }
 }

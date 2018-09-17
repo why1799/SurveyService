@@ -9,6 +9,7 @@ using SurveyService.DAL.Abstract;
 using SurveyService.WebUI.Helper;
 using SurveyService.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SurveyService.WebUI.Controllers
 {
@@ -31,6 +32,7 @@ namespace SurveyService.WebUI.Controllers
         }
 
         // GET: Admin/Create
+        [Authorize]
         public async Task<ActionResult> Create()
         {
             var user = UserHelper.GetUser(HttpContext);
@@ -59,6 +61,7 @@ namespace SurveyService.WebUI.Controllers
             return new JsonResult(id);
         }
 
+        [Authorize]
         public async Task<ActionResult> Edit(string id)
         {
             var user = UserHelper.GetUser(HttpContext);
@@ -254,6 +257,7 @@ namespace SurveyService.WebUI.Controllers
             return Json(new { data = 0 });
         }
 
+        [Authorize]
         public ActionResult Surveys(int page = 1, string id = "")
         {
             int surveysperpage = 10;
