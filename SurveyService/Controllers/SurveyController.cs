@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SurveyService.DAL.Abstract;
@@ -23,9 +24,11 @@ namespace SurveyService.WebUI.Controllers
             this.userRepository = userRepository;
         }
         //GET: /Survey/Index?id=SurveyId
+        //[Authorize(Policy = "AdminOnly")]
         public IActionResult Index(string id, bool anew = false)
         {
-            var user = userRepository.GetItems().SingleOrDefault(x => x.Login == Helper.UserHelper.GetUser(HttpContext).Login);
+            var user = Helper.UserHelper.GetCurrentUser(HttpContext, userRepository);
+            
             if(userAnswer.GetItems().Include(ob => ob.SurveyQuestion).Any(ob => ob.SurveyQuestion.SurveyId == id && ob.UserId == user.Id) && anew == false) // Проверка на прохождееие опроса
             {
                 return RedirectToAction("SurveyCompleted", new { @surveyId = id });
@@ -79,12 +82,7 @@ namespace SurveyService.WebUI.Controllers
         [HttpPost]
         public IActionResult SaveResult([FromBody]Newtonsoft.Json.Linq.JObject data)
         {
-            var user = userRepository.GetItems().SingleOrDefault(x => x.Login == Helper.UserHelper.GetUser(HttpContext).Login);
-            if (user == null)
-            {
-                user = Helper.UserHelper.GetUser(HttpContext);
-                userRepository.Create(user).Wait();
-            }
+            var user = Helper.UserHelper.GetCurrentUser(HttpContext, userRepository);
             string surveyId = data.GetValue("surveyId").ToString();
             if(data.GetValue("anew").ToString() == true.ToString()) // проверяем, это первое прохождение опроса или нет
             {
