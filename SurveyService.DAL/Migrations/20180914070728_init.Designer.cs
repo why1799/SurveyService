@@ -10,8 +10,8 @@ using SurveyService.DAL;
 namespace SurveyService.DAL.Migrations
 {
     [DbContext(typeof(SurveyServiceDbContext))]
-    [Migration("20180906084457_test3")]
-    partial class test3
+    [Migration("20180914070728_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -118,6 +118,8 @@ namespace SurveyService.DAL.Migrations
 
                     b.Property<string>("Login");
 
+                    b.Property<string>("Role");
+
                     b.HasKey("Id");
 
                     b.ToTable("Users");
@@ -163,7 +165,7 @@ namespace SurveyService.DAL.Migrations
 
             modelBuilder.Entity("SurveyService.Models.Survey", b =>
                 {
-                    b.HasOne("SurveyService.Models.User", "CreategBy")
+                    b.HasOne("SurveyService.Models.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById");
                 });
