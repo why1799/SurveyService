@@ -23,11 +23,11 @@ namespace SurveyService.WebUI.Helper
     }
     public class MyClaimsTranformer : IClaimsTransformation
     {
-        IUserRepository userRepository;
-        MyClaimsTranformer(IUserRepository userRepository)
+        //IUserRepository userRepository;
+        /*MyClaimsTranformer(IUserRepository userRepository)
         {
             this.userRepository = userRepository;
-        }
+        }*/
         public async Task<ClaimsPrincipal> TransformAsync(ClaimsPrincipal principal)
         {
             string DisplayName, Email;
@@ -37,16 +37,16 @@ namespace SurveyService.WebUI.Helper
 
                 DisplayName = up.DisplayName;
                 Email = up.EmailAddress;
-                var user = userRepository.GetItems().SingleOrDefault(x => x.Login == Email);
-                if (user == null)
+                //var user = userRepository.GetItems().SingleOrDefault(x => x.Login == Email);
+                //if (user == null)
                 {
-                    user = new SurveyService.Models.User() { DisplayName = DisplayName, Login = Email, Role = "user" };
-                    userRepository.Create(user).Wait();
+                    //user = new SurveyService.Models.User() { DisplayName = DisplayName, Login = Email, Role = "user" };
+                    //userRepository.Create(user).Wait();
                 }
                 var claims = new List<Claim>
                 {
-                    new Claim(ClaimsIdentity.DefaultNameClaimType, user.DisplayName),
-                    new Claim(ClaimsIdentity.DefaultRoleClaimType, user.Role)
+                    //new Claim(ClaimsIdentity.DefaultNameClaimType, user.DisplayName),
+                    //new Claim(ClaimsIdentity.DefaultRoleClaimType, user.Role)
                 };
                 ClaimsIdentity id = new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
                 var newClaimsPrincipal = new ClaimsPrincipal(id);
