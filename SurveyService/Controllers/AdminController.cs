@@ -9,6 +9,7 @@ using SurveyService.DAL.Abstract;
 using SurveyService.WebUI.Helper;
 using SurveyService.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace SurveyService.WebUI.Controllers
 {
@@ -253,8 +254,7 @@ namespace SurveyService.WebUI.Controllers
             }
             return Json(new { data = 0 });
         }
-
-        public ActionResult Surveys(int page = 1, string id = "")
+		public ActionResult Surveys(int page = 1, string id = "")
         {
             int surveysperpage = 10;
             var surveys = surveyRepository.GetItems().Include(x => x.CreatedBy).OrderBy(x => x.DateCreated).ToList();
