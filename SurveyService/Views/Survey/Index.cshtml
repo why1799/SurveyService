@@ -17,10 +17,10 @@
         background-color: transparent;
     }
 </style>
-<div>
+<div style="min-width: 500px;">
     <h2 style="text-align: center;">@Model.Title</h2>
     <form id="questonForm" asp-controller="Survey" asp-action="SetResult" method="post">
-        <div class="contentBox" style="border-style: groove; border-width: thin;">
+        <div class="contentBox" style="border-top-style: groove; border-bottom-style: groove; border-width: thin;">
             @foreach (var question in Model.SurveyQuestion)
             {
                 <div style="padding: 15px 30px;">
