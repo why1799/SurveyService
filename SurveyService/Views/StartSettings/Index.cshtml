@@ -1,0 +1,86 @@
+﻿
+@{
+    ViewData["Title"] = "Start settings";
+}
+
+<div>
+    <form asp-controller="StartSettings" asp-action="Completed" method="post">
+        <h3>Стартовые настройки</h3>
+        <div id="firstSettingsMessage">
+            Добро пожаловать в сервис опросов!<br />
+            Нажмите "Далее" для продолжения.<br />
+            <button id="nextButton">Далее</button>
+        </div>
+        <div id="secondSettingsMessage" style="display:none;">
+            Укажите адинистратора.<br />
+            <input id="adminLogin" type="text" placeholder="Логин" name="adminLogin" /> <button id="checkLoginButton">Проверить</button><br />
+            <span id="validateMessage" style="display: none;"></span><br />
+            <button id="secondNextButton">Далее</button>
+        </div>
+        <div id="lastSettingsMessage" style="display:none;">
+            Наствройка завершена, спасибо!<br />
+            <input type="submit" value="Готово" />
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+
+
+        $('#nextButton').click(function () {
+            event.preventDefault();
+            $('#firstSettingsMessage').hide();
+            $('#secondSettingsMessage').show();
+        });
+
+        $('#checkLoginButton').click(function () {
+            event.preventDefault();
+            let text = $('#adminLogin').val();
+            if (text != null) {
+                checkLogin(text);
+            }
+        })
+        $('#secondNextButton').click(function () {
+            event.preventDefault();
+            let text = $('#adminLogin').val();
+            if (text != null) {
+                if (checkLogin(text)) { // сделали проверку на сущевствование пользователя
+                    $('#secondSettingsMessage').hide();
+                    $('#lastSettingsMessage').show();
+                }
+            }
+
+        })
+
+        //Проверят сущевствование пользователя в домене
+        async function checkLogin(login) {
+            await $.ajax({
+                type: 'POST',
+                url: '@Url.Action("CheckLogin", "StartSettings")',
+                data: JSON.stringify({ 'login': login }),
+                contentType: "application/json",
+                dataType: 'text',
+                success: function (data) {
+                    let res = JSON.parse(data);
+                    let messageBox = $('#validateMessage');
+                    if (res.success) { // если пользователь сущевствует выводим имя
+                        messageBox.show();
+                        messageBox.css('color', 'green');
+                        messageBox.text(res.name);
+                        return true;
+                    } else { // если пользователя нет, сообщаем об этом
+                        messageBox.show();
+                        messageBox.css('color', 'red');
+                        messageBox.text('Указанный пользователь не найден');
+                        return false;
+                    }
+                },
+                error: function () {
+                    alert("Произошел сбой");
+                }
+            });
+
+        }
+    })
+</script>
