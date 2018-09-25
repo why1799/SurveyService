@@ -7,9 +7,11 @@
 
 <style>
     .box {
-        border: 1px solid;
-        width: 700px;
+        border-style: groove;
+        border-width: thin;
+        /*width: 700px;*/
         margin-top: 1em;
+        padding: 1em;
     }
 </style>
 
@@ -64,7 +66,7 @@
                     }
                     else
                     {
-                        <a href='@Url.Action("Surveys", "Admin", new { page = i })' class="btn btn-default">@i.ToString()</a>
+                        <a href='@Url.Action("Surveys", "Admin", new { page  = i })' class="btn btn-default">@i.ToString()</a>
                     }
                 }
                 else

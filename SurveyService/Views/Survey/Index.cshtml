@@ -17,17 +17,17 @@
         background-color: transparent;
     }
 </style>
-<div>
+<div style="min-width: 500px;">
     <h2 style="text-align: center;">@Model.Title</h2>
     <form id="questonForm" asp-controller="Survey" asp-action="SetResult" method="post">
-        <div class="contentBox" style="border-style: groove; border-width: thin;">
+        <div class="contentBox" style="border-top-style: groove; border-bottom-style: groove; border-width: thin;">
             @foreach (var question in Model.SurveyQuestion)
             {
                 <div style="padding: 15px 30px;">
                     <div style="font-size:18px">
                         @question.QuestionText@if (question.IsRequired)
                         {
-                            <span class="IsRequired" id="@question.Id" style="color:red;">*</span>
+                            <span class="IsRequired" style="color:red;">*</span>
                         }
                     </div>
 
@@ -81,7 +81,8 @@
                             case 2: /*Только текстовый ответ*/
                                 {
                                     <li>
-                                        <input id="@question.Id" data-mycastomtextanswer="trye" type="text" value="@(question.UserAnswers?.SingleOrDefault()?.OwnAnswerText)" placeholder="" />
+                                        <input id="@question.Id" data-mycastomtextanswer="trye" type="text" value="@(question.UserAnswers?.SingleOrDefault()?.OwnAnswerText)" placeholder="" 
+                                               @(question.IsRequired == true ? "data-val-required = The IsSelected field is required. data-rule-customText = " + question.Id + " class=input-validation-error" : "")/>
                                     </li>
                                     break;
                                 }
@@ -105,9 +106,21 @@
             if ($('input[name="' + params + '"]:checked').length > 0) {
                 errMessageBox.hide();
                 return true;
+            } else {
+                errMessageBox.show();
+                return false;
             }
-            errMessageBox.show();
-            return false;
+        }, jQuery.validator.format(""));
+        // Валидатор для текстбоксов
+        jQuery.validator.addMethod("customText", function (value, element, params) {
+            let errMessageBox = $('#ErrorMessage' + params);
+            if ($('#' + params).val().length > 0) {
+                errMessageBox.hide();
+                return true;
+            } else {
+                errMessageBox.show();
+                return false;
+            }
         }, jQuery.validator.format(""));
 
         $('#questonForm').submit(function () {
