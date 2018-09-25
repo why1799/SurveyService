@@ -32,7 +32,7 @@ namespace SurveyService.WebUI.Controllers
         }
 
         // GET: Admin/Create
-        [Authorize]
+        [Authorize(Policy = "Admin")]
         public async Task<ActionResult> Create()
         {
             var user = UserHelper.GetUser(HttpContext);
@@ -61,7 +61,7 @@ namespace SurveyService.WebUI.Controllers
             return new JsonResult(id);
         }
 
-        [Authorize]
+        [Authorize(Policy = "Admin")]
         public async Task<ActionResult> Edit(string id)
         {
             var user = UserHelper.GetUser(HttpContext);
@@ -257,10 +257,11 @@ namespace SurveyService.WebUI.Controllers
             return Json(new { data = 0 });
         }
 
-        [Authorize]
+        [Authorize(Policy = "Admin")]
         public ActionResult Surveys(int page = 1, string id = "")
         {
             int surveysperpage = 10;
+            //var surveys = surveyRepository.GetItems().ToList();
             var surveys = surveyRepository.GetItems().Include(x => x.CreatedBy).OrderBy(x => x.DateCreated).ToList();
             surveys.Reverse();
             if(id != "")

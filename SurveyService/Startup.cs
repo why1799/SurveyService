@@ -34,32 +34,42 @@ namespace SurveyService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-			//services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-			//    .AddCookie(options => //CookieAuthenticationOptions
-			//    {
-			//        options.AccessDeniedPath = new PathString("/Authorization/Index");
-			//        options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Authorization/Index");
-			//    });
-			services.AddAuthentication(IISDefaults.AuthenticationScheme).AddCookie();
-			//services.AddSingleton<IClaimsTransformation, SurveyService.WebUI.Helper.ClaimsTransformer>();
-			//services.ConfigureApplicationCookie(options => options.LoginPath = "/Authorization/Index");
+            //services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+            //    .AddCookie(options => //CookieAuthenticationOptions
+            //    {
+            //        options.AccessDeniedPath = new PathString("/Authorization/Index");
+            //        options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Authorization/Index");
+            //    });
 
-			//services.AddScoped<IClaimsTransformation, SurveyService.WebUI.Helper.MyClaimsTranformer>();
-			//services.AddTransient<IClaimsTransformation, SurveyService.WebUI.Helper.MyClaimsTranformer>();
+            services.AddAuthentication(IISDefaults.AuthenticationScheme).AddCookie();
 
-			services.Configure<CookiePolicyOptions>(options =>
+            //services.AddSingleton<IClaimsTransformation, SurveyService.WebUI.Helper.ClaimsTransformer>();
+            //services.ConfigureApplicationCookie(options => options.LoginPath = "/Authorization/Index");
+
+            //services.AddScoped<IClaimsTransformation, SurveyService.WebUI.Helper.MyClaimsTranformer>();
+            //services.AddTransient<IClaimsTransformation, SurveyService.WebUI.Helper.MyClaimsTranformer>();
+
+            services.Configure<CookiePolicyOptions>(options =>
 			{
 				options.CheckConsentNeeded = context => true;
 				options.MinimumSameSitePolicy = SameSiteMode.None;
 			});
-			//services.AddAuthorization(options =>
-			//{
-			//    options.AddPolicy("AdminOnly", policy =>
-			//    {
-			//        policy.RequireClaim("isAdmin");
-			//    });
-			//});
-			services.AddAuthorization(options =>
+            //services.AddAuthorization(options =>
+            //{
+            //    options.AddPolicy("AdminOnly", policy =>
+            //    {
+            //        policy.RequireClaim("isAdmin");
+            //    });
+            //});
+
+            /*services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+               .AddCookie(options => //CookieAuthenticationOptions
+                {
+                   options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Authorization/Index");
+                });*/
+
+
+            services.AddAuthorization(options =>
 			{
 				options.AddPolicy("Admin", policy =>
 				{

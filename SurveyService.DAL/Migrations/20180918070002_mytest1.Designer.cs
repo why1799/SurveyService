@@ -10,8 +10,8 @@ using SurveyService.DAL;
 namespace SurveyService.DAL.Migrations
 {
     [DbContext(typeof(SurveyServiceDbContext))]
-    [Migration("20180914070728_init")]
-    partial class init
+    [Migration("20180918070002_mytest1")]
+    partial class mytest1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
