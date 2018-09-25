@@ -40,7 +40,7 @@ namespace SurveyService
 			//        options.AccessDeniedPath = new PathString("/Authorization/Index");
 			//        options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Authorization/Index");
 			//    });
-			services.AddAuthentication(IISDefaults.AuthenticationScheme).AddCookie();
+			//services.AddAuthentication(IISDefaults.AuthenticationScheme);
 			//services.AddSingleton<IClaimsTransformation, SurveyService.WebUI.Helper.ClaimsTransformer>();
 			//services.ConfigureApplicationCookie(options => options.LoginPath = "/Authorization/Index");
 
