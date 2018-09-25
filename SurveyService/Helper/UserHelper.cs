@@ -13,7 +13,6 @@ namespace SurveyService.WebUI.Helper
 {
     static public class UserHelper
     {
-        static IUserRepository userRepository;
         static public User GetCurrentUser(HttpContext context, IUserRepository userRepository)
         {
             ClaimsPrincipal principal = context.User as ClaimsPrincipal;
@@ -21,10 +20,10 @@ namespace SurveyService.WebUI.Helper
             {
                 UserPrincipal up = UserPrincipal.FindByIdentity(pc, principal.Identity.Name);
                 
-                var user = userRepository.GetItems().SingleOrDefault(x => x.Login == up.EmailAddress);
+                var user = userRepository.GetItems().SingleOrDefault(x => x.Login == up.Name);
                 if (user == null)
                 {
-                    user = new SurveyService.Models.User() { DisplayName = up.DisplayName, Login = up.EmailAddress, Role = "user" };
+                    user = new SurveyService.Models.User() { DisplayName = up.DisplayName, Login = up.Name, Role = "user" };
                     userRepository.Create(user).Wait();
                 }
                 return user;

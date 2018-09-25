@@ -42,7 +42,6 @@ namespace SurveyService.WebUI.Controllers
                     new Claim("isAdmin","true")
 
                 };
-
                 //ClaimsIdentity id = new ClaimsIdentity(claims, "ApplicationCookie", ClaimsIdentity.DefaultNameClaimType, ClaimsIdentity.DefaultRoleClaimType);
                 HttpContext.User.AddIdentity(new ClaimsIdentity(claims));
                 //HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(id)).Wait();

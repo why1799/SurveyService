@@ -34,31 +34,13 @@ namespace SurveyService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-			//services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-			//    .AddCookie(options => //CookieAuthenticationOptions
-			//    {
-			//        options.AccessDeniedPath = new PathString("/Authorization/Index");
-			//        options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Authorization/Index");
-			//    });
 			services.AddAuthentication(IISDefaults.AuthenticationScheme).AddCookie();
-			//services.AddSingleton<IClaimsTransformation, SurveyService.WebUI.Helper.ClaimsTransformer>();
-			//services.ConfigureApplicationCookie(options => options.LoginPath = "/Authorization/Index");
-
-			//services.AddScoped<IClaimsTransformation, SurveyService.WebUI.Helper.MyClaimsTranformer>();
-			//services.AddTransient<IClaimsTransformation, SurveyService.WebUI.Helper.MyClaimsTranformer>();
 
 			services.Configure<CookiePolicyOptions>(options =>
 			{
 				options.CheckConsentNeeded = context => true;
 				options.MinimumSameSitePolicy = SameSiteMode.None;
 			});
-			//services.AddAuthorization(options =>
-			//{
-			//    options.AddPolicy("AdminOnly", policy =>
-			//    {
-			//        policy.RequireClaim("isAdmin");
-			//    });
-			//});
 			services.AddAuthorization(options =>
 			{
 				options.AddPolicy("Admin", policy =>
@@ -66,27 +48,33 @@ namespace SurveyService
 					policy.RequireClaim("isAdmin", "true");
 				});
 			});
-			services.AddSingleton<IClaimsTransformation, ClaimsTranformer>();
 
-			services.AddDbContext<SurveyServiceDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            //services.AddAuthorization(options =>
+            //{
+            //    var windowsGroup = Configuration.GetValue<string>("WindowsGroup");
+            //    options.AddPolicy("RequireWindowsGroupMembership", policy =>
+            //    {
+            //        policy.RequireAuthenticatedUser(); // Policy must have at least one requirement
+            //        if (windowsGroup != null)
+            //            policy.RequireRole(windowsGroup);
+            //    });
+            //});
 
-            //services.AddTransient<IAnswerRepository, SurveyServiceAnswerRepository>();
+            services.AddDbContext<SurveyServiceDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
+            services.AddSingleton<IClaimsTransformation, ClaimsTranformer>();
             services.AddTransient<IOptionRepository, SurveyServiceOptionRepository>();
             services.AddTransient<IOptionsForAnswerRepository, SurveyServiceOptionsForAnswerRepository>();
             services.AddTransient<IUserAnswerRepository, SurveyServiceUserAnswerRepository>();
             services.AddTransient<ISurveyRepository, SurveyServiceSurveyRepository>();
             services.AddTransient<ISurveyQuestionRepository, SurveyServiceSurveyQuestionRepository>();
             services.AddTransient<IUserRepository, SurveyServiceUserRepository>();
-
-            /* services.AddIdentity<Controllers.TestUser, IdentityRole>()
-     .AddEntityFrameworkStores<Controllers.TestDbContext>()
-     .AddDefaultTokenProviders();*/
-
+            
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IUserRepository userRepository)
         {
             if (env.IsDevelopment())
             {
@@ -102,25 +90,23 @@ namespace SurveyService
             app.UseStaticFiles();
             app.UseCookiePolicy();
             app.UseAuthentication();
-            app.UseStatusCodePages(async context =>
-            {
-                if (context.HttpContext.Response.StatusCode == 403)
-                {
-                    context.HttpContext.Response.Redirect("/Authorization/Index?ReturnUrl=" + context.HttpContext.Request.Path + context.HttpContext.Request.QueryString);
-                }
-            });
+
+            //var userRepository = (IUserRepository)app.ApplicationServices.GetService(typeof(IUserRepository));
+            ClaimsTranformer.ServiceProvider = app.ApplicationServices;
+
+            //app.UseStatusCodePages(async context =>
+            //{
+            //    if (context.HttpContext.Response.StatusCode == 403)
+            //    {
+            //        context.HttpContext.Response.Redirect("/Authorization/Index?ReturnUrl=" + context.HttpContext.Request.Path + context.HttpContext.Request.QueryString);
+            //    }
+            //});
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Admin}/{action=Surveys}");
             });
-            //app.UseMvc(routes =>
-            //{
-            //    routes.MapRoute(
-            //        name: "redirectToSurvey",
-            //        template: "{controller=Survey}/{action=index}/{id?}/{anew?}");
-            //});
         }
     }
 }
