@@ -25,7 +25,6 @@ namespace SurveyService.WebUI.Controllers
         }
         //GET: /Survey/Index?id=SurveyId
         //[Authorize(Policy = "Admin")]
-        [Authorize(Policy = "RequireWindowsGroupMembership")]
         public IActionResult Index(string id, bool anew = false)
         {
             var user = Helper.UserHelper.GetCurrentUser(HttpContext, userRepository);
