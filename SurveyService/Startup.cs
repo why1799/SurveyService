@@ -19,6 +19,7 @@ using SurveyService.DAL;
 using SurveyService.DAL.Abstract;
 using SurveyService.DAL.Concrete;
 using SurveyService.WebUI.Helper;
+using SurveyService.WebUI.Middleware;
 
 namespace SurveyService
 {
@@ -48,17 +49,6 @@ namespace SurveyService
 					policy.RequireClaim("isAdmin", "true");
 				});
 			});
-
-            //services.AddAuthorization(options =>
-            //{
-            //    var windowsGroup = Configuration.GetValue<string>("WindowsGroup");
-            //    options.AddPolicy("RequireWindowsGroupMembership", policy =>
-            //    {
-            //        policy.RequireAuthenticatedUser(); // Policy must have at least one requirement
-            //        if (windowsGroup != null)
-            //            policy.RequireRole(windowsGroup);
-            //    });
-            //});
 
             services.AddDbContext<SurveyServiceDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
@@ -90,17 +80,10 @@ namespace SurveyService
             app.UseStaticFiles();
             app.UseCookiePolicy();
             app.UseAuthentication();
+            app.UseMiddleware<AuthorizationMiddleware>();
 
-            //var userRepository = (IUserRepository)app.ApplicationServices.GetService(typeof(IUserRepository));
             ClaimsTranformer.ServiceProvider = app.ApplicationServices;
-
-            //app.UseStatusCodePages(async context =>
-            //{
-            //    if (context.HttpContext.Response.StatusCode == 403)
-            //    {
-            //        context.HttpContext.Response.Redirect("/Authorization/Index?ReturnUrl=" + context.HttpContext.Request.Path + context.HttpContext.Request.QueryString);
-            //    }
-            //});
+            
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

@@ -22,7 +22,7 @@ namespace SurveyService.WebUI.Controllers
         [HttpPost]
         public IActionResult Completed(string adminLogin)
         {
-            using (var context = new PrincipalContext(ContextType.Domain, "demo"))
+            using (var context = new PrincipalContext(ContextType.Domain, "demo")) //TODO domain name
             {
                 var user = UserPrincipal.FindByIdentity(context, adminLogin);
                 if (user != null)
@@ -45,7 +45,7 @@ namespace SurveyService.WebUI.Controllers
             {
                 return Json(new { success = false });
             }
-            using (var context = new PrincipalContext(ContextType.Domain, "demo"))
+            using (var context = new PrincipalContext(ContextType.Domain, "demo")) //TODO domain name
             {
                 var user = UserPrincipal.FindByIdentity(context, data.GetValue("login").ToString());
                 if(user != null)

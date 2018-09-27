@@ -37,7 +37,7 @@
 
     </environment>
 </head>
-<body style="height: 100%; background-color: #EDE7E3;">
+<body style="height: 100%; background-color: #EDE8D1;">
     <style>
         .outer {
             display: table;
@@ -62,17 +62,18 @@
             width: fit-content;
             /*whatever width you want*/
         }
-        .modal {
+        .modalBox {
             position: absolute;
-            top: 50%;
+            /*top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);*/
             margin: 30px;
             box-shadow: 0 0 30px black;
             background-color: white;
             padding: 30px;
             width: fit-content;
-            display: block;
+            /*height: fit-content;
+            display: block;*/
         }
     </style>
     <nav class="navbar navbar-inverse navbar-fixed-top">
@@ -100,13 +101,13 @@
 
     <div class="container body-content" style="display: flex; flex-direction: column; height: 100%;">
         <div style="flex: 1 0 auto;">
-            <div class="outer">
-                <div class="middle">
-                    <div class="inner">
+            @*<div class="outer">
+                <div class="middle">*@
+                    <div class="modalBox">
                         @RenderBody()
                     </div>
-                </div>
-            </div>
+                @*</div>
+            </div>*@
             @*<div style="margin: 30px; box-shadow: 0 0 30px black; background-color: white; padding: 30px; width: fit-content;">
                     @RenderBody()
             </div>*@
@@ -118,5 +119,12 @@
     </div>
 
     @RenderSection("Scripts", required: false)
+    <script type="text/javascript">
+        $(function () {
+            $('.modalBox').css('top', 'calc(50vh - ' + ($('.modalBox').height() / 2 + 60) + 'px)');
+            $('.modalBox').css('left', 'calc(50vw - ' + ($('.modalBox').width() / 2 + 60) + 'px)');
+
+        })
+    </script>
 </body>
 </html>
