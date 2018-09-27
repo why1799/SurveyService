@@ -64,9 +64,9 @@
         }
         .modalBox {
             position: absolute;
-            /*top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);*/
+            top: 40%;
+            left: 40%;
+            /*transform: translate(-50%, -50%);*/
             margin: 30px;
             box-shadow: 0 0 30px black;
             background-color: white;
@@ -120,7 +120,7 @@
 
     @RenderSection("Scripts", required: false)
     <script type="text/javascript">
-        $(function () {
+        $().ready(function () {
             $('.modalBox').css('top', 'calc(50vh - ' + ($('.modalBox').height() / 2 + 60) + 'px)');
             $('.modalBox').css('left', 'calc(50vw - ' + ($('.modalBox').width() / 2 + 60) + 'px)');
 

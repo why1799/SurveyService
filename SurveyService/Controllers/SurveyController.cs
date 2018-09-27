@@ -27,7 +27,7 @@ namespace SurveyService.WebUI.Controllers
         //[Authorize(Policy = "Admin")]
         public IActionResult Index(string id, bool anew = false)
         {
-            var user = Helper.UserHelper.GetCurrentUser(HttpContext, userRepository);
+            var user = Helper.UserHelper.GetUser(HttpContext, userRepository);
             
             if(userAnswer.GetItems().Include(ob => ob.SurveyQuestion).Any(ob => ob.SurveyQuestion.SurveyId == id && ob.UserId == user.Id) && anew == false) // Проверка на прохождееие опроса
             {
@@ -87,7 +87,7 @@ namespace SurveyService.WebUI.Controllers
         [HttpPost]
         public IActionResult SaveResult([FromBody]Newtonsoft.Json.Linq.JObject data)
         {
-            var user = Helper.UserHelper.GetCurrentUser(HttpContext, userRepository);
+            var user = Helper.UserHelper.GetUser(HttpContext, userRepository);
             string surveyId = data.GetValue("surveyId").ToString();
             if(data.GetValue("anew").ToString() == true.ToString()) // проверяем, это первое прохождение опроса или нет
             {
