@@ -35,16 +35,7 @@ namespace SurveyService.WebUI.Controllers
         [Authorize(Policy = "Admin")]
         public async Task<ActionResult> Create()
         {
-            var user = UserHelper.GetUser(HttpContext);
-            var finduser = userRepository.GetItems().SingleOrDefault(x => x.Login == user.Login);
-            if (finduser == null)
-            {
-                user = await userRepository.Create(user);
-            }
-            else
-            {
-                user = finduser;
-            }
+            var user = UserHelper.GetUser(HttpContext, userRepository);
 
             //var survey = await surveyRepository.Create(new Survey { CreatedById = user.Id, Title="Новый опрос", DateCreated = DateTime.Now });
             //return RedirectToAction("Edit", new { id = survey.Id });
@@ -65,16 +56,7 @@ namespace SurveyService.WebUI.Controllers
         [Authorize(Policy = "Admin")]
         public async Task<ActionResult> Edit(string id)
         {
-            var user = UserHelper.GetUser(HttpContext);
-            var finduser = userRepository.GetItems().SingleOrDefault(x => x.Login == user.Login);
-            if (finduser == null)
-            {
-                user = await userRepository.Create(user);
-            }
-            else
-            {
-                user = finduser;
-            }
+            var user = UserHelper.GetUser(HttpContext, userRepository);
 
             var sur = surveyRepository.GetItems()
                     .Include(ob => ob.SurveyQuestion)

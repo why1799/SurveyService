@@ -13,7 +13,7 @@ namespace SurveyService.WebUI.Helper
 {
     static public class UserHelper
     {
-        static public User GetCurrentUser(HttpContext context, IUserRepository userRepository)
+        static public User GetUser(HttpContext context, IUserRepository userRepository)
         {
             ClaimsPrincipal principal = context.User as ClaimsPrincipal;
             using (PrincipalContext pc = new PrincipalContext(ContextType.Domain))
@@ -28,20 +28,6 @@ namespace SurveyService.WebUI.Helper
                 }
                 return user;
             }
-        }
-        static public User GetUser(HttpContext context)
-        {
-            string DisplayName, Email;
-
-            ClaimsPrincipal principal = context.User as ClaimsPrincipal;
-            using (PrincipalContext pc = new PrincipalContext(ContextType.Domain))
-            {
-                UserPrincipal up = UserPrincipal.FindByIdentity(pc, principal.Identity.Name);
-
-                DisplayName = up.DisplayName;
-                Email = up.EmailAddress;
-            }
-            return new User { DisplayName = DisplayName, Login = Email, Role = "user" };
         }
     }
 }

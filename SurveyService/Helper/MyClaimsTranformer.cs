@@ -24,7 +24,7 @@ namespace SurveyService.WebUI.Helper
             using (var services = ServiceProvider.CreateScope())
             {
                 var userRepository = services.ServiceProvider.GetRequiredService<IUserRepository>();
-                
+
                 using (PrincipalContext pc = new PrincipalContext(ContextType.Domain))
                 {
                     UserPrincipal up = UserPrincipal.FindByIdentity(pc, principal.Identity.Name);
@@ -32,17 +32,23 @@ namespace SurveyService.WebUI.Helper
                     var user = userRepository.GetItems().SingleOrDefault(x => x.Login == up.Name);
                     if (user == null)
                     {
-                        user = new User() { DisplayName = up.DisplayName, Login = up.Name, Role = "user" };
-                        await userRepository.Create(user);
+                        if (userRepository.GetItems().Count() == 0)
+                        {
+                            (principal.Identity as ClaimsIdentity).AddClaim(new Claim("FirstUser", "true"));
+                        }
+                        else
+                        {
+                            user = new User() { DisplayName = up.DisplayName, Login = up.Name, Role = "user" };
+                            await userRepository.Create(user);
+                        }
                     }
-                    if (user.Role == "admin")
+                    else
                     {
-                        (principal.Identity as ClaimsIdentity).AddClaim(new Claim("isAdmin", "true"));
+                        if (user.Role == "admin")
+                        {
+                            (principal.Identity as ClaimsIdentity).AddClaim(new Claim("isAdmin", "true"));
+                        }
                     }
-                }
-                if (principal.Identity.Name.ToLower() != "demo\\administrator")
-                {
-                    (principal.Identity as ClaimsIdentity).AddClaim(new Claim("isAdmin", "true"));
                 }
                 return principal;
             }

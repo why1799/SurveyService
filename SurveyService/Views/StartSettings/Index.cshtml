@@ -9,25 +9,23 @@
         <div id="firstSettingsMessage">
             Добро пожаловать в сервис опросов!<br />
             Нажмите "Далее" для продолжения.<br />
-            <button id="nextButton">Далее</button>
+            <button id="nextButton"  class="btn btn-default">Далее</button>
         </div>
         <div id="secondSettingsMessage" style="display:none;">
             Укажите адинистратора.<br />
             <input id="adminLogin" type="text" placeholder="Логин" name="adminLogin" /> <button id="checkLoginButton">Проверить</button><br />
             <span id="validateMessage" style="display: none;"></span><br />
-            <button id="secondNextButton">Далее</button>
+            <button id="secondNextButton"  class="btn btn-default">Далее</button>
         </div>
         <div id="lastSettingsMessage" style="display:none;">
             Наствройка завершена, спасибо!<br />
-            <input type="submit" value="Готово" />
+            <input type="submit"  class="btn btn-default" value="Готово" />
         </div>
     </form>
 </div>
 
 <script type="text/javascript">
     $(function () {
-
-
         $('#nextButton').click(function () {
             event.preventDefault();
             $('#firstSettingsMessage').hide();
