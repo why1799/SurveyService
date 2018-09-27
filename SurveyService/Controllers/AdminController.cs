@@ -46,8 +46,9 @@ namespace SurveyService.WebUI.Controllers
                 user = finduser;
             }
 
-            var survey = await surveyRepository.Create(new Survey { CreatedById = user.Id, Title="Новый опрос", DateCreated = DateTime.Now });
-            return RedirectToAction("Edit", new { id = survey.Id });
+            //var survey = await surveyRepository.Create(new Survey { CreatedById = user.Id, Title="Новый опрос", DateCreated = DateTime.Now });
+            //return RedirectToAction("Edit", new { id = survey.Id });
+            return View();
         }
 
         public async Task<JsonResult> RemoveSurvey(string id)
@@ -234,13 +235,54 @@ namespace SurveyService.WebUI.Controllers
         [HttpPost]
         public async Task<JsonResult> Save(string id, string title, string description, string[][] lines)
         {
-            var survey = await surveyRepository.GetItem(id);
-            survey.Title = title;
-            survey.Description = description;
-            await surveyRepository.Update(survey);
+            Survey survey;
+            if (id == null)
+            {
+                var user = UserHelper.GetUser(HttpContext);
+                var finduser = userRepository.GetItems().SingleOrDefault(x => x.Login == user.Login);
+                if (finduser == null)
+                {
+                    user = await userRepository.Create(user);
+                }
+                else
+                {
+                    user = finduser;
+                }
+                survey = await surveyRepository.Create(new Survey { Title = title, Description = description, DateCreated = DateTime.UtcNow, CreatedById = user.Id });
+                id = survey.Id;
+
+                for (int i = 0; i < lines.Length; i++)
+                {
+
+                    var question = await surveyQuestionRepository.Create(new SurveyQuestion {
+                        SurveyId = id,
+                        QuestionText = lines[i][1],
+                        Type = int.Parse(lines[i][2]),
+                        HasOwnAnswer = bool.Parse(lines[i][3]),
+                        IsRequired = bool.Parse(lines[i][4]),
+                        Order = i
+                    });
+
+
+                    for (int j = 5, ord = 0; j < lines[i].Length; j += 2, ord++)
+                    {
+                        var option = await optionRepository.Create(new Option { QuestionId = question.Id, Text = lines[i][j + 1], Order = ord });
+                    }
+                }
+                return Json(new { id = id });
+
+            }
+            else
+            {
+                survey = await surveyRepository.GetItem(id);
+                survey.Title = title;
+                survey.Description = description;
+                await surveyRepository.Update(survey);
+            }
 
             for (int i = 0; i < lines.Length; i++)
             {
+
                 var question = await surveyQuestionRepository.GetItem(lines[i][0]);
                 question.QuestionText = lines[i][1];
                 question.Type = int.Parse(lines[i][2]);

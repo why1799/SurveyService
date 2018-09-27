@@ -6,6 +6,7 @@
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 
+
 <style>
 
     .separate {
@@ -30,6 +31,20 @@
         border: 1px solid;
         width: 742px;
         margin-top: 1em;
+    }
+
+    input[type=text] {
+        transition: 0.6s;
+        border: none;
+        border-bottom: 1px solid #CCC;
+        background-color: transparent;
+    }
+
+    textarea {
+        transition: 0.6s;
+        border: none;
+        border-bottom: 1px solid #CCC;
+        background-color: transparent;
     }
 </style>
 
@@ -362,14 +377,15 @@
         }
 
         function ChangeDivs(firstid, secondid) {
-            var div1 = document.getElementById(firstid);
-            var innerdiv1 = div1.innerHTML;
-            var div2 = document.getElementById(secondid);
-            var innerdiv2 = div2.innerHTML;
-            div1.id = secondid;
-            div2.id = firstid;
-            div1.innerHTML = innerdiv2;
-            div2.innerHTML = innerdiv1;
+
+            div1 = $('#' + firstid);
+            div2 = $('#' + secondid);
+
+            tdiv1 = div1.clone();
+            tdiv2 = div2.clone();
+
+            div1.replaceWith(tdiv2);
+            div2.replaceWith(tdiv1);
         }
 
         function Save() {
