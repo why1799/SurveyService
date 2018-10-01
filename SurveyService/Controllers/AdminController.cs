@@ -35,9 +35,11 @@ namespace SurveyService.WebUI.Controllers
         [Authorize(Policy = "Admin")]
         public async Task<ActionResult> Create()
         {
-            var user = UserHelper.GetUser(HttpContext, userRepository);
-            var survey = await surveyRepository.Create(new Survey { CreatedById = user.Id, Title="Новый опрос", DateCreated = DateTime.Now });
-            return RedirectToAction("Edit", new { id = survey.Id });
+            //var user = UserHelper.GetUser(HttpContext, userRepository);
+
+            //var survey = await surveyRepository.Create(new Survey { CreatedById = user.Id, Title="Новый опрос", DateCreated = DateTime.Now });
+            //return RedirectToAction("Edit", new { id = survey.Id });
+            return View();
         }
 
         public async Task<JsonResult> RemoveSurvey(string id)
@@ -54,7 +56,7 @@ namespace SurveyService.WebUI.Controllers
         [Authorize(Policy = "Admin")]
         public async Task<ActionResult> Edit(string id)
         {
-            var user = UserHelper.GetUser(HttpContext, userRepository);
+           // var user = UserHelper.GetUser(HttpContext, userRepository);
 
             var sur = surveyRepository.GetItems()
                     .Include(ob => ob.SurveyQuestion)
@@ -215,27 +217,107 @@ namespace SurveyService.WebUI.Controllers
         [HttpPost]
         public async Task<JsonResult> Save(string id, string title, string description, string[][] lines)
         {
-            var survey = await surveyRepository.GetItem(id);
-            survey.Title = title;
-            survey.Description = description;
-            await surveyRepository.Update(survey);
+            Survey survey;
+            if (id == null)
+            {
+                var user = UserHelper.GetUser(HttpContext, userRepository);
+                survey = await surveyRepository.Create(new Survey { Title = title, Description = description, DateCreated = DateTime.UtcNow, CreatedById = user.Id });
+                id = survey.Id;
+            }
+            else
+            {
+                survey = surveyRepository.GetItems().Include(x => x.SurveyQuestion).FirstOrDefault(x => x.Id == id);
+                survey.Title = title;
+                survey.Description = description;
+                await surveyRepository.Update(survey);
+                List<SurveyQuestion> questions = new List<SurveyQuestion>();
+                foreach(var question in survey.SurveyQuestion)
+                {
+                    bool found = false;
+                    for(int i = 0; !found && i < lines.Length; i++)
+                    {
+                        if(lines[i][0] == question.Id)
+                        {
+                            found = true;
+                        }
+                    }
+                    if(!found)
+                    {
+                        questions.Add(question);
+                    }
+                }
+
+                foreach(var question in questions)
+                {
+                    await RemoveQuestion(question.Id);
+                }
+            }
 
             for (int i = 0; i < lines.Length; i++)
             {
-                var question = await surveyQuestionRepository.GetItem(lines[i][0]);
-                question.QuestionText = lines[i][1];
-                question.Type = int.Parse(lines[i][2]);
-                question.HasOwnAnswer = bool.Parse(lines[i][3]);
-                question.IsRequired = bool.Parse(lines[i][4]);
-                await surveyQuestionRepository.Update(question);
-                for (int j = 5; j < lines[i].Length; j += 2)
+                SurveyQuestion question;
+                if (lines[i][0].IndexOf("newquest") == 0)
                 {
-                    var option = await optionRepository.GetItem(lines[i][j]);
-                    option.Text = lines[i][j + 1];
-                    await optionRepository.Update(option);
+                    question = await surveyQuestionRepository.Create(new SurveyQuestion
+                    {
+                        SurveyId = id,
+                        QuestionText = lines[i][1],
+                        Type = int.Parse(lines[i][2]),
+                        HasOwnAnswer = bool.Parse(lines[i][3]),
+                        IsRequired = bool.Parse(lines[i][4]),
+                        Order = i
+                    });
+                }
+                else
+                {
+                    question = await surveyQuestionRepository.GetItem(lines[i][0]);
+                    question.QuestionText = lines[i][1];
+                    question.Type = int.Parse(lines[i][2]);
+                    question.HasOwnAnswer = bool.Parse(lines[i][3]);
+                    question.IsRequired = bool.Parse(lines[i][4]);
+                    question.Order = i;
+                    await surveyQuestionRepository.Update(question);
+                }
+
+                List<Option> options = new List<Option>();
+
+                foreach(var option in optionRepository.GetItems().Where(x => x.QuestionId == question.Id))
+                {
+                    bool found = false;
+                    for (int j = 5; !found && j < lines[i].Length; j += 2)
+                    {
+                        if (lines[i][j] == option.Id)
+                        {
+                            found = true;
+                        }
+                    }
+                    if (!found)
+                    {
+                        options.Add(option);
+                    }
+                }
+
+                foreach (var option in options)
+                {
+                    await optionRepository.Delete(option);
+                }
+
+                for (int j = 5, ord = 0; j < lines[i].Length; j += 2, ord++)
+                {
+                    if (lines[i][j].IndexOf("newopt") == 0)
+                    {
+                        await optionRepository.Create(new Option { QuestionId = question.Id, Text = lines[i][j + 1], Order = ord });
+                    }
+                    else
+                    {
+                        var option = await optionRepository.GetItem(lines[i][j]);
+                        option.Text = lines[i][j + 1];
+                        option.Order = ord;
+                        await optionRepository.Update(option);
+                    }
                 }
             }
-            return Json(new { data = 0 });
+            return Json(new { id });
         }
 
         [Authorize(Policy = "Admin")]

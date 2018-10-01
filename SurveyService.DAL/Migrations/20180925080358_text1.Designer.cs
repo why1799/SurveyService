@@ -10,14 +10,14 @@ using SurveyService.DAL;
 namespace SurveyService.DAL.Migrations
 {
     [DbContext(typeof(SurveyServiceDbContext))]
-    [Migration("20180918070002_mytest1")]
-    partial class mytest1
+    [Migration("20180925080358_text1")]
+    partial class text1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.2-rtm-30932")
+                .HasAnnotation("ProductVersion", "2.1.3-rtm-32065")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
