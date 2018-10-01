@@ -8,6 +8,7 @@
     <environment include="Development">
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
         <link rel="stylesheet" href="~/css/site.css" />
+        <link rel="stylesheet" href="~/css/Layout.css" />
     </environment>
     <environment exclude="Development">
         <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap.min.css"
@@ -34,48 +35,9 @@
                 integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa">
         </script>
         <script src="~/js/site.min.js" asp-append-version="true"></script>
-
     </environment>
 </head>
-<body style="height: 100%; background-color: #EDE8D1;">
-    <style>
-        .outer {
-            display: table;
-            position: absolute;
-            height: 100%;
-            width: 100%;
-        }
-
-        .middle {
-            display: table-cell;
-            vertical-align: middle;
-        }
-
-        .inner {
-            margin-left: auto;
-            margin-right: auto;
-            /*width: 400px;*/
-            margin: 30px;
-            box-shadow: 0 0 30px black;
-            background-color: white;
-            padding: 30px;
-            width: fit-content;
-            /*whatever width you want*/
-        }
-        .modalBox {
-            position: absolute;
-            top: 40%;
-            left: 40%;
-            /*transform: translate(-50%, -50%);*/
-            margin: 30px;
-            box-shadow: 0 0 30px black;
-            background-color: white;
-            padding: 30px;
-            width: fit-content;
-            /*height: fit-content;
-            display: block;*/
-        }
-    </style>
+<body>
     <nav class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
             <div class="navbar-header">
@@ -99,32 +61,22 @@
 
     <partial name="_CookieConsentPartial" />
 
-    <div class="container body-content" style="display: flex; flex-direction: column; height: 100%;">
-        <div style="flex: 1 0 auto;">
-            @*<div class="outer">
-                <div class="middle">*@
-                    <div class="modalBox">
+    <div class="container body-content">
+        <div class="content-flex-continer">
+            <div>
+                <div class="modal-box">
+                    <div>
                         @RenderBody()
                     </div>
-                @*</div>
-            </div>*@
-            @*<div style="margin: 30px; box-shadow: 0 0 30px black; background-color: white; padding: 30px; width: fit-content;">
-                    @RenderBody()
-            </div>*@
+                </div>
+            </div>
         </div>
         <hr />
-        <footer style="flex: 0 0 auto;">
+        <footer class="footer">
             <p>&copy; 2018 - SurveyService</p>
         </footer>
     </div>
 
     @RenderSection("Scripts", required: false)
-    <script type="text/javascript">
-        $().ready(function () {
-            $('.modalBox').css('top', 'calc(50vh - ' + ($('.modalBox').height() / 2 + 60) + 'px)');
-            $('.modalBox').css('left', 'calc(50vw - ' + ($('.modalBox').width() / 2 + 60) + 'px)');
-
-        })
-    </script>
 </body>
 </html>

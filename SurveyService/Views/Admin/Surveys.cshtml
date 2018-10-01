@@ -26,7 +26,7 @@
         <p style="margin-left:1.75em;margin-bottom:0em;">Дата создания: @survey.DateCreated.ToString("dd.MM.yyyy HH:mm")</p>
         @Html.ActionLink("Редактировать опрос", "Edit", "Admin", new { id = @survey.Id }, new { @class = "btn btn-default", @style = "margin:1em" })
         <button type="button" class="btn btn-default" style="margin:0em" onclick="RemoveSurvey('@survey.Id')">Удалить опрос</button>
-        @Html.ActionLink("Посмотреть опрос", "Index", "Survey", new { survey.Id }, new { @class = "btn btn-default", @style = "margin-left:0.5em" })
+        @Html.ActionLink("Посмотреть опрос", "Index", "DisplaySurvey", new { survey.Id }, new { @class = "btn btn-default", @style = "margin-left:0.5em" })
     </div>
 }
 

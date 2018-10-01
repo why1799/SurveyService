@@ -176,7 +176,7 @@
 <button type="button" class="btn btn-default" style="margin:0.5em" onclick="RemoveSurvey('@Model.Id')">Удалить опрос</button>
 <button type="button" class="btn btn-default" style="margin:0em" onclick="AddQuestion()">Добавить вопрос</button>
 <button type="button" class="btn btn-default" style="margin:0em" onclick="Save()">Сохранить</button>
-@Html.ActionLink("Посмотреть опрос", "Index", "Survey", new { Model.Id }, new { @class = "btn btn-default", @style = "margin-left:0.5em" })
+@Html.ActionLink("Посмотреть опрос", "Index", "DisplaySurvey", new { Model.Id }, new { @class = "btn btn-default", @style = "margin-left:0.5em" })
 
 
 <script>
