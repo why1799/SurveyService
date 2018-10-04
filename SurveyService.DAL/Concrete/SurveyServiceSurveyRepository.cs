@@ -20,10 +20,10 @@ namespace SurveyService.DAL.Concrete
             return result.Entity;
         }
 
-        public void CreateRange(ICollection<Survey> item)
+        public async Task CreateRange(ICollection<Survey> item)
         {
-            context.Surveys.AddRangeAsync(item).Wait();
-            context.SaveChangesAsync().Wait();
+            await context.Surveys.AddRangeAsync(item);
+            await context.SaveChangesAsync();
         }
 
         public async Task Delete(Survey item)

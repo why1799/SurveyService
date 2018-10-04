@@ -4,10 +4,10 @@
     //<script src="~/js/Validation.js"></script>
 }
 
-<script src="~/lib/jquery/dist/jquery.js"></script>
 <script src="~/lib/autosize-master/dist/autosize.js"></script>
 <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
-
+<script src="~/lib/jquery-ui-1.12.1/jquery-ui.js"></script>
+<link type="text/css" href="~/lib/jquery-ui-1.12.1/jquery-ui.css" />
 
 <style>
 
@@ -31,6 +31,7 @@
 
 
     .box {
+        background-color: white;
         border: 1px solid;
         width: 742px;
         margin-top: 1em;
@@ -97,7 +98,12 @@
         autosize($('textarea'));
         addedquest = 0;
         addedopt = 0;
-
+        $('#questions').sortable({
+            axis: 'y',
+            containment: '#questions',
+            opacity: 1,
+            tolerance: 'pointer'
+        });
     });
 
     function AddQuestion() {
@@ -144,9 +150,9 @@
                     </select>\
                 </div>\
             </div>\
-            <div id=\"options\">\
+            <div id=\"options{ID}\">\
             </div>\
-            <button id=\"newoption\" type=\"button\" class=\"btn btn-default\" style=\"margin-left:1em\" onclick=\"AddOption('newquest{ID}')\">Добавить ответ</button>\
+            <button id=\"newoption\" type=\"button\" class=\"btn btn-default\" style=\"margin-left:1em\" onclick=\"AddOption('{ID}')\">Добавить ответ</button>\
             <button id=\"removequest\" type=\"button\" class=\"btn btn-default\" style=\"margin-left:0em\" onclick=\"RemoveQuestion('newquest{ID}')\">Удалить вопрос</button>\
             <button type=\"button\" class=\"btn btn-default\" style=\"margin-left:0em\" onclick=\"UpQuestion('newquest{ID}')\">&#8593;</button>\
             <button type=\"button\" class=\"btn btn-default\" style=\"margin-left:0em\" onclick=\"DownQuestion('newquest{ID}')\">&#8595;</button>";
@@ -155,9 +161,16 @@
             .replace("{ID}", addedquest)
             .replace("{ID}", addedquest)
             .replace("{ID}", addedquest)
+            .replace("{ID}", addedquest)
             .replace("{ID}", addedquest);
-        addedquest++;
         $("#questions").append(newquestion);
+        $('#options' + addedquest).sortable({
+            axis: 'y',
+            containment: '#options' + addedquest,
+            opacity: 1,
+            tolerance: 'pointer'
+        });
+        addedquest++;
     }
 
     function RemoveQuestion(surveyquestionid) {
@@ -182,7 +195,7 @@
             .replace("{ID}", addedopt)
             .replace("{ID}", addedopt);
         addedopt++;
-        $("#" + surveyquestionid).children("#options").append(newoption);
+        $("#newquest" + surveyquestionid).children("#options" + surveyquestionid).append(newoption);
     }
 
     function RemoveOption(optionid) {
