@@ -84,7 +84,7 @@
                 </div>
             }
         </div>
-        <input type="submit" id="submitButton" value="Отправить"/>
+        <input type="submit" id="submitButton" value="Отправить" />
     </form>
 </div>
 <script type="text/javascript">
@@ -92,13 +92,34 @@
         // Валидатор
         jQuery.validator.addMethod("customv", function (value, element, params) {
             let errMessageBox = $('#ErrorMessage' + params);
-            if ($('input[name="' + params + '"]:checked').length > 0) {
-                errMessageBox.hide();
-                return true;
+            if ($('input[name="' + params + '"]:checked').length > 0) { 
+                // Если есть выбранные чекбоксы
+                let flag = true;
+                $('input[name="' + params + '"]:checked').each(function () {
+                    // Проходим по всем выбранным чекбоксам, и ищем 
+                    let textBoxId = $(this).attr('for');
+                    if (textBoxId) {
+                        if (!$('#' + textBoxId).val().length > 0) {
+                            // Если был выбран "Свой вариант ответа" и в текстовом поле нет символов, говорим что все плохо
+                            flag = false;
+                            return false;
+                        }
+                    }
+                });
+                if (!flag) {
+                    errMessageBox.show();
+                    return false;
+
+                }
+                else {
+                    errMessageBox.hide();
+                    return true;
+                }
             } else {
                 errMessageBox.show();
                 return false;
             }
+
         }, jQuery.validator.format(""));
         // Валидатор для текстбоксов
         jQuery.validator.addMethod("customText", function (value, element, params) {
@@ -136,7 +157,7 @@
                 json += ' "' + index++ + '": { "type": "custom", "questionId": "' + textBoxArr[i].id + '", "text": "' + textBoxArr[i].value + '"}, ';
 
             }
-            
+
             json = json.substring(0, json.length - 2) + '}}'; // заканчиваем формирование json
             $.ajax({ // отправляем запрос
                 type: 'POST',
