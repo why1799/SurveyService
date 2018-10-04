@@ -92,13 +92,13 @@
         // Валидатор
         jQuery.validator.addMethod("customv", function (value, element, params) {
             let errMessageBox = $('#ErrorMessage' + params);
-            if ($('input[name="' + params + '"]:checked').length > 0) { 
+            if ($('input[name="' + params + '"]:checked').length > 0) {
                 // Если есть выбранные чекбоксы
                 let flag = true;
-                $('input[name="' + params + '"]:checked').each(function () {
-                    // Проходим по всем выбранным чекбоксам, и ищем 
+                $('input[name="' + params + '"]:').each(function () {
+                    // Проходим по всем выбранным чекбоксам, и ищем
                     let textBoxId = $(this).attr('for');
-                    if (textBoxId) {
+                    if (textBoxId) {checked
                         if (!$('#' + textBoxId).val().length > 0) {
                             // Если был выбран "Свой вариант ответа" и в текстовом поле нет символов, говорим что все плохо
                             flag = false;
