@@ -9,7 +9,7 @@ namespace SurveyService.DAL.Abstract
     public interface IRepository<T>
     {
         Task<T> Create(T item);
-        void CreateRange(ICollection<T> item);
+        Task CreateRange(ICollection<T> item);
         Task Delete(T item);
         Task DeleteRange(ICollection<T> item);
         Task<T> Update(T item);

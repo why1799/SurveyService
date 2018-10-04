@@ -4,30 +4,19 @@
 }
 <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
 <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
-<style>
-    .contentBox div:nth-child(n + 2) {
-        border-top-style: groove;
-        border-top-width: thin;
-    }
-
-    input[type=text] {
-        transition: 0.6s;
-        border: none;
-        border-bottom: 1px solid #CCC;
-        background-color: transparent;
-    }
-</style>
-<div style="min-width: 500px;">
-    <h2 style="text-align: center;">@Model.Title</h2>
-    <form id="questonForm" asp-controller="Survey" asp-action="SetResult" method="post">
-        <div class="contentBox" style="border-top-style: groove; border-bottom-style: groove; border-width: thin;">
+<link rel="stylesheet" href="~/css/DisplaySurvey.css" />
+<div>
+    @*style="min-width: 500px;"*@
+    <h2>@Model.Title</h2>
+    <form id="questonForm" asp-controller="DisplaySurvey" asp-action="SetResult" method="post">
+        <div class="content-box">
             @foreach (var question in Model.SurveyQuestion)
             {
-                <div style="padding: 15px 30px;">
-                    <div style="font-size:18px">
+                <div class="question-card">
+                    <div class="question-title">
                         @question.QuestionText@if (question.IsRequired)
                         {
-                            <span class="IsRequired" style="color:red;">*</span>
+                            <span class="IsRequired">*</span>
                         }
                     </div>
 
@@ -72,7 +61,7 @@
                                         <li>
                                             <input type="checkbox" name=@question.Id value="custom" data-questionid="@question.Id"
                                                    for="@("customAnswer" + question.Id)" @(string.IsNullOrEmpty(question.UserAnswers?.SingleOrDefault()?.OwnAnswerText) == false ? "checked" : "")
-                                                   @(question.IsRequired == true ? "data-val-required = The IsSelected field is required. data-rule-customv = " + question.Id + " class=input-validation-error" : "") />
+                                                   @(question.IsRequired == true ? "data-val-required='The IsSelected field is required.' data-rule-customv='" + question.Id + "' class='input-validation-error'" : "") />
                                             <input id=@("customAnswer" + question.Id) type="text" value="@(question.UserAnswers?.SingleOrDefault()?.OwnAnswerText)" placeholder="Свой вариант." />
                                         </li>
                                     }
@@ -81,8 +70,8 @@
                             case 2: /*Только текстовый ответ*/
                                 {
                                     <li>
-                                        <input id="@question.Id" data-mycastomtextanswer="trye" type="text" value="@(question.UserAnswers?.SingleOrDefault()?.OwnAnswerText)" placeholder="" 
-                                               @(question.IsRequired == true ? "data-val-required = The IsSelected field is required. data-rule-customText = " + question.Id + " class=input-validation-error" : "")/>
+                                        <input id="@question.Id" data-mycastomtextanswer="trye" type="text" value="@(question.UserAnswers?.SingleOrDefault()?.OwnAnswerText)" placeholder=""
+                                               @(question.IsRequired == true ? "data-val-required = The IsSelected field is required. data-rule-customText = " + question.Id + " class=input-validation-error" : "") />
                                     </li>
                                     break;
                                 }
@@ -91,11 +80,11 @@
                         }
 
                     </ul>
-                    <span id="@("ErrorMessage" + question.Id)" style="color:red; display:none;">Необходимо дать ответ на этот вопрос!</span>
+                    <span id="@("ErrorMessage" + question.Id)" class="error-message">Необходимо дать ответ на этот вопрос!</span>
                 </div>
             }
         </div>
-        <input type="submit" id="submitButton" value="Отправить" style="margin:30px;" />
+        <input type="submit" id="submitButton" value="Отправить" />
     </form>
 </div>
 <script type="text/javascript">
@@ -104,12 +93,33 @@
         jQuery.validator.addMethod("customv", function (value, element, params) {
             let errMessageBox = $('#ErrorMessage' + params);
             if ($('input[name="' + params + '"]:checked').length > 0) {
-                errMessageBox.hide();
-                return true;
+                // Если есть выбранные чекбоксы
+                let flag = true;
+                $('input[name="' + params + '"]:').each(function () {
+                    // Проходим по всем выбранным чекбоксам, и ищем
+                    let textBoxId = $(this).attr('for');
+                    if (textBoxId) {checked
+                        if (!$('#' + textBoxId).val().length > 0) {
+                            // Если был выбран "Свой вариант ответа" и в текстовом поле нет символов, говорим что все плохо
+                            flag = false;
+                            return false;
+                        }
+                    }
+                });
+                if (!flag) {
+                    errMessageBox.show();
+                    return false;
+
+                }
+                else {
+                    errMessageBox.hide();
+                    return true;
+                }
             } else {
                 errMessageBox.show();
                 return false;
             }
+
         }, jQuery.validator.format(""));
         // Валидатор для текстбоксов
         jQuery.validator.addMethod("customText", function (value, element, params) {
@@ -147,11 +157,11 @@
                 json += ' "' + index++ + '": { "type": "custom", "questionId": "' + textBoxArr[i].id + '", "text": "' + textBoxArr[i].value + '"}, ';
 
             }
-            
+
             json = json.substring(0, json.length - 2) + '}}'; // заканчиваем формирование json
             $.ajax({ // отправляем запрос
                 type: 'POST',
-                url:  '@Url.Action("SaveResult", "Survey")',//'SaveResult',
+                url:  '@Url.Action("SaveResult", "DisplaySurvey")',//'SaveResult',
                 data: json,
                 contentType: "application/json",
                 dataType: 'text',

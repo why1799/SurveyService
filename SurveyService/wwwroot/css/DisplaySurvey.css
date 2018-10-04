@@ -1,0 +1,44 @@
+﻿body {
+}
+
+h2 {
+    text-align: center;
+}
+
+.content-box div:nth-child(n + 2) {
+    border-bottom-style: groove;
+    border-top-style: groove;
+    border-width: thin
+}
+
+input[type=text] {
+    outline: none;
+    transition: 0.6s;
+    border: none;
+    border-bottom: 1px solid #CCC;
+    background-color: transparent;
+}
+    input[type=text]::selection {
+        border: none;
+        border-bottom: 1px solid #CCC;
+        background-color: transparent;
+    }
+
+.question-card {
+    padding: 15px 30px;
+}
+
+    .question-card .question-title {
+        font-size: 18px
+    }
+
+        .question-card .question-title .IsRequired {
+            color: red;
+        }
+.error-message {
+    color: red;
+    display: none;
+}
+#submitButton {
+    margin: 30px;
+}

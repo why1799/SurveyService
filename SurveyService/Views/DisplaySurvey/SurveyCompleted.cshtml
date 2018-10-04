@@ -1,0 +1,14 @@
+﻿<div>
+    <h3 style="text-align: center;">Опрос пройден!</h3>
+    @{
+        var data = new Dictionary<string, string> {
+        {"id", ViewBag.surveyId},
+        {"anew", "true"}
+    };
+    }
+    <form  asp-controller="DisplaySurvey" asp-action="Index" asp-all-route-data="data">
+        <div style="text-align:center;">
+            <input type="submit" value="Изменить ответы" />
+        </div>
+    </form>
+</div>

@@ -3,10 +3,10 @@
     ViewData["Title"] = "Добавление нового опроса";
 }
 
-
-<script src="~/js/jquery.ddslick.min.js"></script>
 <script src="~/lib/autosize-master/dist/autosize.js"></script>
 <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+<script src="~/lib/jquery-ui-1.12.1/jquery-ui.js"></script>
+<link type="text/css" href="~/lib/jquery-ui-1.12.1/jquery-ui.css" />
 
 
 
@@ -53,6 +53,7 @@
 
 
     .contentBox {
+        background-color: white;
         border: 1px solid;
         width: 742px;
         margin-top: 1em;
@@ -134,6 +135,12 @@
     $(document).ready(function () {
         addedquest = 0;
         addedopt = 0;
+    $('#questions').sortable({
+            axis: 'y',
+            containment: '#questions',
+            opacity: 1,
+            tolerance: 'pointer'
+        });
         $('.modalBox').css("width", "742px");
     });
 
@@ -163,6 +170,7 @@
                 }
             }
         });
+
     }
 
     function AddAnother(id) {
@@ -177,7 +185,7 @@
 
     function AddQuestion() {
 
-        
+
         var newquestion = "<div id=\"newquest{ID}\" class=\"box\" style=\"margin-top:1em;\">\
             <div class=\"separate\">\
                 <div class=\"leftdiv\" style=\"width:60%;\">\
@@ -228,10 +236,16 @@
             .replace("{ID}", addedquest)
             .replace("{ID}", addedquest);
 
-        
+
         $("#questions").append(newquestion);
         MakeSelectSlick('newquest' + addedquest + 'select');
         autosize($('#newquest' + addedquest + ' div div textarea'));
+    $('#options' + addedquest).sortable({
+            axis: 'y',
+            containment: '#options' + addedquest,
+            opacity: 1,
+            tolerance: 'pointer'
+        });
         addedquest++;
 
     }
@@ -398,9 +412,9 @@
             else if (select === 2) {
                 type = "1"
             }
-            
+
             question.push(type);*/
-            
+
 
             if ($('#' + id + ' #another').css('display') == 'none') {
                 question.push("False");

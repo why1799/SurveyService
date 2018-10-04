@@ -9,13 +9,13 @@ using SurveyService.DAL.Abstract;
 
 namespace SurveyService.WebUI.Controllers
 {
-    public class SurveyController : Controller
+    public class DisplaySurveyController : Controller
     {
         ISurveyRepository survey;
         IUserAnswerRepository userAnswer;
         IUserRepository userRepository;
 
-        public SurveyController(ISurveyRepository survey,
+        public DisplaySurveyController(ISurveyRepository survey,
         IUserAnswerRepository userAnswer,
         IUserRepository userRepository)
         {
@@ -23,7 +23,7 @@ namespace SurveyService.WebUI.Controllers
             this.userAnswer = userAnswer;
             this.userRepository = userRepository;
         }
-        //GET: /Survey/Index?id=SurveyId
+        //GET: /DisplaySurvey/Index?id=SurveyId
         //[Authorize(Policy = "Admin")]
         public IActionResult Index(string id, bool anew = false)
         {
