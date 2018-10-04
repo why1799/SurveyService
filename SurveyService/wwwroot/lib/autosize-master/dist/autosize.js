@@ -130,8 +130,8 @@
 			var overflows = getParentOverflows(ta);
 			var docTop = document.documentElement && document.documentElement.scrollTop; // Needed for Mobile IE (ticket #240)
 
-			ta.style.height = '';
-			ta.style.height = ta.scrollHeight + heightOffset + 'px';
+            ta.style.height = '';
+            ta.style.height = ta.scrollHeight + heightOffset + 'px';
 
 			// used to check if an update is actually necessary on window.resize
 			clientWidth = ta.clientWidth;
