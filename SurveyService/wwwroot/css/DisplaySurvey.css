@@ -12,16 +12,17 @@ h2 {
 }
 
 input[type=text] {
+    outline: none;
     transition: 0.6s;
     border: none;
     border-bottom: 1px solid #CCC;
     background-color: transparent;
 }
-input[type=text]::selection {
-    border: none;
-    border-bottom: 1px solid #CCC;
-    background-color: transparent;
-}
+    input[type=text]::selection {
+        border: none;
+        border-bottom: 1px solid #CCC;
+        background-color: transparent;
+    }
 
 .question-card {
     padding: 15px 30px;
