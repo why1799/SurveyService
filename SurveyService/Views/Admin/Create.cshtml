@@ -75,7 +75,6 @@
     }
 
     .box {
-        position: relative;
         border-top-style: groove;
         border-top-width: thin;
     }
@@ -110,24 +109,43 @@
         display: flex;
     }
 
-    .optionright{
+    .optionright {
         width: 95%;
     }
-    .left-menu {
-        top: 130px;
-        right: -69px;
+
+    #left-menu {
+        top: 60px;
+        right: -100px;
         position: fixed;
         position: absolute;
         -webkit-transition: all .3s cubic-bezier(0.4,0.0,0.2,1);
-        transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
-        opacity: .54;
+        transition: all .4s cubic-bezier(0.07, 0.01, 0.9, 0.99);
+        height: 110px;
+        width: 50px;
+        background-color: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0 4px 13px rgba(0,0,0,0.25), 0 0px 4px rgba(0,0,0,0.22);
     }
+        #left-menu > div {
+            margin: 5px 0 5px 0;
+            opacity: .54;
+        }
+        #left-menu > div:hover {
+            opacity: 1;
+        }
 </style>
 
 <form>
     <div class="box">
-        <div class="left-menu">
-            <div style="background: url(/images/SurveyIcon.svg) no-repeat -2px -3170px; width: 20px; height: 20px; cursor: pointer;"></div>
+        <div style="position: relative;">
+            <div id="left-menu">
+            <div style="background: url(/images/SurveyIcon.svg) no-repeat -2px -3168px; width: 20px; height: 24px; cursor: pointer;" onclick="AddQuestion()"></div>
+            <div style="background: url(/images/SurveyIcon.svg) no-repeat -2px -3458px; width: 20px; height: 22px; cursor: pointer;" onclick="GoBack()"></div>
+            <div style="background: url(/images/SurveyIcon.svg) no-repeat -2px -4700px; width: 20px; height: 30px; cursor: pointer;" onclick="Save()"></div>
+        </div>
         </div>
         <input id="SurveyName" style="width:90%;height: 46px;font-size: 30px; margin:5%;" type="text" placeholder="Название опроса" required
                oninvalid="this.setCustomValidity('Введите название опроса')"
@@ -139,7 +157,7 @@
 
     <div id="questions">
 
-        
+
     </div>
 
     <input class="submit" type="submit" style="display:none">
@@ -149,9 +167,6 @@
 <div style="border-bottom-style: groove; border-width: thin; margin-top:0em">
 </div>
 
-@Html.ActionLink("Вернуться к списку опросов", "Surveys", "Admin", new { }, new { @class = "btn btn-default", @style = "margin-left:0em" })
-<input id="addquest" type="button" class="btn btn-default" style="margin:0em" onclick="AddQuestion()" value="Добавить вопрос">
-<button type="button" class="btn btn-default" style="margin:0em" onclick="Save()">Сохранить</button>
 
 
 <script>
@@ -163,13 +178,16 @@
         addedquest = 0;
         addedopt = 0;
         autosize($('textarea'));
-    $('#questions').sortable({
+        $('#questions').sortable({
             axis: 'y',
             containment: '#questions',
             opacity: 1,
             tolerance: 'pointer'
         });
         $('.modalBox').css("width", "742px");
+        $(window).scroll(function (e) {
+            $('#left-menu').css('top', $(window).scrollTop() + 60 + 'px')
+        });
     });
 
 
@@ -423,6 +441,10 @@
         }
     }
 
+    function GoBack() {
+        window.location = '@Url.Action("Surveys", "Admin")';
+    }
+
     function Save() {
         var title = $("#SurveyName").val();
         var description = $("#SurveyDescription").val();
@@ -571,11 +593,11 @@
         box-shadow: 0 3px 8px rgba(79, 46, 220, 0.2);
     }
 
-    input[type=checkbox]:checked + .toggle span:before {
-        transform: scale(1);
-        opacity: 0;
-        transition: all 0.4s ease;
-    }
+        input[type=checkbox]:checked + .toggle span:before {
+            transform: scale(1);
+            opacity: 0;
+            transition: all 0.4s ease;
+        }
 
     .center {
         position: absolute;
