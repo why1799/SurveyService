@@ -6,6 +6,7 @@
 <script src="~/lib/autosize-master/dist/autosize.js"></script>
 <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
 <script src="~/lib/jquery-ui-1.12.1/jquery-ui.js"></script>
+<script src="~/js/jquery.ddslick.min.js"></script>
 <link type="text/css" href="~/lib/jquery-ui-1.12.1/jquery-ui.css" />
 
 
@@ -97,6 +98,21 @@
         justify-content: flex-end;
     }
 
+    .optionseparation {
+        display: flex;
+        align-items: center;
+    }
+
+    .optionleft {
+        width: 5%;
+        float: left;
+        display: flex;
+    }
+
+    .optionright{
+        width: 95%;
+    }
+
 </style>
 
 <form>
@@ -135,6 +151,7 @@
     $(document).ready(function () {
         addedquest = 0;
         addedopt = 0;
+        autosize($('textarea'));
     $('#questions').sortable({
             axis: 'y',
             containment: '#questions',
@@ -187,6 +204,9 @@
 
 
         var newquestion = "<div id=\"newquest{ID}\" class=\"box\" style=\"margin-top:1em;\">\
+            <div style=\"justify-content: center;display: flex;margin-top:1em;\">\
+                <img id=\"movenewquest{ID}\" src=\"/images/questiondots.png\" style=\"cursor:move;\" width=\"20\" height=\"10\">\
+            </div>\
             <div class=\"separate\">\
                 <div class=\"leftdiv\" style=\"width:60%;\">\
                     <textarea rows=\"1\" style=\"resize:none;width:90%;height: 36px;font-size: 20px; margin-top:1em; margin-right:5%;\" type=\"text\" placeholder=\"Название вопроса\" required oninvalid=\"this.setCustomValidity('Введите название вопроса')\" oninput=\"setCustomValidity('')\"></textarea>\
@@ -234,15 +254,16 @@
             .replace("{ID}", addedquest)
             .replace("{ID}", addedquest)
             .replace("{ID}", addedquest)
+            .replace("{ID}", addedquest)
             .replace("{ID}", addedquest);
 
 
         $("#questions").append(newquestion);
         MakeSelectSlick('newquest' + addedquest + 'select');
         autosize($('#newquest' + addedquest + ' div div textarea'));
-    $('#options' + addedquest).sortable({
+        $('#optionsnewquest' + addedquest).sortable({
             axis: 'y',
-            containment: '#options' + addedquest,
+            containment: '#optionsnewquest' + addedquest,
             opacity: 1,
             tolerance: 'pointer'
         });
@@ -256,16 +277,21 @@
 
     function AddOption(surveyquestionid) {
         var newoption = "\
-                <div id =\"newopt{ID}\" style=\"margin-top:1em\">\
-                    <img id=\"image\" src=\"{TYPE}\" width=\"20\" height=\"20\" style=\"margin-left:5%;\">\
-                    <input style=\"width:83%;height: 30px;font-size: 15px;\" type=\"text\" placeholder=\"Ответ\" required oninvalid=\"this.setCustomValidity('Введите ответ')\" oninput=\"setCustomValidity('')\">\
-                    <img src=\"/images/cross.png\" style=\"cursor:pointer\" width=\"20\" height=\"20\" onclick=\"RemoveOption('newopt{ID}')\">\
+                <div id=\"newopt{ID}\" class=\"optionseparation\" style=\"margin-top:1em\">\
+                    <div class=\"optionleft\">\
+                        <img id=\"movenewopt{ID}\" src=\"/images/optiondots.png\" width=\"10\" height=\"20\" style=\"cursor:move;\">\
+                    </div>\
+                    <div class=\"optionright\">\
+                        <img id=\"image\" src=\"{TYPE}\" width=\"20\" height=\"20\">\
+                        <input style=\"width:87%;height: 30px;font-size: 15px;\" type=\"text\" placeholder=\"Ответ\" required oninvalid=\"this.setCustomValidity('Введите ответ')\" oninput=\"setCustomValidity('')\">\
+                        <img src=\"/images/cross.png\" style=\"cursor:pointer\" width=\"20\" height=\"20\" onclick=\"RemoveOption('newopt{ID}')\">\
+                    </div>\
                 </div>"
 
         newoption = newoption.replace("{ID}", addedopt)
-            .replace("{ID}", addedopt).replace("{TYPE}", $("#" + surveyquestionid + " #addnew #image").attr('src'));
+            .replace("{ID}", addedopt).replace("{ID}", addedopt).replace("{TYPE}", $("#" + surveyquestionid + " #addnew #image").attr('src'));
 
-        $("#options" + surveyquestionid).append(newoption);
+        $("#options"+ surveyquestionid).append(newoption);
 
         $('#newopt' + addedopt + ' input').focus();
 
@@ -400,21 +426,22 @@
             question.push(id);
             question.push($("#" + id + " div div textarea").val());
 
-
-            /*var select = $("#" + id + "select").ddslick('destroy');
+            $("#" + id + "select").ddslick('destroy');
+            var select = $("#" + id + "select").val();
             var type;
-            if (select === 0) {
+            if (select === "0") {
                 type = "2"
             }
-            else if (select === 1) {
+            else if (select === "1") {
                 type = "0"
             }
-            else if (select === 2) {
+            else if (select === "2") {
                 type = "1"
             }
 
-            question.push(type);*/
+            question.push(type);
 
+            MakeSelectSlick(id + "select");
 
             if ($('#' + id + ' #another').css('display') == 'none') {
                 question.push("False");
@@ -423,18 +450,20 @@
                 question.push("True");
             }
 
-            if ($("#newquest1required")[0].checked) {
+            if ($("#" + id + "required")[0].checked) {
                 question.push("True");
             }
             else  {
                 question.push("False");
             }
 
-            var options = $("#" + id + " #options").children();
-            for (var j = 0; j < options.length; j++) {
-                var optionid = options[j].id;
-                question.push(optionid);
-                question.push($("#" + optionid + " div input").val());
+            if (select != 0) {
+                var options = $("#options" + id).children();
+                for (var j = 0; j < options.length; j++) {
+                    var optionid = options[j].id;
+                    question.push(optionid);
+                    question.push($("#" + optionid + " div input").val());
+                }
             }
             questions.push(question);
         }
