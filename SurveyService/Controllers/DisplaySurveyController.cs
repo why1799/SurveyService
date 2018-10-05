@@ -87,6 +87,11 @@ namespace SurveyService.WebUI.Controllers
         [HttpPost]
         public IActionResult SaveResult([FromBody]Newtonsoft.Json.Linq.JObject data)
         {
+
+            if (data == null)
+            {
+                return Json(new { ok = false, newUrl = "/Error" }); // редиректнули на страниц "Опрос пройден";
+            }
             var user = Helper.UserHelper.GetUser(HttpContext, userRepository);
             string surveyId = data.GetValue("surveyId").ToString();
             if(data.GetValue("anew").ToString() == true.ToString()) // проверяем, это первое прохождение опроса или нет

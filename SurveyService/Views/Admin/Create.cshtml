@@ -75,6 +75,7 @@
     }
 
     .box {
+        position: relative;
         border-top-style: groove;
         border-top-width: thin;
     }
@@ -112,12 +113,22 @@
     .optionright{
         width: 95%;
     }
-
+    .left-menu {
+        top: 130px;
+        right: -69px;
+        position: fixed;
+        position: absolute;
+        -webkit-transition: all .3s cubic-bezier(0.4,0.0,0.2,1);
+        transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
+        opacity: .54;
+    }
 </style>
 
 <form>
     <div class="box">
-
+        <div class="left-menu">
+            <div style="background: url(/images/SurveyIcon.svg) no-repeat -2px -3170px; width: 20px; height: 20px; cursor: pointer;"></div>
+        </div>
         <input id="SurveyName" style="width:90%;height: 46px;font-size: 30px; margin:5%;" type="text" placeholder="Название опроса" required
                oninvalid="this.setCustomValidity('Введите название опроса')"
                oninput="setCustomValidity('')">
