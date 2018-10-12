@@ -7,7 +7,7 @@
 <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
 <script src="~/lib/jquery-ui-1.12.1/jquery-ui.js"></script>
 <script src="~/js/jquery.ddslick.min.js"></script>
-<link type="text/css" href="~/lib/jquery-ui-1.12.1/jquery-ui.css" />
+<link rel="stylesheet" href="~/lib/jquery-ui-1.12.1/jquery-ui.css" />
 
 
 
@@ -120,7 +120,7 @@
         position: absolute;
         -webkit-transition: all .3s cubic-bezier(0.4,0.0,0.2,1);
         transition: all .4s cubic-bezier(0.07, 0.01, 0.9, 0.99);
-        height: 110px;
+        height: 85px;
         width: 50px;
         background-color: white;
         display: flex;
@@ -129,25 +129,104 @@
         align-items: center;
         box-shadow: 0 4px 13px rgba(0,0,0,0.25), 0 0px 4px rgba(0,0,0,0.22);
     }
+
         #left-menu > div {
             margin: 5px 0 5px 0;
             opacity: .54;
         }
-        #left-menu > div:hover {
-            opacity: 1;
+
+            #left-menu > div:hover {
+                opacity: 1;
+            }
+
+    html, body {
+        height: 100%;
+    }
+
+    .toggle {
+        position: relative;
+        display: block;
+        width: 40px;
+        height: 20px;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+        transform: translate3d(0, 0, 0);
+    }
+
+        .toggle:before {
+            content: "";
+            position: relative;
+            top: 3px;
+            left: 3px;
+            width: 34px;
+            height: 14px;
+            display: block;
+            background: #9A9999;
+            border-radius: 8px;
+            transition: background 0.2s ease;
         }
+
+        .toggle span {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 20px;
+            height: 20px;
+            display: block;
+            border: 1px solid darkgrey;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 3px 8px rgba(154, 153, 153, 0.5);
+            transition: all 0.2s ease;
+        }
+
+            .toggle span:before {
+                content: "";
+                position: absolute;
+                display: block;
+                margin: -18px;
+                width: 56px;
+                height: 56px;
+                background: rgba(79, 46, 220, 0.5);
+                border-radius: 50%;
+                transform: scale(0);
+                opacity: 1;
+                pointer-events: none;
+            }
+
+    input[type=checkbox]:checked + .toggle:before {
+        background: #947ADA;
+    }
+
+    input[type=checkbox]:checked + .toggle span {
+        background: #4F2EDC;
+        transform: translateX(20px);
+        transition: all 0.2s cubic-bezier(0.8, 0.4, 0.3, 1.25), background 0.15s ease;
+        box-shadow: 0 3px 8px rgba(79, 46, 220, 0.2);
+    }
+
+        input[type=checkbox]:checked + .toggle span:before {
+            transform: scale(1);
+            opacity: 0;
+            transition: all 0.4s ease;
+        }
+
+    .center {
+        position: absolute;
+        top: calc(50% - 10px);
+        left: calc(50% - 20px);
+    }
 </style>
 
-<form>
+<form id="SurveyForm">
     <div class="box">
         <div style="position: relative;">
             <div id="left-menu">
-            <div style="background: url(/images/SurveyIcon.svg) no-repeat -2px -3168px; width: 20px; height: 24px; cursor: pointer;" onclick="AddQuestion()"></div>
-            <div style="background: url(/images/SurveyIcon.svg) no-repeat -2px -3458px; width: 20px; height: 22px; cursor: pointer;" onclick="GoBack()"></div>
-            <div style="background: url(/images/SurveyIcon.svg) no-repeat -2px -4700px; width: 20px; height: 30px; cursor: pointer;" onclick="Save()"></div>
+                <div style="background: url(/images/SurveyIcon.svg) no-repeat -2px -3168px; width: 20px; height: 24px; cursor: pointer;" onclick="AddQuestion()"></div>
+                <div id="savebutton" style="background: url(/images/SurveyIcon.svg) no-repeat -2px -4700px; width: 20px; height: 30px; cursor: pointer;" onclick="Save()"></div>
+            </div>
         </div>
-        </div>
-        <input id="SurveyName" style="width:90%;height: 46px;font-size: 30px; margin:5%;" type="text" placeholder="Название опроса" required
+        <input id="SurveyName" style="width:90%;height: 46px;font-size: 30px; margin:5%;" type="text" placeholder="Название опроса" required autocomplete="off"
                oninvalid="this.setCustomValidity('Введите название опроса')"
                oninput="setCustomValidity('')">
 
@@ -160,11 +239,24 @@
 
     </div>
 
-    <input class="submit" type="submit" style="display:none">
+    <input id="submitButton" class="submit" type="submit" style="display:none">
 
 </form>
 
 <div style="border-bottom-style: groove; border-width: thin; margin-top:0em">
+</div>
+
+<div id="error-message" title="Ошибка сохранение!" style="display:none">
+    <p>
+        Необходимо добавить вопрос!
+    </p>
+</div>
+
+<div id="save-message" title="Сохранение!" style="display:none">
+    <p>
+        Опрос сохраняется!
+    </p>
+    <img src="~/images/loading.gif" width="115" height="115" style="display: block;margin: 0 auto;"/>
 </div>
 
 
@@ -188,8 +280,80 @@
         $(window).scroll(function (e) {
             $('#left-menu').css('top', $(window).scrollTop() + 60 + 'px')
         });
+
+        try {
+            $("#save-message").dialog('widget').css({ 'margin-top': '0em' });
+            $("#save-message").dialog("option", "position", { my: "top", at: "top", of: window });
+            $("#save-message").dialog('widget').css({ 'margin-top': '5em' });
+        }
+        catch{ }
+        try {
+            $("#error-message").dialog('widget').css({ 'margin-top': '0em' });
+            $("#error-message").dialog("option", "position", { my: "top", at: "top", of: window });
+            $("#error-message").dialog('widget').css({ 'margin-top': '5em' });
+        }
+        catch{ }
     });
 
+    function ErrorMessage() {
+
+        $("#error-message").dialog({
+            width: 280,
+            height: 150,
+            resizable: false,
+            modal: true,
+            draggable: false,
+
+            closeOnEscape: false,
+            open: function (event, ui) {
+                $(event.target).dialog('widget')
+                    .css("box-shadow", "0 10px 28px rgba(0,0,0,0.25), 0 0px 10px rgba(0,0,0,0.22)")
+                    .css("border-radius", "10px")
+                    .css({ position: 'fixed' })
+                    .position({ my: 'top', at: 'top', of: window })
+                    .css({ 'margin-top': '5em' });
+                $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+            },
+
+            close: function (event, ui) {
+                $(event.target).dialog('widget')
+                    .css({ 'margin-top': '0em' });
+            },
+
+            buttons: {
+                Ok: function () {
+                    $(this).dialog("close");
+                }
+            }
+        });
+    }
+
+    function SaveMessage() {
+
+        $("#save-message").dialog({
+            width: 280,
+            height: 205,
+            resizable: false,
+            modal: true,
+            draggable: false,
+
+            closeOnEscape: false,
+            open: function (event, ui) {
+                $(event.target).dialog('widget')
+                    .css("box-shadow", "0 10px 28px rgba(0,0,0,0.25), 0 0px 10px rgba(0,0,0,0.22)")
+                    .css("border-radius", "10px")
+                    .css({ position: 'fixed' })
+                    .position({ my: 'top', at: 'top', of: window })
+                    .css({ 'margin-top': '5em' });
+                $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+            },
+
+            close: function (event, ui) {
+                $(event.target).dialog('widget')
+                    .css({ 'margin-top': '0em' });
+            }
+        });
+    }
 
     function MakeSelectSlick(selectid) {
         $('#' + selectid).ddslick({
@@ -296,6 +460,7 @@
             opacity: 1,
             tolerance: 'pointer'
         });
+
         addedquest++;
 
     }
@@ -324,6 +489,8 @@
 
         $('#newopt' + addedopt + ' input').focus();
 
+        $("#" + surveyquestionid + " #addnew input")[0].setCustomValidity('');
+
         addedopt++;
     }
 
@@ -331,121 +498,10 @@
         $("#" + optionid).remove();
     }
 
-    function ChangeDivs(firstid, secondid) {
-
-        div1 = $('#' + firstid);
-        div2 = $('#' + secondid);
-
-        tdiv1 = div1.clone();
-        tdiv2 = div2.clone();
-
-        div1.replaceWith(tdiv2);
-        div2.replaceWith(tdiv1);
-    }
-
-    function UpQuestion(questionid) {
-        var questions = $("#questions").children();
-        if (questions.length < 2) {
-            return;
-        }
-
-        var f = questions[0].id;
-        if (f === questionid)
-            return;
-        var s;
-
-        for (var i = 1; i < questions.length; i++) {
-            s = questions[i].id;
-            if (s === questionid) {
-                ChangeDivs(f, s);
-                return;
-            }
-            f = s;
-        }
-    }
-
-    function DownQuestion(questionid) {
-        var questions = $("#questions").children();
-        if (questions.length < 2) {
-            return;
-        }
-
-        var f = questions[questions.length - 1].id;
-        if (f === questionid)
-            return;
-        var s;
-
-        for (var i = questions.length - 2; i >= 0; i--) {
-            s = questions[i].id;
-            if (s === questionid) {
-                ChangeDivs(f, s);
-                return;
-            }
-            f = s;
-        }
-    }
-
-    function UpOption(optionid) {
-        var options = $("#" + optionid).parent().children();
-
-        if (options.length < 2) {
-            return;
-        }
-
-        var f = options[0].id;
-        if (f === optionid)
-            return;
-        var s;
-
-        for (var i = 1; i < options.length; i++) {
-            s = options[i].id;
-            if (s === optionid) {
-                ChangeDivs(f, s);
-                return;
-            }
-            f = s;
-        }
-    }
-
-    function DownOption(optionid) {
-        var options = $("#" + optionid).parent().children();
-
-        if (options.length < 2) {
-            return;
-        }
-
-        var f = options[options.length - 1].id;
-        if (f === optionid)
-            return;
-        var s;
-
-        for (var i = options.length - 2; i >= 0; i--) {
-            s = options[i].id;
-            if (s === optionid) {
-                ChangeDivs(f, s);
-                return;
-            }
-            f = s;
-        }
-    }
-
-    function OnSelectChange(questionid) {
-        if ($("#" + questionid + " select option:selected")[0].text == "Текстовый ответ") {
-            $("#" + questionid + " #options").empty();
-            $("#" + questionid + " #newoption").hide();
-            $("#" + questionid + " #removequest").css("margin-left", "1em")
-        }
-        else {
-            $("#" + questionid + " #newoption").show();
-            $("#" + questionid + " #removequest").css("margin-left", "0em")
-        }
-    }
-
-    function GoBack() {
-        window.location = '@Url.Action("Surveys", "Admin")';
-    }
-
     function Save() {
+
+        SaveMessage();
+
         var title = $("#SurveyName").val();
         var description = $("#SurveyDescription").val();
 
@@ -501,6 +557,29 @@
             questions.push(question);
         }
 
+        if (questions.length == 0) {
+            $("#save-message").dialog("close");
+            $("#savebutton").effect("bounce");
+            ErrorMessage();
+            return;
+        }
+
+        for (var i = 0; i < questions.length; i++) {
+            if (questions[i].length <= 5 && questions[i][2] != "2") {
+                $("#" + questions[i][0] + " #addnew input")[0].setCustomValidity('Необходимо добавить ответ');
+            }
+
+            if (questions[i][2] === "2") {
+                $("#" + questions[i][0] + " #addnew input")[0].setCustomValidity('');
+            }
+        }
+
+        if (!$('#SurveyForm')[0].checkValidity()) {
+            $("#save-message").dialog("close");
+            $('#submitButton').click();
+            return;
+        }
+
         $.ajax(
             {
                 url: '/Admin/Save',
@@ -510,99 +589,13 @@
                     var url = '@Url.Action("Edit", "Admin", new { id = "--ID--" })';
                     url = url.replace("--ID--", data.id);
                     window.location.href = url;
+                },
+                error: function () {
+                    $("#save-message").dialog("close");
                 }
             });
     }
 
 
 </script>
-
-
-
-
-
-
-
-
-
-<style>
-
-    html, body {
-        height: 100%;
-    }
-
-    .toggle {
-        position: relative;
-        display: block;
-        width: 40px;
-        height: 20px;
-        cursor: pointer;
-        -webkit-tap-highlight-color: transparent;
-        transform: translate3d(0, 0, 0);
-    }
-
-        .toggle:before {
-            content: "";
-            position: relative;
-            top: 3px;
-            left: 3px;
-            width: 34px;
-            height: 14px;
-            display: block;
-            background: #9A9999;
-            border-radius: 8px;
-            transition: background 0.2s ease;
-        }
-
-        .toggle span {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 20px;
-            height: 20px;
-            display: block;
-            border: 1px solid darkgrey;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 3px 8px rgba(154, 153, 153, 0.5);
-            transition: all 0.2s ease;
-        }
-
-            .toggle span:before {
-                content: "";
-                position: absolute;
-                display: block;
-                margin: -18px;
-                width: 56px;
-                height: 56px;
-                background: rgba(79, 46, 220, 0.5);
-                border-radius: 50%;
-                transform: scale(0);
-                opacity: 1;
-                pointer-events: none;
-            }
-
-    input[type=checkbox]:checked + .toggle:before {
-        background: #947ADA;
-    }
-
-    input[type=checkbox]:checked + .toggle span {
-        background: #4F2EDC;
-        transform: translateX(20px);
-        transition: all 0.2s cubic-bezier(0.8, 0.4, 0.3, 1.25), background 0.15s ease;
-        box-shadow: 0 3px 8px rgba(79, 46, 220, 0.2);
-    }
-
-        input[type=checkbox]:checked + .toggle span:before {
-            transform: scale(1);
-            opacity: 0;
-            transition: all 0.4s ease;
-        }
-
-    .center {
-        position: absolute;
-        top: calc(50% - 10px);
-        left: calc(50% - 20px);
-    }
-</style>
 
