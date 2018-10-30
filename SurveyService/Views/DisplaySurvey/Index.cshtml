@@ -5,9 +5,10 @@
 <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
 <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
 <link rel="stylesheet" href="~/css/DisplaySurvey.css" />
-<div>
+<div class="form-container">
     @*style="min-width: 500px;"*@
     <h2>@Model.Title</h2>
+    <h4>@Model.Description</h4>
     <form id="questonForm" asp-controller="DisplaySurvey" asp-action="SetResult" method="post">
         <div class="content-box">
             @foreach (var question in Model.SurveyQuestion)
