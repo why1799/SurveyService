@@ -31,14 +31,22 @@ namespace SurveyService.WebUI.Controllers
             this.optionRepository = optionRepository;
         }
 
+        [Authorize(Policy = "Admin")]
+        public ActionResult Index()
+        {
+            var surveys = surveyRepository.GetItems().Include(x => x.CreatedBy).OrderByDescending(x => x.DateCreated).ToList();
+            return View(surveys);
+        }
+
+
         // GET: Admin/Create
         [Authorize(Policy = "Admin")]
         public async Task<ActionResult> Create()
         {
-            //var user = UserHelper.GetUser(HttpContext, userRepository);
+            /*var user = UserHelper.GetUser(HttpContext, userRepository);
 
-            //var survey = await surveyRepository.Create(new Survey { CreatedById = user.Id, Title="Новый опрос", DateCreated = DateTime.Now });
-            //return RedirectToAction("Edit", new { id = survey.Id });
+            var survey = await surveyRepository.Create(new Survey { CreatedById = user.Id, Title="Новый опрос", DateCreated = DateTime.UtcNow });
+            return RedirectToAction("Edit", new { id = survey.Id });*/
             return View();
         }
 
@@ -215,13 +223,14 @@ namespace SurveyService.WebUI.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> Save(string id, string title, string description, string[][] lines)
+        public async Task<JsonResult> Save(string id, string title, string description, string[][] lines, string image)
         {
             Survey survey;
+            byte[] dataimage = Convert.FromBase64String(image);
             if (id == null)
             {
                 var user = UserHelper.GetUser(HttpContext, userRepository);
-                survey = await surveyRepository.Create(new Survey { Title = title, Description = description, DateCreated = DateTime.UtcNow, CreatedById = user.Id });
+                survey = await surveyRepository.Create(new Survey { Title = title, Description = description, DateCreated = DateTime.UtcNow, CreatedById = user.Id, Image = dataimage });
                 id = survey.Id;
             }
             else
@@ -229,6 +238,7 @@ namespace SurveyService.WebUI.Controllers
                 survey = surveyRepository.GetItems().Include(x => x.SurveyQuestion).FirstOrDefault(x => x.Id == id);
                 survey.Title = title;
                 survey.Description = description;
+                survey.Image = dataimage;
                 await surveyRepository.Update(survey);
                 List<SurveyQuestion> questions = new List<SurveyQuestion>();
                 foreach(var question in survey.SurveyQuestion)

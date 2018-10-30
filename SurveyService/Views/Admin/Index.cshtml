@@ -1,0 +1,152 @@
+﻿@model List<SurveyService.Models.Survey>
+
+
+@{
+    ViewData["Title"] = "Опросы";
+}
+
+<style>
+    .box {
+        border-style: groove;
+        border-width: thin;
+        /*width: 700px;*/
+        margin-top: 1em;
+        padding: 1em;
+    }
+
+    .survey-box {
+        cursor: pointer;
+        /* border-color: lightgrey;
+        border-style: groove;
+        border-width: thin;*/
+        box-shadow: 0 10px 28px rgba(0,0,0,0.25), 0 0px 10px rgba(0,0,0,0.22);
+        border-radius: 10px;
+        margin: 1em;
+        height: 266px;
+    }
+
+    .image-box {
+        border-bottom-color: lightgrey;
+        border-bottom-style: groove;
+        border-bottom-width: thin;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+    }
+
+    .label-title {
+        cursor: pointer;
+        margin: 0.5em;
+        font-weight: bold;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        width: 165px;
+        white-space: nowrap;
+        color: rgba(51, 51, 51, 0.78);
+    }
+
+        .label-title a {
+            color: rgba(51, 51, 51, 0.78);
+        }
+
+    .label-date {
+        font-weight: normal;
+        margin-left: 0.5em;
+        color: rgba(51, 51, 51, 0.78);
+    }
+
+    .surveys {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        max-width: 920px;
+    }
+
+    .survey-bottom {
+        background-color: #ede7f6;
+        display: flex;
+        align-items: center;
+        border-bottom-left-radius: 10px;
+        border-bottom-right-radius: 10px;
+    }
+
+    .trashbin {
+        opacity: .54;
+        background: url(/images/SurveyIcon.svg) no-repeat -5px -1203px;
+        width: 14px;
+        height: 18px;
+        cursor: pointer;
+        margin-left: auto;
+        margin-right: 0.5em
+    }
+
+        .trashbin:hover {
+            opacity: 1;
+        }
+</style>
+
+<div class="surveys">
+    <a href="@Url.Action("Create", "Admin")" class="survey-box">
+
+        <img src="~/images/add.png" height="200" width="200" class="image-box" /><br>
+        <div class="survey-bottom" style="background-color:white;">
+            <label class="label-title">Создать опрос</label>
+        </div>
+
+    </a>
+
+
+    @foreach (var survey in Model)
+    {
+
+        <div id="@survey.Id" class="survey-box" style="background-color: #ede7f6;">
+            <a href="@Url.Action("Edit", "Admin", new { id = survey.Id })">
+                @{
+                    string imgSrc;
+                    if (survey.Image == null)
+                    {
+                        imgSrc = "";
+                    }
+                    else
+                    {
+                        var base64 = Convert.ToBase64String(survey.Image);
+                        imgSrc = String.Format("data:image/png;base64,{0}", base64);
+                    }
+                }
+                <img src="@imgSrc" height="200" width="200" class="image-box" /><br>
+            </a>
+            <div class="survey-bottom">
+
+                <div>
+
+                    <label class="label-title"><a href="@Url.Action("Edit", "Admin", new { id = survey.Id })">@survey.Title</a></label><br>
+                    @if (DateTime.UtcNow.Day == survey.DateCreated.Day && DateTime.UtcNow.Month == survey.DateCreated.Month && DateTime.UtcNow.Year == survey.DateCreated.Year)
+                    {
+                        <label class="label-date">@survey.DateCreated.ToLocalTime().ToString("HH:mm")</label>
+                    }
+                    else
+                    {
+                        <label class="label-date">@survey.DateCreated.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</label>
+                    }
+
+                </div>
+
+                <div class="trashbin" onclick="RemoveSurvey('@survey.Id')"></div>
+
+            </div>
+        </div>
+
+    }
+</div>
+
+<script>
+    function RemoveSurvey(surveyid) {
+        $.ajax({
+            url: "/Admin/RemoveSurvey",
+            type: "GET",
+            data: { id: surveyid },
+            success: function (data) {
+                $("#" + surveyid).remove();
+            }
+        });
+    }
+</script>

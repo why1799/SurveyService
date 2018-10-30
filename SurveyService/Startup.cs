@@ -88,7 +88,7 @@ namespace SurveyService
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Admin}/{action=Surveys}");
+                    template: "{controller=Admin}/{action=Index}");
             });
         }
     }

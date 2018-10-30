@@ -23,6 +23,6 @@ namespace SurveyService.Models
         public User CreatedBy { get; set; }
 
         public ICollection<SurveyQuestion> SurveyQuestion { get; set; }
-
+        public byte[] Image { get; set; }
     }
 }
