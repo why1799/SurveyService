@@ -466,6 +466,12 @@
     </p>
 </div>
 
+<div id="error-message2" title="" style="display:none">
+    <p>
+        Опрос нельзя изменять, поскольку его уже проходили!
+    </p>
+</div>
+
 <div id="save-message" title="Сохранение!" style="display:none">
     <p>
         Опрос сохраняется!
@@ -473,9 +479,17 @@
     <img src="~/images/loading.gif" width="115" height="115" style="display: block;margin: 0 auto;" />
 </div>
 
+<div id="remove-message" title="Удаление!" style="display:none">
+    <p>
+        Опрос удаляется!
+    </p>
+    <img src="~/images/loading.gif" width="115" height="115" style="display: block;margin: 0 auto;" />
+</div>
+
 <script>
     var addedquest;
     var addedopt;
+    var check;
 
     $(document).ready(function () {
         addedquest = 0;
@@ -502,6 +516,18 @@
                 $("#error-message").dialog('widget').css({ 'margin-top': '0em' });
                 $("#error-message").dialog("option", "position", { my: "top", at: "top", of: window });
                 $("#error-message").dialog('widget').css({ 'margin-top': '5em' });
+            }
+            catch{ }
+            try {
+                $("#error-message2").dialog('widget').css({ 'margin-top': '0em' });
+                $("#error-message2").dialog("option", "position", { my: "top", at: "top", of: window });
+                $("#error-message2").dialog('widget').css({ 'margin-top': '5em' });
+            }
+            catch{ }
+            try {
+                $("#remove-message").dialog('widget').css({ 'margin-top': '0em' });
+                $("#remove-message").dialog("option", "position", { my: "top", at: "top", of: window });
+                $("#remove-message").dialog('widget').css({ 'margin-top': '5em' });
             }
             catch{ }
         });
@@ -544,6 +570,18 @@
 
         MarginHead();
 
+        $.ajax({
+            url: "/Admin/GotAnswers",
+            type: "GET",
+            data: { id: '@Model.Id' },
+            success: function (data) {
+                check = data;
+
+                if (check) {
+                    ErrorMessage2(1);
+                }
+            }
+        });
     });
 
     function MarginHead() {
@@ -560,6 +598,48 @@
         var url = '@Url.Action("Index", "DisplaySurvey", new { id = "--ID--" })';
         url = url.replace("--ID--", "@Model.Id");
         window.location.href = url;
+    }
+
+    function ErrorMessage2(type) {
+        var tit;
+        if (type === 0) {
+            tit = "Ошибка сохранение!";
+        }
+        else {
+            tit = "Уведомление";
+        }
+
+
+        $("#error-message2").dialog({
+            width: 280,
+            height: 170,
+            resizable: false,
+            modal: true,
+            draggable: false,
+            title: tit,
+
+            closeOnEscape: false,
+            open: function (event, ui) {
+                $(event.target).dialog('widget')
+                    .css("box-shadow", "0 10px 28px rgba(0,0,0,0.25), 0 0px 10px rgba(0,0,0,0.22)")
+                    .css("border-radius", "10px")
+                    .css({ position: 'fixed' })
+                    .position({ my: 'top', at: 'top', of: window })
+                    .css({ 'margin-top': '5em' });
+                $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+            },
+
+            close: function (event, ui) {
+                $(event.target).dialog('widget')
+                    .css({ 'margin-top': '0em' });
+            },
+
+            buttons: {
+                Ok: function () {
+                    $(this).dialog("close");
+                }
+            }
+        });
     }
 
     function ErrorMessage() {
@@ -596,8 +676,33 @@
     }
 
     function SaveMessage() {
-
         $("#save-message").dialog({
+            width: 280,
+            height: 205,
+            resizable: false,
+            modal: true,
+            draggable: false,
+
+            closeOnEscape: false,
+            open: function (event, ui) {
+                $(event.target).dialog('widget')
+                    .css("box-shadow", "0 10px 28px rgba(0,0,0,0.25), 0 0px 10px rgba(0,0,0,0.22)")
+                    .css("border-radius", "10px")
+                    .css({ position: 'fixed' })
+                    .position({ my: 'top', at: 'top', of: window })
+                    .css({ 'margin-top': '5em' });
+                $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+            },
+
+            close: function (event, ui) {
+                $(event.target).dialog('widget')
+                    .css({ 'margin-top': '0em' });
+            }
+        });
+    }
+
+    function RemoveMessage() {
+        $("#remove-message").dialog({
             width: 280,
             height: 205,
             resizable: false,
@@ -650,7 +755,8 @@
 
     }
 
-function RemoveSurvey(surveyid) {
+    function RemoveSurvey(surveyid) {
+        RemoveMessage();
         $.ajax({
             url: "/Admin/RemoveSurvey",
             type: "GET",
@@ -810,7 +916,18 @@ function RemoveSurvey(surveyid) {
 
     function Save() {
 
-        if (!$('#SurveyForm')[0].checkValidity()) {
+        $.ajax({
+            url: "/Admin/GotAnswers",
+            type: "GET",
+            data: { id: '@Model.Id' },
+            success: function (data) {
+                check = data;
+
+                if (check) {
+                    ErrorMessage2(0);
+                }
+                else {
+                    if (!$('#SurveyForm')[0].checkValidity()) {
             $("#submitButton").prop("disabled", false);
             $('#submitButton').click();
             $("#submitButton").prop("disabled", true);
@@ -960,6 +1077,12 @@ function RemoveSurvey(surveyid) {
                 }
             });
         });
+
+                }
+            }
+        });
+
+        
     }
 
     function crop(can, a, b) {

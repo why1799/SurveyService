@@ -11,14 +11,17 @@ h2, h4 {
     border-width: thin
 }
 
-input[type=text] {
+input[type=text],
+textarea {
+    width:95%;
     outline: none;
     transition: 0.6s;
     border: none;
     border-bottom: 1px solid #CCC;
     background-color: transparent;
 }
-    input[type=text]::selection {
+    input[type=text]::selection,
+    textarea::selection {
         border: none;
         border-bottom: 1px solid #CCC;
         background-color: transparent;

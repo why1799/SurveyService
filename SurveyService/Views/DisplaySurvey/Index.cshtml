@@ -4,6 +4,7 @@
 }
 <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
 <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+<script src="~/lib/autosize-master/dist/autosize.js"></script>
 <link rel="stylesheet" href="~/css/DisplaySurvey.css" />
 <div class="form-container">
     @*style="min-width: 500px;"*@
@@ -41,7 +42,7 @@
                                             <input type="radio" name=@question.Id value="custom" data-questionid="@question.Id"
                                                    for="@("customAnswer" + question.Id)" @(string.IsNullOrEmpty(question.UserAnswers?.SingleOrDefault()?.OwnAnswerText) == false ? "checked" : "")
                                                    @(question.IsRequired == true ? "data-val-required = The IsSelected field is required. data-rule-customv = " + question.Id + " class=input-validation-error" : "") />
-                                            <input id=@("customAnswer" + question.Id) type="text" value="@(question.UserAnswers?.SingleOrDefault()?.OwnAnswerText)" placeholder="Свой вариант." />
+                                            <input id=@("customAnswer" + question.Id) type="text" value="@(question.UserAnswers?.SingleOrDefault()?.OwnAnswerText)" placeholder="Свой вариант" />
                                         </li>
                                     }
                                     break;
@@ -63,7 +64,7 @@
                                             <input type="checkbox" name=@question.Id value="custom" data-questionid="@question.Id"
                                                    for="@("customAnswer" + question.Id)" @(string.IsNullOrEmpty(question.UserAnswers?.SingleOrDefault()?.OwnAnswerText) == false ? "checked" : "")
                                                    @(question.IsRequired == true ? "data-val-required='The IsSelected field is required.' data-rule-customv='" + question.Id + "' class='input-validation-error'" : "") />
-                                            <input id=@("customAnswer" + question.Id) type="text" value="@(question.UserAnswers?.SingleOrDefault()?.OwnAnswerText)" placeholder="Свой вариант." />
+                                            <input id=@("customAnswer" + question.Id) type="text" value="@(question.UserAnswers?.SingleOrDefault()?.OwnAnswerText)" placeholder="Свой вариант" />
                                         </li>
                                     }
                                     break;
@@ -71,8 +72,8 @@
                             case 2: /*Только текстовый ответ*/
                                 {
                                     <li>
-                                        <input id="@question.Id" data-mycastomtextanswer="trye" type="text" value="@(question.UserAnswers?.SingleOrDefault()?.OwnAnswerText)" placeholder=""
-                                               @(question.IsRequired == true ? "data-val-required = The IsSelected field is required. data-rule-customText = " + question.Id + " class=input-validation-error" : "") />
+                                        <textarea id="@question.Id" data-mycastomtextanswer="trye" rows="1" style="resize:none;width:100%;" placeholder=""  @(question.IsRequired == true ? "data-val-required = The IsSelected field is required. data-rule-customText = " + question.Id + " class=input-validation-error" : "")>@(question.UserAnswers?.SingleOrDefault()?.OwnAnswerText)</textarea>
+                                        <br/>
                                     </li>
                                     break;
                                 }
@@ -89,6 +90,11 @@
     </form>
 </div>
 <script type="text/javascript">
+
+    $(document).ready(function () {
+        autosize($('textarea'));
+    });
+
     $(function () {
         // Валидатор
         jQuery.validator.addMethod("customv", function (value, element, params) {
@@ -96,10 +102,10 @@
             if ($('input[name="' + params + '"]:checked').length > 0) {
                 // Если есть выбранные чекбоксы
                 let flag = true;
-                $('input[name="' + params + '"]:').each(function () {
+                $('input[name="' + params + '"]:checked').each(function () {
                     // Проходим по всем выбранным чекбоксам, и ищем
                     let textBoxId = $(this).attr('for');
-                    if (textBoxId) {checked
+                    if (textBoxId) {
                         if (!$('#' + textBoxId).val().length > 0) {
                             // Если был выбран "Свой вариант ответа" и в текстовом поле нет символов, говорим что все плохо
                             flag = false;
@@ -153,7 +159,7 @@
                 }
             }
             // проверяем текстовые ответы(тип 2)
-            let textBoxArr = $('input[data-mycastomtextanswer="trye"]');
+            let textBoxArr = $('textarea[data-mycastomtextanswer="trye"]');
             for (let i = 0; i < textBoxArr.length; i++) {
                 json += ' "' + index++ + '": { "type": "custom", "questionId": "' + textBoxArr[i].id + '", "text": "' + textBoxArr[i].value + '"}, ';
 

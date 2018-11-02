@@ -19,16 +19,22 @@ namespace SurveyService.WebUI.Controllers
         private ISurveyRepository surveyRepository;
         private ISurveyQuestionRepository surveyQuestionRepository;
         private IOptionRepository optionRepository;
+        private IOptionsForAnswerRepository optionsForAnswerRepository;
+        private IUserAnswerRepository userAnswerRepository;
 
         public AdminController(IUserRepository userRepository,
             ISurveyRepository surveyRepository,
             ISurveyQuestionRepository surveyQuestionRepository,
-            IOptionRepository optionRepository)
+            IOptionRepository optionRepository,
+            IOptionsForAnswerRepository optionsForAnswerRepository,
+            IUserAnswerRepository userAnswerRepository)
         {
             this.userRepository = userRepository;
             this.surveyRepository = surveyRepository;
             this.surveyQuestionRepository = surveyQuestionRepository;
             this.optionRepository = optionRepository;
+            this.optionsForAnswerRepository = optionsForAnswerRepository;
+            this.userAnswerRepository = userAnswerRepository;
         }
 
         [Authorize(Policy = "Admin")]
@@ -52,10 +58,22 @@ namespace SurveyService.WebUI.Controllers
 
         public async Task<JsonResult> RemoveSurvey(string id)
         {
-            var survey = surveyRepository.GetItems().Include(x => x.SurveyQuestion).FirstOrDefault(x => x.Id == id);
-            foreach(var x in survey.SurveyQuestion.ToList())
+            var survey = surveyRepository.GetItems().Include(x => x.SurveyQuestion).ThenInclude(y => y.Options).ThenInclude(z => z.OptionsForAnswers).Include(x => x.SurveyQuestion).ThenInclude(a => a.UserAnswers).FirstOrDefault(x => x.Id == id);
+            foreach (var question in survey.SurveyQuestion.ToList())
             {
-                await RemoveQuestion(x.Id);
+                foreach (var option in question.Options.ToList())
+                {
+                    foreach (var optionsforanswer in option.OptionsForAnswers.ToList())
+                    {
+                        await optionsForAnswerRepository.Delete(optionsforanswer);
+                    }
+                    await optionRepository.Delete(option);
+                }
+                foreach (var useranswers in question.UserAnswers.ToList())
+                {
+                    await userAnswerRepository.Delete(useranswers);
+                }
+                await surveyQuestionRepository.Delete(question);
             }
             await surveyRepository.Delete(survey);
             return new JsonResult(id);
@@ -220,6 +238,21 @@ namespace SurveyService.WebUI.Controllers
                 firstid = firstoption.Id,
                 secondid = secondoption.Id
             });
+        }
+
+        public async Task<JsonResult> GotAnswers(string id)
+        {
+            var survey = surveyRepository.GetItems().Include(x => x.SurveyQuestion).ThenInclude(a => a.UserAnswers).FirstOrDefault(x => x.Id == id);
+            bool got = false;
+            foreach(var question in survey.SurveyQuestion)
+            {
+                if(question.UserAnswers.Count > 0)
+                {
+                    got = true;
+                    break;
+                }
+            }
+            return Json( got );
         }
 
         [HttpPost]

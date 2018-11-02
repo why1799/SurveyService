@@ -85,7 +85,7 @@ namespace SurveyService.WebUI.Controllers
         /// <param name="data">данные</param>
         /// <returns></returns>
         [HttpPost]
-        public IActionResult SaveResult([FromBody]Newtonsoft.Json.Linq.JObject data)
+        public async Task<IActionResult> SaveResult([FromBody]Newtonsoft.Json.Linq.JObject data)
         {
 
             if (data == null)
@@ -116,7 +116,7 @@ namespace SurveyService.WebUI.Controllers
                     answer.OptionsForAnswers.Add(new SurveyService.Models.OptionsForAnswer() { OptionId = item.First["optionId"].ToString() });
                 }
             }
-            userAnswer.CreateRange(answersList);
+            await userAnswer.CreateRange(answersList);
             return Json(new { ok = true, newUrl = Url.Action("SurveyCompleted", new { @surveyId = surveyId }) }); // редиректнули на страниц "Опрос пройден"
         }
         /// <summary>
