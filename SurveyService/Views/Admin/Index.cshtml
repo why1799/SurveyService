@@ -5,6 +5,11 @@
     ViewData["Title"] = "Опросы";
 }
 
+<script src="~/lib/jquery/dist/jquery.js"></script>
+<script src="~/lib/jquery-ui-1.12.1/jquery-ui.js"></script>
+<script src="~/js/jquery.ddslick.min.js"></script>
+<link rel="stylesheet" href="~/lib/jquery-ui-1.12.1/jquery-ui.css" />
+
 <style>
     .box {
         border-style: groove;
@@ -39,7 +44,7 @@
         font-weight: bold;
         text-overflow: ellipsis;
         overflow: hidden;
-        width: 165px;
+        width: 138px;
         white-space: nowrap;
         color: rgba(51, 51, 51, 0.78);
     }
@@ -80,6 +85,20 @@
     }
 
         .trashbin:hover {
+            opacity: 1;
+        }
+
+    .download {
+        opacity: .54;
+        background: url(/images/download.svg) no-repeat;
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        margin-left: auto;
+        margin-right: 0.5em
+    }
+
+        .download:hover {
             opacity: 1;
         }
 </style>
@@ -130,7 +149,8 @@
 
                 </div>
 
-                <div class="trashbin" onclick="RemoveSurvey('@survey.Id')"></div>
+                <div title="Выгрузить результаты" class="download" onclick="SaveResult('@survey.Id')"></div>
+                <div title="Удалить опрос" class="trashbin" onclick="RemoveSurvey('@survey.Id')"></div>
 
             </div>
         </div>
@@ -138,14 +158,175 @@
     }
 </div>
 
+<div id="error-message" title="Ошибка выгрузки" style="display:none">
+    <p>
+        Опрос ещё никто не проходил!
+    </p>
+</div>
+
+<div id="download-message" title="Выгрузка результатов!" style="display:none">
+    <p>
+        Результаты загружаются!
+    </p>
+    <img src="~/images/loading.gif" width="115" height="115" style="display: block;margin: 0 auto;" />
+</div>
+
+<div id="remove-message" title="Удаление!" style="display:none">
+    <p>
+        Опрос удаляется!
+    </p>
+    <img src="~/images/loading.gif" width="115" height="115" style="display: block;margin: 0 auto;" />
+</div>
+
 <script>
+
+    $(document).ready(function () {
+
+        $(window).resize(function () {
+            try {
+                $("#error-message").dialog('widget').css({ 'margin-top': '0em' });
+                $("#error-message").dialog("option", "position", { my: "top", at: "top", of: window });
+                $("#error-message").dialog('widget').css({ 'margin-top': '5em' });
+            }
+            catch{ }
+            try {
+                $("#download-message").dialog('widget').css({ 'margin-top': '0em' });
+                $("#download-message").dialog("option", "position", { my: "top", at: "top", of: window });
+                $("#download-message").dialog('widget').css({ 'margin-top': '5em' });
+            }
+            catch{ }
+            try {
+                $("#remove-message").dialog('widget').css({ 'margin-top': '0em' });
+                $("#remove-message").dialog("option", "position", { my: "top", at: "top", of: window });
+                $("#remove-message").dialog('widget').css({ 'margin-top': '5em' });
+            }
+            catch{ }
+        });
+
+    });
+
+    function DownloadMessage() {
+        $("#download-message").dialog({
+            width: 280,
+            height: 205,
+            resizable: false,
+            modal: true,
+            draggable: false,
+
+            closeOnEscape: false,
+            open: function (event, ui) {
+                $(event.target).dialog('widget')
+                    .css("box-shadow", "0 10px 28px rgba(0,0,0,0.25), 0 0px 10px rgba(0,0,0,0.22)")
+                    .css("border-radius", "10px")
+                    .css({ position: 'fixed' })
+                    .position({ my: 'top', at: 'top', of: window })
+                    .css({ 'margin-top': '5em' });
+                $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+            },
+
+            close: function (event, ui) {
+                $(event.target).dialog('widget')
+                    .css({ 'margin-top': '0em' });
+            }
+        });
+    }
+
+    function ErrorMessage() {
+
+        $("#error-message").dialog({
+            width: 280,
+            height: 150,
+            resizable: false,
+            modal: true,
+            draggable: false,
+
+            closeOnEscape: false,
+            open: function (event, ui) {
+                $(event.target).dialog('widget')
+                    .css("box-shadow", "0 10px 28px rgba(0,0,0,0.25), 0 0px 10px rgba(0,0,0,0.22)")
+                    .css("border-radius", "10px")
+                    .css({ position: 'fixed' })
+                    .position({ my: 'top', at: 'top', of: window })
+                    .css({ 'margin-top': '5em' });
+                $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+            },
+
+            close: function (event, ui) {
+                $(event.target).dialog('widget')
+                    .css({ 'margin-top': '0em' });
+            },
+
+            buttons: {
+                Ok: function () {
+                    $(this).dialog("close");
+                }
+            }
+        });
+    }
+
+    function RemoveMessage() {
+        $("#remove-message").dialog({
+            width: 280,
+            height: 205,
+            resizable: false,
+            modal: true,
+            draggable: false,
+
+            closeOnEscape: false,
+            open: function (event, ui) {
+                $(event.target).dialog('widget')
+                    .css("box-shadow", "0 10px 28px rgba(0,0,0,0.25), 0 0px 10px rgba(0,0,0,0.22)")
+                    .css("border-radius", "10px")
+                    .css({ position: 'fixed' })
+                    .position({ my: 'top', at: 'top', of: window })
+                    .css({ 'margin-top': '5em' });
+                $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+            },
+
+            close: function (event, ui) {
+                $(event.target).dialog('widget')
+                    .css({ 'margin-top': '0em' });
+            }
+        });
+    }
+
+
     function RemoveSurvey(surveyid) {
+        RemoveMessage();
         $.ajax({
             url: "/Admin/RemoveSurvey",
             type: "GET",
             data: { id: surveyid },
             success: function (data) {
                 $("#" + surveyid).remove();
+                $("#remove-message").dialog('close');
+            }
+        });
+    }
+
+    function SaveResult(surveyid) {
+        DownloadMessage();
+        $.ajax({
+            url: "/Admin/GetResult",
+            type: "GET",
+            data: { id: surveyid },
+            success: function (data) {
+                if (data === null) {
+                    $("#download-message").dialog('close');
+                    ErrorMessage();
+                }
+                else {
+                    $('<a></a>')
+                        .attr('id', 'downloadFile')
+                        .attr('href', 'data:text/csv,' + '\uFEFF' + encodeURIComponent(data.data))
+                        .attr('download', data.name + '.csv')
+                        .appendTo('body');
+
+                    $('#downloadFile').get(0).click();
+                    $('#downloadFile').remove();
+                    $("#download-message").dialog('close');
+                }
+
             }
         });
     }

@@ -5,8 +5,6 @@
 }
 
 <script src="~/lib/jquery/dist/jquery.js"></script>
-<script src="~/lib/autosize-master/dist/autosize.js"></script>
-<script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
 
 
 <script src="~/lib/autosize-master/dist/autosize.js"></script>
@@ -288,10 +286,10 @@
     <form id="SurveyForm">
         <div style="position: relative;">
             <div id="left-menu">
-                <div style="background: url(/images/SurveyIcon.svg) no-repeat -2px -3168px; width: 20px; height: 24px; cursor: pointer;" onclick="AddQuestion()"></div>
-                <div style="background: url(/images/SurveyIcon.svg) no-repeat -5px -1203px; width: 14px; height: 18px; cursor: pointer;" onclick="RemoveSurvey('@Model.Id')"></div>
-                <div id="savebutton" style="background:url(/images/save.svg) no-repeat; width: 20px; height: 20px; cursor: pointer;" onclick="Save()"></div>
-                <div style="background: url(/images/SurveyIcon.svg) no-repeat -1px -2620px; width: 22px; height: 16px; cursor: pointer;" onclick="Show()"></div>
+                <div title="Добавить вопрос" style="background: url(/images/SurveyIcon.svg) no-repeat -2px -3168px; width: 20px; height: 24px; cursor: pointer;" onclick="AddQuestion()"></div>
+                <div title="Удалить опрос" style="background: url(/images/SurveyIcon.svg) no-repeat -5px -1203px; width: 14px; height: 18px; cursor: pointer;" onclick="RemoveSurvey('@Model.Id')"></div>
+                <div title="Сохранить опрос" id="savebutton" style="background:url(/images/save.svg) no-repeat; width: 20px; height: 20px; cursor: pointer;" onclick="Save()"></div>
+                <div title="Посмотреть опрос" style="background: url(/images/SurveyIcon.svg) no-repeat -1px -2620px; width: 22px; height: 16px; cursor: pointer;" onclick="Show()"></div>
             </div>
         </div>
         <div class="box header">
@@ -375,7 +373,7 @@
                                         <div class="optionright">
                                             <img id="image" src="/images/radioboxoptions.png" width="20" height="20">
                                             <input class="option-input" type="text" placeholder="Ответ" required="" oninvalid="this.setCustomValidity('Введите ответ')" oninput="setCustomValidity('')" value="@option.Text">
-                                            <div name="picture" style="background: url('/images/SurveyIcon.svg') no-repeat -5px -4061px; width: 14px; height: 14px; zoom:1.4; cursor: pointer;" onclick="RemoveOption('@option.Id')"></div>
+                                            <div title="Удалить ответ" name="picture" style="background: url('/images/SurveyIcon.svg') no-repeat -5px -4061px; width: 14px; height: 14px; zoom:1.4; cursor: pointer;" onclick="RemoveOption('@option.Id')"></div>
                                         </div>
 
                                     </div>
@@ -393,7 +391,7 @@
                             <div id="another" style="display:normal;">
                                 <img id="image" src="/images/radioboxoptions.png" width="20" height="20" style="margin-left:5%;">
                                 <input class="option-input" style="width:87%;" disabled type="text" placeholder="Другое...">
-                                <div name="picture" style="background: url('/images/SurveyIcon.svg') no-repeat -5px -4061px; width: 14px; height: 14px; zoom:1.4; cursor: pointer;" onclick="RemoveAnother('@surveyquestion.Id')"></div>
+                                <div title="Удалить другое" name="picture" style="background: url('/images/SurveyIcon.svg') no-repeat -5px -4061px; width: 14px; height: 14px; zoom:1.4; cursor: pointer;" onclick="RemoveAnother('@surveyquestion.Id')"></div>
                             </div>
                         }
                         else
@@ -401,7 +399,7 @@
                             <div id="another" style="display:none;">
                                 <img id="image" src="/images/radioboxoptions.png" width="20" height="20" style="margin-left:5%;">
                                 <input class="option-input" style="width:87%;" disabled type="text" placeholder="Другое...">
-                                <div name="picture" style="background: url('/images/SurveyIcon.svg') no-repeat -5px -4061px; width: 14px; height: 14px; zoom:1.4; cursor: pointer;" onclick="RemoveAnother('@surveyquestion.Id')"></div>
+                                <div title="Удалить другое" name="picture" style="background: url('/images/SurveyIcon.svg') no-repeat -5px -4061px; width: 14px; height: 14px; zoom:1.4; cursor: pointer;" onclick="RemoveAnother('@surveyquestion.Id')"></div>
                             </div>
                         }
 
@@ -422,7 +420,7 @@
                         <div class="hl" style="margin-top:1em;"></div>
 
                         <div class="questionfooter" style="margin-top:0.5em;margin-bottom:0.5em;">
-                            <div name="picture" style="background: url(/images/SurveyIcon.svg) no-repeat -5px -1203px; width: 14px; height: 18px;margin-right:2em;cursor: pointer;" onclick="RemoveQuestion('@surveyquestion.Id')"></div>
+                            <div title="Удалить вопрос" name="picture" style="background: url(/images/SurveyIcon.svg) no-repeat -5px -1203px; width: 14px; height: 18px;margin-right:2em;cursor: pointer;" onclick="RemoveQuestion('@surveyquestion.Id')"></div>
                             <div class="vl" style="margin-right:2em"></div>
                             <div style="margin-right:0.5em">
                                 <label style="color:rgba(51, 51, 51, 0.78);">Обязательный вопрос</label>
@@ -762,7 +760,7 @@
             type: "GET",
             data: { id: surveyid },
             success: function (data) {
-                window.location.href = '@Url.Action("Surveys", "Admin")';
+                window.location.href = '@Url.Action("Index", "Admin")';
             }
         });
     }
@@ -812,7 +810,7 @@
     <div id=\"another\" style=\"display:none;\">\
         <img id=\"image\" src=\"/images/radioboxoptions.png\" width=\"20\" height=\"20\" style=\"margin-left:5%;\">\
         <input class=\"option-input\" style=\"width:87%;\" disabled type=\"text\" placeholder=\"Другое...\">\
-        <div name=\"picture\" style=\"background: url('/images/SurveyIcon.svg') no-repeat -5px -4061px; width: 14px; height: 14px; zoom:1.4; cursor: pointer;\" onclick=\"RemoveAnother('newquest{ID}')\"></div>\
+        <div title=\"Удалить другое\" name=\"picture\" style=\"background: url('/images/SurveyIcon.svg') no-repeat -5px -4061px; width: 14px; height: 14px; zoom:1.4; cursor: pointer;\" onclick=\"RemoveAnother('newquest{ID}')\"></div>\
     </div>\
 \
 \
@@ -825,7 +823,7 @@
     <div class=\"hl\" style=\"margin-top:1em;\"></div>\
 \
     <div class=\"questionfooter\" style=\"margin-top:0.5em;margin-bottom:0.5em;\">\
-        <div name=\"picture\" style=\"background: url(/images/SurveyIcon.svg) no-repeat -5px -1203px; width: 14px; height: 18px;margin-right:2em;cursor: pointer;\" onclick=\"RemoveQuestion('newquest{ID}')\"></div>\
+        <div title=\"Удалить вопрос\" name=\"picture\" style=\"background: url(/images/SurveyIcon.svg) no-repeat -5px -1203px; width: 14px; height: 18px;margin-right:2em;cursor: pointer;\" onclick=\"RemoveQuestion('newquest{ID}')\"></div>\
         <div class=\"vl\" style=\"margin-right:2em\"></div>\
         <div style=\"margin-right:0.5em\">\
             <label style=\"color:rgba(51, 51, 51, 0.78);\">Обязательный вопрос</label>\
@@ -886,7 +884,7 @@
                                 <div class=\"optionright\">\
                                     <img id=\"image\" src=\"{TYPE}\" width=\"20\" height=\"20\">\
                                     <input class=\"option-input\" type=\"text\" placeholder=\"Ответ\" required=\"\" oninvalid=\"this.setCustomValidity('Введите ответ')\" oninput=\"setCustomValidity('')\" value=\"\">\
-                                    <div name=\"picture\" style=\"background: url('/images/SurveyIcon.svg') no-repeat -5px -4061px; width: 14px; height: 14px; zoom:1.4; cursor: pointer;\" onclick=\"RemoveOption('newopt{ID}')\"></div>\
+                                    <div title=\"Удалить ответ\" name=\"picture\" style=\"background: url('/images/SurveyIcon.svg') no-repeat -5px -4061px; width: 14px; height: 14px; zoom:1.4; cursor: pointer;\" onclick=\"RemoveOption('newopt{ID}')\"></div>\
                                 </div>\
 \
                             </div>";

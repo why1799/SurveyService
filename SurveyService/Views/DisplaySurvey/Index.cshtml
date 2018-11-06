@@ -42,7 +42,7 @@
                                             <input type="radio" name=@question.Id value="custom" data-questionid="@question.Id"
                                                    for="@("customAnswer" + question.Id)" @(string.IsNullOrEmpty(question.UserAnswers?.SingleOrDefault()?.OwnAnswerText) == false ? "checked" : "")
                                                    @(question.IsRequired == true ? "data-val-required = The IsSelected field is required. data-rule-customv = " + question.Id + " class=input-validation-error" : "") />
-                                            <input id=@("customAnswer" + question.Id) type="text" value="@(question.UserAnswers?.SingleOrDefault()?.OwnAnswerText)" placeholder="Свой вариант" />
+                                            <input id=@("customAnswer" + question.Id) type="text" value="@(question.UserAnswers?.SingleOrDefault()?.OwnAnswerText)" autocomplete="off" placeholder="Свой вариант" />
                                         </li>
                                     }
                                     break;
@@ -64,7 +64,7 @@
                                             <input type="checkbox" name=@question.Id value="custom" data-questionid="@question.Id"
                                                    for="@("customAnswer" + question.Id)" @(string.IsNullOrEmpty(question.UserAnswers?.SingleOrDefault()?.OwnAnswerText) == false ? "checked" : "")
                                                    @(question.IsRequired == true ? "data-val-required='The IsSelected field is required.' data-rule-customv='" + question.Id + "' class='input-validation-error'" : "") />
-                                            <input id=@("customAnswer" + question.Id) type="text" value="@(question.UserAnswers?.SingleOrDefault()?.OwnAnswerText)" placeholder="Свой вариант" />
+                                            <input id=@("customAnswer" + question.Id) type="text" value="@(question.UserAnswers?.SingleOrDefault()?.OwnAnswerText)" autocomplete="off" placeholder="Свой вариант" />
                                         </li>
                                     }
                                     break;
@@ -72,7 +72,7 @@
                             case 2: /*Только текстовый ответ*/
                                 {
                                     <li>
-                                        <textarea id="@question.Id" data-mycastomtextanswer="trye" rows="1" style="resize:none;width:100%;" placeholder=""  @(question.IsRequired == true ? "data-val-required = The IsSelected field is required. data-rule-customText = " + question.Id + " class=input-validation-error" : "")>@(question.UserAnswers?.SingleOrDefault()?.OwnAnswerText)</textarea>
+                                        <textarea id="@question.Id" data-mycastomtextanswer="trye" rows="1" style="resize:none;width:100%;" placeholder="" autocomplete="off"  @(question.IsRequired == true ? "data-val-required = The IsSelected field is required. data-rule-customText = " + question.Id + " class=input-validation-error" : "")>@(question.UserAnswers?.SingleOrDefault()?.OwnAnswerText)</textarea>
                                         <br/>
                                     </li>
                                     break;

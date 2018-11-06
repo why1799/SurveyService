@@ -10,6 +10,7 @@ using SurveyService.WebUI.Helper;
 using SurveyService.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
+using System.Text;
 
 namespace SurveyService.WebUI.Controllers
 {
@@ -387,5 +388,39 @@ namespace SurveyService.WebUI.Controllers
             return View(new Models.SurveysModel { page = page, pages = pages, surveys = surveys.Skip((page - 1) * surveysperpage).Take(surveysperpage).ToList() });
         }
 
+        
+        public async Task<JsonResult> GetResult(string id)
+        {
+            bool ok = false;
+            StringBuilder builder = new StringBuilder();
+            var survey = surveyRepository.GetItems().Include(x => x.SurveyQuestion).ThenInclude(y => y.UserAnswers).ThenInclude(z => z.User).Include(x => x.SurveyQuestion).ThenInclude(y => y.Options).ThenInclude(z => z.OptionsForAnswers).FirstOrDefault(x => x.Id == id);
+            foreach(var question in survey.SurveyQuestion.OrderBy(x => x.Order))
+            {
+                if(ok || question.UserAnswers.Count > 0)
+                {
+                    ok = true;
+                }
+                foreach(var useranswer in question.UserAnswers)
+                {
+                    if(useranswer.OptionsForAnswers == null)
+                    {
+                        builder.AppendLine(String.Format("{0};{1};{2};{3};", question.QuestionText, useranswer.OwnAnswerText, useranswer.User.DisplayName, useranswer.User.Login));
+                    }
+                    else
+                    {
+                        foreach(var optionsforanswer in useranswer.OptionsForAnswers)
+                        {
+                            builder.AppendLine(String.Format("{0};{1};{2};{3};", question.QuestionText, optionsforanswer.Option.Text, useranswer.User.DisplayName, useranswer.User.Login));
+                        }
+                    }
+                }
+            }
+
+            if (!ok)
+            {
+                return Json(null);
+            }
+            return Json(new { name = survey.Title, data = builder.ToString() });
+        }
     }
 }
