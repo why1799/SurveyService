@@ -267,17 +267,20 @@
         margin-left: 5px;
     }
 
-    #questions .box {
-        border-top-style: groove;
-        border-top-width: thin;
+    #questions {
         margin-left: 5%;
-        width: 90%;
     }
 
-    #questions .box:last-child {
-        border-bottom-style: groove;
-        border-bottom-width: thin;
-    }
+        #questions .box {
+            border-top-style: groove;
+            border-top-width: thin;
+            width: 95%;
+        }
+
+            #questions .box:last-child {
+                border-bottom-style: groove;
+                border-bottom-width: thin;
+            }
 </style>
 
 
@@ -493,12 +496,7 @@
         addedquest = 0;
         addedopt = 0;
         autosize($('textarea'));
-        $('#questions').sortable({
-            axis: 'y',
-            containment: '#questions',
-            opacity: 1,
-            tolerance: 'pointer'
-        });
+       
         $(window).scroll(function (e) {
             $('#left-menu').css('top', $(window).scrollTop() + 60 + 'px')
         });
@@ -537,6 +535,14 @@
                 opacity: 1,
                 tolerance: 'pointer'
             });
+        });
+
+
+        $('#questions').sortable({
+            axis: 'y',
+            containment: '#questions',
+            opacity: 1,
+            tolerance: 'pointer'
         });
 
         $('select').each(function () {

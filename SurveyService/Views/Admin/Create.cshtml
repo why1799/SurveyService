@@ -270,17 +270,21 @@
         margin-left: 5px;
     }
 
+    #questions{
+        margin-left: 5%;
+    }
+
     #questions .box {
         border-top-style: groove;
         border-top-width: thin;
-        margin-left: 5%;
-        width: 90%;
+        width: 95%;
     }
 
         #questions .box:last-child {
             border-bottom-style: groove;
             border-bottom-width: thin;
         }
+
 </style>
 
 <div class="form-container">
@@ -574,10 +578,12 @@ function RemoveSurvey(surveyid) {
 
         addedquest++;
 
+        MarginHead();
     }
 
     function RemoveQuestion(surveyquestionid) {
         $("#" + surveyquestionid).remove();
+        MarginHead();
     }
 
     function AddOption(surveyquestionid) {

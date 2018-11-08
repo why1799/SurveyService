@@ -28,7 +28,7 @@ namespace SurveyService.WebUI.Controllers
                 if (user != null)
                 {
                     userRepository.Create(new SurveyService.Models.User() { Login = user.Name, DisplayName = user.DisplayName, Role = "admin" });
-                    return Redirect("/Admin/Surveys");
+                    return Redirect("/Admin/Index");
                 }
                 else
                 {

@@ -404,13 +404,13 @@ namespace SurveyService.WebUI.Controllers
                 {
                     if(useranswer.OptionsForAnswers == null)
                     {
-                        builder.AppendLine(String.Format("{0};{1};{2};{3};", question.QuestionText, useranswer.OwnAnswerText, useranswer.User.DisplayName, useranswer.User.Login));
+                        builder.AppendLine(String.Format("{0};{1};{2};", question.QuestionText, useranswer.OwnAnswerText, useranswer.User.DisplayName));
                     }
                     else
                     {
                         foreach(var optionsforanswer in useranswer.OptionsForAnswers)
                         {
-                            builder.AppendLine(String.Format("{0};{1};{2};{3};", question.QuestionText, optionsforanswer.Option.Text, useranswer.User.DisplayName, useranswer.User.Login));
+                            builder.AppendLine(String.Format("{0};{1};{2};", question.QuestionText, optionsforanswer.Option.Text, useranswer.User.DisplayName));
                         }
                     }
                 }
