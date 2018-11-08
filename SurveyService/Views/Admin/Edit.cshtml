@@ -507,25 +507,25 @@
                 $("#save-message").dialog("option", "position", { my: "top", at: "top", of: window });
                 $("#save-message").dialog('widget').css({ 'margin-top': '5em' });
             }
-            catch{ }
+            catch(e){ }
             try {
                 $("#error-message").dialog('widget').css({ 'margin-top': '0em' });
                 $("#error-message").dialog("option", "position", { my: "top", at: "top", of: window });
                 $("#error-message").dialog('widget').css({ 'margin-top': '5em' });
             }
-            catch{ }
+            catch (e){ }
             try {
                 $("#error-message2").dialog('widget').css({ 'margin-top': '0em' });
                 $("#error-message2").dialog("option", "position", { my: "top", at: "top", of: window });
                 $("#error-message2").dialog('widget').css({ 'margin-top': '5em' });
             }
-            catch{ }
+            catch (e){ }
             try {
                 $("#remove-message").dialog('widget').css({ 'margin-top': '0em' });
                 $("#remove-message").dialog("option", "position", { my: "top", at: "top", of: window });
                 $("#remove-message").dialog('widget').css({ 'margin-top': '5em' });
             }
-            catch{ }
+            catch (e){ }
         });
 
         $("div[name=options]").each(function () {
@@ -1044,7 +1044,7 @@
                 $('#left-menu', $(clonedDoc)).remove();
                 $(".container.body-content", $(clonedDoc)).css("width", "1000px");
                 //$(".container.body-content", $(clonedDoc)).css("height", "1000px");
-                var color = $("body", ).css("background-color");
+                var color = $("body").css("background-color");
                 $(".container.body-content", $(clonedDoc)).css("background-color", color);
 
                 $("div[name=picture]", $(clonedDoc)).each(function () {
