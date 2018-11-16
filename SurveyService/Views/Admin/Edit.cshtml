@@ -11,6 +11,7 @@
 <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
 <script src="~/lib/jquery-ui-1.12.1/jquery-ui.js"></script>
 <script src="~/js/jquery.ddslick.min.js"></script>
+<script src="~/js/polyfill.min.js"></script>
 <script src="~/js/html2canvas.min.js"></script>
 <link rel="stylesheet" href="~/lib/jquery-ui-1.12.1/jquery-ui.css" />
 
@@ -153,12 +154,12 @@
         box-shadow: 0 4px 13px rgba(0,0,0,0.25), 0 0px 4px rgba(0,0,0,0.22);
     }
 
-        #left-menu > div {
+        #left-menu > div, #left-menu > a {
             margin: 5px 0 5px 0;
             opacity: .54;
         }
 
-            #left-menu > div:hover {
+            #left-menu > div:hover, #left-menu > a:hover {
                 opacity: 1;
             }
 
@@ -243,7 +244,8 @@
     .form-input {
         margin-top: 5%;
         width: 90%;
-        margin-left: 5%
+        margin-left: 5%;
+        position: relative;
     }
 
     div[name=picture] {
@@ -281,6 +283,92 @@
                 border-bottom-style: groove;
                 border-bottom-width: thin;
             }
+
+    .surveynameinput {
+        height: 46px;
+        font-size: 30px;
+        position: relative;
+        background: none;
+        z-index: 2;
+    }
+
+        .surveynameinput:focus ~ .surveynamelabel,
+        .surveynameinput:not(:focus):valid ~ .surveynamelabel {
+            top: -5px;
+            font-size: 12px;
+            padding-left: 1.5px;
+        }
+
+    .surveynamelabel {
+        position: absolute;
+        z-index: 1;
+        top: 50%;
+        left: 0;
+        margin-top: -0.7em;
+        transition: .3s;
+        font-size: 30px;
+        color: grey;
+    }
+
+    .surveydescriptioninput {
+        resize: none;
+        font-size: 20px;
+        position: relative;
+        background: none;
+        z-index: 2;
+    }
+
+        .surveydescriptioninput:focus + .surveydescriptionlabel,
+        .surveydescriptioninputfilled + .surveydescriptionlabel {
+            top: -5px;
+            font-size: 12px;
+            padding-left: 1.5px;
+        }
+
+    .surveydescriptionlabel {
+        position: absolute;
+        z-index: 1;
+        top: 50%;
+        left: 0;
+        margin-top: -0.8em;
+        transition: .3s;
+        font-size: 20px;
+        color: grey;
+    }
+
+    .questiontitleinput {
+        position: relative;
+        background: none;
+        z-index: 2;
+        resize: none;
+        width: 90%;
+        font-size: 20px;
+        margin-right: 5%;
+    }
+
+        .questiontitleinput:focus ~ .questiontitlelabel,
+        .questiontitleinput:not(:focus):valid ~ .questiontitlelabel {
+            top: -5px;
+            font-size: 12px;
+            padding-left: 1.5px;
+        }
+
+    .questiontitlelabel {
+        position: absolute;
+        z-index: 1;
+        top: 50%;
+        left: 0;
+        margin-top: -0.7em;
+        transition: .3s;
+        font-size: 20px;
+        color: grey;
+        font-weight: normal;
+    }
+
+    .beforequestionfooter{
+        display: none;
+        margin-bottom: 1em;
+    }
 </style>
 
 
@@ -292,18 +380,20 @@
                 <div title="Добавить вопрос" style="background: url(/images/SurveyIcon.svg) no-repeat -2px -3168px; width: 20px; height: 24px; cursor: pointer;" onclick="AddQuestion()"></div>
                 <div title="Удалить опрос" style="background: url(/images/SurveyIcon.svg) no-repeat -5px -1203px; width: 14px; height: 18px; cursor: pointer;" onclick="RemoveSurvey('@Model.Id')"></div>
                 <div title="Сохранить опрос" id="savebutton" style="background:url(/images/save.svg) no-repeat; width: 20px; height: 20px; cursor: pointer;" onclick="Save()"></div>
-                <div title="Посмотреть опрос" style="background: url(/images/SurveyIcon.svg) no-repeat -1px -2620px; width: 22px; height: 16px; cursor: pointer;" onclick="Show()"></div>
+                <a href="@Url.Action("Index", "DisplaySurvey", new { id = Model.Id })" title="Посмотреть опрос" style="background: url(/images/SurveyIcon.svg) no-repeat -1px -2620px; width: 22px; height: 16px; cursor: pointer;"></a>
             </div>
         </div>
         <div class="box header">
 
             <div class="form-input">
-                <input id="SurveyName" style="height: 46px;font-size: 30px; " type="text" placeholder="Название опроса" required autocomplete="off"
+                <input id="SurveyName" class="surveynameinput" type="text" placeholder="" required autocomplete="off"
                        oninvalid="this.setCustomValidity('Введите название опроса')"
                        oninput="setCustomValidity('')" value="@Model.Title">
+                <lable class="surveynamelabel">Название опроса</lable>
             </div>
             <div class="form-input">
-                <textarea id="SurveyDescription" rows="1" style="resize:none; font-size:20px" placeholder="Описание (не обязательно)">@Model.Description</textarea>
+                <textarea id="SurveyDescription" class="surveydescriptioninput @((Model.Description == "" || Model.Description == null) ? "" : "surveydescriptioninputfilled")" rows="1" placeholder="">@Model.Description</textarea>
+                <lable class="surveydescriptionlabel">Описание (не обязательно)</lable>
             </div>
         </div>
 
@@ -325,8 +415,9 @@
 
 
                         <div class="question-settings">
-                            <div class="leftdiv">
-                                <textarea rows="1" style="resize:none;width:90%;height: 36px;font-size: 20px; margin-right:5%;" type="text" placeholder="Название вопроса" required oninvalid="this.setCustomValidity('Введите название вопроса')" oninput="setCustomValidity('')">@surveyquestion.QuestionText</textarea>
+                            <div class="leftdiv" style="position: relative;">
+                                <textarea rows="1" class="questiontitleinput" type="text" placeholder="" required oninvalid="this.setCustomValidity('Введите название вопроса')" oninput="setCustomValidity('')">@surveyquestion.QuestionText</textarea>
+                                <label class="questiontitlelabel">Название вопроса</label>
                             </div>
                             <div class="rightdiv">
                                 @{
@@ -407,7 +498,7 @@
                         }
 
 
-                        <div id="addnew" style="margin-top:1em">
+                        <div id="addnew" class="addnew" style="margin-top:1em">
                             <img id="image" src="/images/radioboxoptions.png" width="20" height="20" style="margin-left:5%;">
                             <input style="height: 30px;font-size: 15px;width:127px" type="text" placeholder="Добавить вариант" onclick="AddOption('@surveyquestion.Id')" onkeydown="OnChangeAdd('@surveyquestion.Id')">
                             @if (surveyquestion.HasOwnAnswer)
@@ -422,6 +513,7 @@
 
                         <div class="hl" style="margin-top:1em;"></div>
 
+                        <div class="beforequestionfooter"></div>
                         <div class="questionfooter" style="margin-top:0.5em;margin-bottom:0.5em;">
                             <div title="Удалить вопрос" name="picture" style="background: url(/images/SurveyIcon.svg) no-repeat -5px -1203px; width: 14px; height: 18px;margin-right:2em;cursor: pointer;" onclick="RemoveQuestion('@surveyquestion.Id')"></div>
                             <div class="vl" style="margin-right:2em"></div>
@@ -487,6 +579,12 @@
     <img src="~/images/loading.gif" width="115" height="115" style="display: block;margin: 0 auto;" />
 </div>
 
+<div id="remove-ask-message" title="Удалить опрос?" style="display:none">
+    <p>
+        Этот опрос будет удалён навсегда. Вы уверены?
+    </p>
+</div>
+
 <script>
     var addedquest;
     var addedopt;
@@ -525,7 +623,13 @@
                 $("#remove-message").dialog("option", "position", { my: "top", at: "top", of: window });
                 $("#remove-message").dialog('widget').css({ 'margin-top': '5em' });
             }
-            catch (e){ }
+            catch (e) { }
+            try {
+                $("#remove-ask-message").dialog('widget').css({ 'margin-top': '0em' });
+                $("#remove-ask-message").dialog("option", "position", { my: "top", at: "top", of: window });
+                $("#remove-ask-message").dialog('widget').css({ 'margin-top': '5em' });
+            }
+            catch (e) { }
         });
 
         $("div[name=options]").each(function () {
@@ -586,6 +690,15 @@
                 }
             }
         });
+    });
+
+    $('.surveydescriptioninput').on('input', function () {
+        var $this = $(this);
+        if ($this.val() == '') {
+            $this.removeClass('surveydescriptioninputfilled');
+        } else {
+            $this.addClass('surveydescriptioninputfilled');
+        }
     });
 
     function MarginHead() {
@@ -760,13 +873,45 @@
     }
 
     function RemoveSurvey(surveyid) {
-        RemoveMessage();
-        $.ajax({
-            url: "/Admin/RemoveSurvey",
-            type: "GET",
-            data: { id: surveyid },
-            success: function (data) {
-                window.location.href = '@Url.Action("Index", "Admin")';
+        $("#remove-ask-message").dialog({
+            width: 280,
+            height: 170,
+            resizable: false,
+            modal: true,
+            draggable: false,
+
+            closeOnEscape: false,
+            open: function (event, ui) {
+                $(event.target).dialog('widget')
+                    .css("box-shadow", "0 10px 28px rgba(0,0,0,0.25), 0 0px 10px rgba(0,0,0,0.22)")
+                    .css("border-radius", "10px")
+                    .css({ position: 'fixed' })
+                    .position({ my: 'top', at: 'top', of: window })
+                    .css({ 'margin-top': '5em' })
+                $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+            },
+
+            close: function (event, ui) {
+                $(event.target).dialog('widget')
+                    .css({ 'margin-top': '0em' });
+            },
+
+            buttons: {
+                "Удалить опрос": function () {
+                    $(this).dialog("close");
+                    RemoveMessage();
+                    $.ajax({
+                        url: "/Admin/RemoveSurvey",
+                        type: "GET",
+                        data: { id: surveyid },
+                        success: function (data) {
+                            window.location.href = '@Url.Action("Index", "Admin")';
+                        }
+                    });
+                },
+                "Отмена": function () {
+                    $(this).dialog("close");
+                }
             }
         });
     }
@@ -793,8 +938,9 @@
 \
 \
     <div class=\"question-settings\">\
-        <div class=\"leftdiv\">\
-            <textarea rows=\"1\" style=\"resize:none;width:90%;height: 36px;font-size: 20px; margin-right:5%;\" type=\"text\" placeholder=\"Название вопроса\" required oninvalid=\"this.setCustomValidity('Введите название вопроса')\" oninput=\"setCustomValidity('')\"></textarea>\
+        <div class=\"leftdiv\" style=\"position: relative;\">\
+            <textarea rows=\"1\" class=\"questiontitleinput\" type=\"text\" placeholder=\"\" required oninvalid=\"this.setCustomValidity('Введите название вопроса')\" oninput=\"setCustomValidity('')\"></textarea>\
+            <label class=\"questiontitlelabel\">Название вопроса</label>\
         </div>\
         <div class=\"rightdiv\">\
             <select id=\"newquest{ID}select\" style=\"width:100%;display:none;\">\
@@ -820,7 +966,7 @@
     </div>\
 \
 \
-    <div id=\"addnew\" style=\"margin-top:1em\">\
+    <div id=\"addnew\" class=\"addnew\" style=\"margin-top:1em\">\
         <img id=\"image\" src=\"/images/radioboxoptions.png\" width=\"20\" height=\"20\" style=\"margin-left:5%;\">\
         <input style=\"height: 30px;font-size: 15px;width:127px\" type=\"text\" placeholder=\"Добавить вариант\" onclick=\"AddOption('newquest{ID}')\"  onkeydown=\"OnChangeAdd('newquest{ID}')\">\
         <label style=\"display:normal;font-weight:normal\"> или <a style=\"cursor:pointer;font-weight:bold\" onclick=\"AddAnother('newquest{ID}')\">ДОБАВИТЬ ВАРИАНТ \"ДРУГОЕ\"</a></label>\
@@ -828,6 +974,7 @@
 \
     <div class=\"hl\" style=\"margin-top:1em;\"></div>\
 \
+    <div class=\"beforequestionfooter\"></div>\
     <div class=\"questionfooter\" style=\"margin-top:0.5em;margin-bottom:0.5em;\">\
         <div title=\"Удалить вопрос\" name=\"picture\" style=\"background: url(/images/SurveyIcon.svg) no-repeat -5px -1203px; width: 14px; height: 18px;margin-right:2em;cursor: pointer;\" onclick=\"RemoveQuestion('newquest{ID}')\"></div>\
         <div class=\"vl\" style=\"margin-right:2em\"></div>\
@@ -920,6 +1067,8 @@
 
     function Save() {
 
+        var surveyid = '@Model.Id';
+
         $.ajax({
             url: "/Admin/GotAnswers",
             type: "GET",
@@ -927,161 +1076,185 @@
             success: function (data) {
                 check = data;
 
+                if (check === null) {
+                    surveyid = null;
+                }
+
                 if (check) {
                     ErrorMessage2(0);
                 }
                 else {
                     if (!$('#SurveyForm')[0].checkValidity()) {
-            $("#submitButton").prop("disabled", false);
-            $('#submitButton').click();
-            $("#submitButton").prop("disabled", true);
-            return;
-        }
+                        $("#submitButton").prop("disabled", false);
+                        $('#submitButton').click();
+                        $("#submitButton").prop("disabled", true);
+                        return;
+                    }
 
-        SaveMessage();
+                    SaveMessage();
 
-        var title = $("#SurveyName").val();
-        var description = $("#SurveyDescription").val();
+                    var title = $("#SurveyName").val();
+                    var description = $("#SurveyDescription").val();
 
-        var questions = [];
+                    var questions = [];
 
-        var questiondivs = $("#questions").children();
+                    var questiondivs = $("#questions").children();
 
-        for (var i = 0; i < questiondivs.length; i++) {
-            var question = [];
-            var id = questiondivs[i].id;
-            question.push(id);
-            question.push($("#" + id + " div div textarea").val());
+                    for (var i = 0; i < questiondivs.length; i++) {
+                        var question = [];
+                        var id = questiondivs[i].id;
+                        question.push(id);
+                        question.push($("#" + id + " div div textarea").val());
 
-            $("#" + id + "select").ddslick('destroy');
-            var select = $("#" + id + "select").val();
-            var type;
-            if (select === "0") {
-                type = "2"
-            }
-            else if (select === "1") {
-                type = "0"
-            }
-            else if (select === "2") {
-                type = "1"
-            }
+                        $("#" + id + "select").ddslick('destroy');
+                        var select = $("#" + id + "select").val();
+                        var type;
+                        if (select === "0") {
+                            type = "2"
+                        }
+                        else if (select === "1") {
+                            type = "0"
+                        }
+                        else if (select === "2") {
+                            type = "1"
+                        }
 
-            question.push(type);
+                        question.push(type);
 
-            MakeSelectSlick(id + "select");
+                        MakeSelectSlick(id + "select");
 
-            if ($('#' + id + ' #addnew label').css('display') == 'none') {
-                question.push("True");
-            }
-            else {
-                question.push("False");
-            }
+                        if ($('#' + id + ' #addnew label').css('display') == 'none') {
+                            question.push("True");
+                        }
+                        else {
+                            question.push("False");
+                        }
 
-            if ($("#" + id + "required")[0].checked) {
-                question.push("True");
-            }
-            else {
-                question.push("False");
-            }
+                        if ($("#" + id + "required")[0].checked) {
+                            question.push("True");
+                        }
+                        else {
+                            question.push("False");
+                        }
 
-            if (select != 0) {
-                var options = $("#options" + id).children();
-                for (var j = 0; j < options.length; j++) {
-                    var optionid = options[j].id;
-                    question.push(optionid);
-                    question.push($("#" + optionid + " div input").val());
-                }
-            }
-            questions.push(question);
-        }
+                        if (select != 0) {
+                            var options = $("#options" + id).children();
+                            for (var j = 0; j < options.length; j++) {
+                                var optionid = options[j].id;
+                                question.push(optionid);
+                                question.push($("#" + optionid + " div input").val());
+                            }
+                        }
+                        questions.push(question);
+                    }
 
-        if (questions.length == 0) {
-            $("#save-message").dialog("close");
-            $("#savebutton").effect("bounce");
-            ErrorMessage();
-            return;
-        }
+                    if (questions.length == 0) {
+                        $("#save-message").dialog("close");
+                        $("#savebutton").effect("bounce");
+                        ErrorMessage();
+                        return;
+                    }
 
-        for (var i = 0; i < questions.length; i++) {
-            if (questions[i].length <= 5 && questions[i][2] != "2") {
-                $("#" + questions[i][0] + " #addnew input")[0].setCustomValidity('Необходимо добавить ответ');
-            }
+                    for (var i = 0; i < questions.length; i++) {
+                        if (questions[i].length <= 5 && questions[i][2] != "2") {
+                            $("#" + questions[i][0] + " #addnew input")[0].setCustomValidity('Необходимо добавить ответ');
+                        }
 
-            if (questions[i][2] === "2") {
-                $("#" + questions[i][0] + " #addnew input")[0].setCustomValidity('');
-            }
-        }
+                        if (questions[i][2] === "2") {
+                            $("#" + questions[i][0] + " #addnew input")[0].setCustomValidity('');
+                        }
+                    }
 
-        if (!$('#SurveyForm')[0].checkValidity()) {
-            $("#save-message").dialog("close");
-            $("#submitButton").prop("disabled", false);
-            $('#submitButton').click();
-            $("#submitButton").prop("disabled", true);
-            return;
-        }
-
-
-        /* var div = "<div id=\"screenshot\"></div>";
-         $("body").append(div);
-         //$("#screenshot").css("display", "none");
-         $("#screenshot").css("width", "1000px");
-         $("#screenshot").css("height", "1000px");
-         $("#screenshot").append($("body").clone());
-         $("#screenshot #left-menu").remove();*/
-
-        $("span[name=span]").each(function () {
-             var a = $(this).css('transform');
-             if (a.indexOf("20") >= 0) {
-                 $(this).css('transform', 'translateX(10px)');
-             }
-
-         })
+                    if (!$('#SurveyForm')[0].checkValidity()) {
+                        $("#save-message").dialog("close");
+                        $("#submitButton").prop("disabled", false);
+                        $('#submitButton').click();
+                        $("#submitButton").prop("disabled", true);
+                        return;
+                    }
 
 
+                    /* var div = "<div id=\"screenshot\"></div>";
+                     $("body").append(div);
+                     //$("#screenshot").css("display", "none");
+                     $("#screenshot").css("width", "1000px");
+                     $("#screenshot").css("height", "1000px");
+                     $("#screenshot").append($("body").clone());
+                     $("#screenshot #left-menu").remove();*/
 
-        html2canvas(document.body.querySelector(".container.body-content"),  {
-            onclone: function (clonedDoc) {
-                $('#left-menu', $(clonedDoc)).remove();
-                $(".container.body-content", $(clonedDoc)).css("width", "1000px");
-                //$(".container.body-content", $(clonedDoc)).css("height", "1000px");
-                var color = $("body").css("background-color");
-                $(".container.body-content", $(clonedDoc)).css("background-color", color);
+                    $("span[name=span]").each(function () {
+                        var a = $(this).css('transform');
+                        if (a.indexOf("20") >= 0) {
+                            $(this).css('transform', 'translateX(10px)');
+                        }
 
-                $("div[name=picture]", $(clonedDoc)).each(function () {
-                    $(this).css('zoom', '1');
-                })
-            }
-        }).then(function (canvas) {
-
-            $("span[name=span]").each(function () {
-                var a = $(this).css('transform');
-                if (a.indexOf("10") >= 0) {
-                    $(this).css('transform', '');
-                }
-            })
-
-            canvas = crop(canvas, { x: 0, y: 0 }, { x: 1000, y: 1000 });
-
-            var img = canvas.toDataURL("image/png");
-            img = img.replace('data:image/png;base64,', '');
+                    })
 
 
-            $.ajax(
-            {
-                url: '/Admin/Save',
-                type: "POST",
-                data: {'id' : '@Model.Id', 'title': title, 'description': description, 'lines': questions, 'image':img },
-                success: function (data) {
-                    var url = '@Url.Action("Edit", "Admin", new { id = "--ID--" })';
-                    url = url.replace("--ID--", data.id);
-                    window.location.href = url;
-                },
-                error: function () {
-                    $("#save-message").dialog("close");
-                }
-            });
-        });
 
+                    html2canvas(document.body.querySelector(".container.body-content"), {
+                        onclone: function (clonedDoc) {
+
+                            $(".addnew", $(clonedDoc)).each(function () {
+                                $(this).css('display', 'none');
+                            })
+
+                            $('.questionfooter', $(clonedDoc)).each(function () {
+                                $(this).css('display', 'none');
+                            })
+
+                            $('.hl', $(clonedDoc)).each(function () {
+                                $(this).css('display', 'none');
+                            })
+
+                            $(".beforequestionfooter", $(clonedDoc)).each(function () {
+                                $(this).css('display', 'block');
+                            })
+
+                            $('#left-menu', $(clonedDoc)).remove();
+                            $(".container.body-content", $(clonedDoc)).css("width", "1000px");
+                            $(".container.body-content", $(clonedDoc)).css("height", "1000px");
+                            var color = $("body").css("background-color");
+                            $(".container.body-content", $(clonedDoc)).css("background-color", color);
+
+
+
+                            $("div[name=picture]", $(clonedDoc)).each(function () {
+                                $(this).css('zoom', '1');
+                            })
+                        }
+                    }).then(function (canvas) {
+
+                        $("span[name=span]").each(function () {
+                            var a = $(this).css('transform');
+                            if (a.indexOf("10") >= 0) {
+                                $(this).css('transform', '');
+                            }
+                        })
+
+                       // document.body.appendChild(canvas);
+
+                        canvas = crop(canvas, { x: 0, y: 0 }, { x: canvas.width, y: canvas.width });
+                        var img = canvas.toDataURL("image/png");
+                        img = img.replace('data:image/png;base64,', '');
+
+
+                        $.ajax(
+                            {
+                                url: '/Admin/Save',
+                                type: "POST",
+                                data: { 'id': surveyid, 'title': title, 'description': description, 'lines': questions, 'image': img },
+                                success: function (data) {
+                                    var url = '@Url.Action("Edit", "Admin", new { id = "--ID--" })';
+                                    url = url.replace("--ID--", data.id);
+                                    window.location.href = url;
+                                },
+                                error: function () {
+                                    $("#save-message").dialog("close");
+                                }
+                            });
+                        $("#save-message").dialog("close");
+                        });
                 }
             }
         });
@@ -1106,6 +1279,16 @@
         newCtx.putImageData(imageData, 0, 0);
 
         return newCan;
+    }
+
+    function crop2() {
+        var image = document.getElementById("source");
+        ctx.drawImage(image, 0, 0);
+        var image1 = document.getElementById("texture1");
+        var ptrn = ctx.createPattern(image1, 'repeat');
+        ctx.fillStyle = ptrn;
+        ctx.fillRect(0, 0, 1500, 1500);
+
     }
 
 

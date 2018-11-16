@@ -10,6 +10,7 @@
 <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
 <script src="~/lib/jquery-ui-1.12.1/jquery-ui.js"></script>
 <script src="~/js/jquery.ddslick.min.js"></script>
+<script src="~/js/polyfill.min.js"></script>
 <script src="~/js/html2canvas.min.js"></script>
 <link rel="stylesheet" href="~/lib/jquery-ui-1.12.1/jquery-ui.css" />
 
@@ -246,7 +247,8 @@
     .form-input {
         margin-top: 5%;
         width: 90%;
-        margin-left: 5%
+        margin-left: 5%;
+        position: relative;
     }
 
     div[name=picture] {
@@ -285,6 +287,91 @@
             border-bottom-width: thin;
         }
 
+    .surveynameinput {
+        height: 46px;
+        font-size: 30px;
+        position: relative;
+        background: none;
+        z-index: 2;
+    }
+
+        .surveynameinput:focus ~ .surveynamelabel,
+        .surveynameinput:not(:focus):valid ~ .surveynamelabel {
+            top: -5px;
+            font-size: 12px;
+            padding-left: 1.5px;
+        }
+
+    .surveynamelabel {
+        position: absolute;
+        z-index: 1;
+        top: 50%;
+        left: 0;
+        margin-top: -0.7em;
+        transition: .3s;
+        font-size: 30px;
+        color: grey;
+    }
+
+    .surveydescriptioninput {
+        resize: none;
+        font-size: 20px;
+        position: relative;
+        background: none;
+        z-index: 2;
+    }
+
+        .surveydescriptioninput:focus + .surveydescriptionlabel,
+        .surveydescriptioninputfilled + .surveydescriptionlabel {
+            top: -5px;
+            font-size: 12px;
+            padding-left: 1.5px;
+        }
+
+    .surveydescriptionlabel {
+        position: absolute;
+        z-index: 1;
+        top: 50%;
+        left: 0;
+        margin-top: -0.8em;
+        transition: .3s;
+        font-size: 20px;
+        color: grey;
+    }
+
+    .questiontitleinput {
+        position: relative;
+        background: none;
+        z-index: 2;
+        resize: none;
+        width: 90%;
+        font-size: 20px;
+        margin-right: 5%;
+    }
+
+        .questiontitleinput:focus ~ .questiontitlelabel,
+        .questiontitleinput:not(:focus):valid ~ .questiontitlelabel {
+            top: -5px;
+            font-size: 12px;
+            padding-left: 1.5px;
+        }
+
+    .questiontitlelabel {
+        position: absolute;
+        z-index: 1;
+        top: 50%;
+        left: 0;
+        margin-top: -0.7em;
+        transition: .3s;
+        font-size: 20px;
+        color: grey;
+        font-weight: normal;
+    }
+
+    .beforequestionfooter {
+        display: none;
+        margin-bottom: 1em;
+    }
 </style>
 
 <div class="form-container">
@@ -299,12 +386,14 @@
         <div class="box header">
 
             <div class="form-input">
-                <input id="SurveyName" style="height: 46px;font-size: 30px; " type="text" placeholder="Название опроса" required autocomplete="off"
+                <input id="SurveyName" class="surveynameinput" type="text" placeholder="" required autocomplete="off"
                        oninvalid="this.setCustomValidity('Введите название опроса')"
                        oninput="setCustomValidity('')">
+                <lable class="surveynamelabel">Название опроса</lable>
             </div>
             <div class="form-input">
-                <textarea id="SurveyDescription" rows="1" style="resize:none; font-size:20px" placeholder="Описание (не обязательно)"></textarea>
+                <textarea id="SurveyDescription" class="surveydescriptioninput" rows="1" placeholder=""></textarea>
+                <lable class="surveydescriptionlabel">Описание (не обязательно)</lable>
             </div>
         </div>
 
@@ -372,6 +461,16 @@
 
         MarginHead();
     });
+
+    $('.surveydescriptioninput').on('input', function () {
+        var $this = $(this);
+        if ($this.val() == '') {
+            $this.removeClass('surveydescriptioninputfilled');
+        } else {
+            $this.addClass('surveydescriptioninputfilled');
+        }
+    });
+
 
     function MarginHead() {
         if ($("#questions").children().length === 0) {
@@ -504,8 +603,9 @@ function RemoveSurvey(surveyid) {
 \
 \
     <div class=\"question-settings\">\
-        <div class=\"leftdiv\">\
-            <textarea rows=\"1\" style=\"resize:none;width:90%;height: 36px;font-size: 20px; margin-right:5%;\" type=\"text\" placeholder=\"Название вопроса\" required oninvalid=\"this.setCustomValidity('Введите название вопроса')\" oninput=\"setCustomValidity('')\"></textarea>\
+        <div class=\"leftdiv\" style=\"position: relative;\">\
+            <textarea rows=\"1\" class=\"questiontitleinput\" type=\"text\" placeholder=\"\" required oninvalid=\"this.setCustomValidity('Введите название вопроса')\" oninput=\"setCustomValidity('')\"></textarea>\
+            <label class=\"questiontitlelabel\">Название вопроса</label>\
         </div>\
         <div class=\"rightdiv\">\
             <select id=\"newquest{ID}select\" style=\"width:100%;display:none;\">\
@@ -531,7 +631,7 @@ function RemoveSurvey(surveyid) {
     </div>\
 \
 \
-    <div id=\"addnew\" style=\"margin-top:1em\">\
+    <div id=\"addnew\" class=\"addnew\" style=\"margin-top:1em\">\
         <img id=\"image\" src=\"/images/radioboxoptions.png\" width=\"20\" height=\"20\" style=\"margin-left:5%;\">\
         <input style=\"height: 30px;font-size: 15px;width:127px\" type=\"text\" placeholder=\"Добавить вариант\" onclick=\"AddOption('newquest{ID}')\"  onkeydown=\"OnChangeAdd('newquest{ID}')\">\
         <label style=\"display:normal;font-weight:normal\"> или <a style=\"cursor:pointer;font-weight:bold\" onclick=\"AddAnother('newquest{ID}')\">ДОБАВИТЬ ВАРИАНТ \"ДРУГОЕ\"</a></label>\
@@ -539,6 +639,7 @@ function RemoveSurvey(surveyid) {
 \
     <div class=\"hl\" style=\"margin-top:1em;\"></div>\
 \
+    <div class=\"beforequestionfooter\"></div>\
     <div class=\"questionfooter\" style=\"margin-top:0.5em;margin-bottom:0.5em;\">\
         <div title=\"Удалить вопрос\" name=\"picture\" style=\"background: url(/images/SurveyIcon.svg) no-repeat -5px -1203px; width: 14px; height: 18px;margin-right:2em;cursor: pointer;\" onclick=\"RemoveQuestion('newquest{ID}')\"></div>\
         <div class=\"vl\" style=\"margin-right:2em\"></div>\
@@ -741,6 +842,22 @@ function RemoveSurvey(surveyid) {
 
         html2canvas(document.body.querySelector(".container.body-content"),  {
             onclone: function (clonedDoc) {
+                $(".addnew", $(clonedDoc)).each(function () {
+                    $(this).css('display', 'none');
+                })
+
+                $('.questionfooter', $(clonedDoc)).each(function () {
+                    $(this).css('display', 'none');
+                })
+
+                $('.hl', $(clonedDoc)).each(function () {
+                    $(this).css('display', 'none');
+                })
+
+                $(".beforequestionfooter", $(clonedDoc)).each(function () {
+                    $(this).css('display', 'block');
+                })
+
                 $('#left-menu', $(clonedDoc)).remove();
                 $(".container.body-content", $(clonedDoc)).css("width", "1000px");
                 //$(".container.body-content", $(clonedDoc)).css("height", "1000px");

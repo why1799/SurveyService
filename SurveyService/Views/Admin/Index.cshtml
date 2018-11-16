@@ -28,6 +28,7 @@
         border-radius: 10px;
         margin: 1em;
         height: 266px;
+        background-color: #eee;
     }
 
     .image-box {
@@ -104,7 +105,7 @@
 </style>
 
 <div class="surveys">
-    <a href="@Url.Action("Create", "Admin")" class="survey-box">
+    <a href="@Url.Action("Create", "Admin")" class="survey-box" style="background-color: white;">
 
         <img src="~/images/add.png" height="200" width="200" class="image-box" /><br>
         <div class="survey-bottom" style="background-color:white;">
@@ -117,7 +118,7 @@
     @foreach (var survey in Model)
     {
 
-        <div id="@survey.Id" class="survey-box" style="background-color: #ede7f6;">
+        <div id="@survey.Id" class="survey-box">
             <a href="@Url.Action("Edit", "Admin", new { id = survey.Id })">
                 @{
                     string imgSrc;
@@ -137,7 +138,7 @@
 
                 <div>
 
-                    <label class="label-title"><a href="@Url.Action("Edit", "Admin", new { id = survey.Id })">@survey.Title</a></label><br>
+                    <label title="@survey.Title" class="label-title"><a href="@Url.Action("Edit", "Admin", new { id = survey.Id })">@survey.Title</a></label><br>
                     @if (DateTime.UtcNow.Day == survey.DateCreated.Day && DateTime.UtcNow.Month == survey.DateCreated.Month && DateTime.UtcNow.Year == survey.DateCreated.Year)
                     {
                         <label class="label-date">@survey.DateCreated.ToLocalTime().ToString("HH:mm")</label>
@@ -178,6 +179,12 @@
     <img src="~/images/loading.gif" width="115" height="115" style="display: block;margin: 0 auto;" />
 </div>
 
+<div id="remove-ask-message" title="Удалить опрос?" style="display:none">
+    <p>
+        Этот опрос будет удалён навсегда. Вы уверены?
+    </p>
+</div>
+
 <script>
 
     $(document).ready(function () {
@@ -188,19 +195,25 @@
                 $("#error-message").dialog("option", "position", { my: "top", at: "top", of: window });
                 $("#error-message").dialog('widget').css({ 'margin-top': '5em' });
             }
-            catch{ }
+            catch(e){ }
             try {
                 $("#download-message").dialog('widget').css({ 'margin-top': '0em' });
                 $("#download-message").dialog("option", "position", { my: "top", at: "top", of: window });
                 $("#download-message").dialog('widget').css({ 'margin-top': '5em' });
             }
-            catch{ }
+            catch (e){ }
             try {
                 $("#remove-message").dialog('widget').css({ 'margin-top': '0em' });
                 $("#remove-message").dialog("option", "position", { my: "top", at: "top", of: window });
                 $("#remove-message").dialog('widget').css({ 'margin-top': '5em' });
             }
-            catch{ }
+            catch (e) { }
+            try {
+                $("#remove-ask-message").dialog('widget').css({ 'margin-top': '0em' });
+                $("#remove-ask-message").dialog("option", "position", { my: "top", at: "top", of: window });
+                $("#remove-ask-message").dialog('widget').css({ 'margin-top': '5em' });
+            }
+            catch (e) { }
         });
 
     });
@@ -231,7 +244,7 @@
         });
     }
 
-    function ErrorMessage() {
+    function ErrorMessage(text) {
 
         $("#error-message").dialog({
             width: 280,
@@ -247,7 +260,8 @@
                     .css("border-radius", "10px")
                     .css({ position: 'fixed' })
                     .position({ my: 'top', at: 'top', of: window })
-                    .css({ 'margin-top': '5em' });
+                    .css({ 'margin-top': '5em' })
+                    .children('div').children('p').text(text);
                 $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
             },
 
@@ -292,14 +306,46 @@
 
 
     function RemoveSurvey(surveyid) {
-        RemoveMessage();
-        $.ajax({
-            url: "/Admin/RemoveSurvey",
-            type: "GET",
-            data: { id: surveyid },
-            success: function (data) {
-                $("#" + surveyid).remove();
-                $("#remove-message").dialog('close');
+        $("#remove-ask-message").dialog({
+            width: 280,
+            height: 170,
+            resizable: false,
+            modal: true,
+            draggable: false,
+
+            closeOnEscape: false,
+            open: function (event, ui) {
+                $(event.target).dialog('widget')
+                    .css("box-shadow", "0 10px 28px rgba(0,0,0,0.25), 0 0px 10px rgba(0,0,0,0.22)")
+                    .css("border-radius", "10px")
+                    .css({ position: 'fixed' })
+                    .position({ my: 'top', at: 'top', of: window })
+                    .css({ 'margin-top': '5em' })
+                $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+            },
+
+            close: function (event, ui) {
+                $(event.target).dialog('widget')
+                    .css({ 'margin-top': '0em' });
+            },
+
+            buttons: {
+                "Удалить опрос": function () {
+                    $(this).dialog("close");
+                     RemoveMessage();
+                     $.ajax({
+                         url: "/Admin/RemoveSurvey",
+                         type: "GET",
+                         data: { id: surveyid },
+                         success: function (data) {
+                             $("#" + surveyid).remove();
+                             $("#remove-message").dialog('close');
+                         }
+                     });
+                },
+                "Отмена": function () {
+                    $(this).dialog("close");
+                }
             }
         });
     }
@@ -311,23 +357,41 @@
             type: "GET",
             data: { id: surveyid },
             success: function (data) {
-                if (data === null) {
+                if (data.data === null) {
                     $("#download-message").dialog('close');
-                    ErrorMessage();
+                    ErrorMessage(data.name);
+                    if (data.remove) {
+                        $("#" + surveyid).remove();
+                    }
                 }
                 else {
-                    $('<a></a>')
-                        .attr('id', 'downloadFile')
-                        .attr('href', 'data:text/csv,' + '\uFEFF' + encodeURIComponent(data.data))
-                        .attr('download', data.name + '.csv')
-                        .appendTo('body');
 
-                    $('#downloadFile').get(0).click();
-                    $('#downloadFile').remove();
+                    var blob = new Blob(["\uFEFF", data.data], { type: "text/csv;charset=utf-8;" });
+
+                    if (navigator.msSaveBlob) { // IE 10+
+                        navigator.msSaveBlob(blob, data.name + ".csv")
+                    } else {
+                        var link = document.createElement("a");
+                        if (link.download !== undefined) { // feature detection
+                            // Browsers that support HTML5 download attribute
+                            var url = URL.createObjectURL(blob);
+                            link.setAttribute("href", url);
+                            link.setAttribute("download", data.name + ".csv");
+                            link.style = "visibility:hidden";
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                        }
+                    }
+
                     $("#download-message").dialog('close');
                 }
 
             }
         });
+    }
+
+    function Update() {
+        location.href = location.href;
     }
 </script>

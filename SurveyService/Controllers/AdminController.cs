@@ -60,6 +60,10 @@ namespace SurveyService.WebUI.Controllers
         public async Task<JsonResult> RemoveSurvey(string id)
         {
             var survey = surveyRepository.GetItems().Include(x => x.SurveyQuestion).ThenInclude(y => y.Options).ThenInclude(z => z.OptionsForAnswers).Include(x => x.SurveyQuestion).ThenInclude(a => a.UserAnswers).FirstOrDefault(x => x.Id == id);
+            if(survey == null)
+            {
+                return Json(null);
+            }
             foreach (var question in survey.SurveyQuestion.ToList())
             {
                 foreach (var option in question.Options.ToList())
@@ -90,7 +94,10 @@ namespace SurveyService.WebUI.Controllers
                                 .ThenInclude(ob => ob.Options)
                     .Where(ob => ob.Id == id).FirstOrDefault();
 
-
+            if(sur == null)
+            {
+                return RedirectToAction("Index");
+            }
 
             return View(sur);
         }
@@ -100,7 +107,7 @@ namespace SurveyService.WebUI.Controllers
             int order = surveyQuestionRepository.GetItems().Where(x => x.SurveyId == surveyid).Count();
             var question = await surveyQuestionRepository.Create(new SurveyQuestion { QuestionText = "Новый вопрос", HasOwnAnswer = false, IsRequired = false, SurveyId = surveyid, Type = 0, Order = order });
             return new JsonResult(new { surveyquestionid = question.Id, text = question.QuestionText });
-        }
+        }//Метод не используется
 
         public async Task<JsonResult> RemoveQuestion(string surveyquestionid)
         {
@@ -121,7 +128,7 @@ namespace SurveyService.WebUI.Controllers
             }
 
             return new JsonResult(surveyquestionid);
-        }
+        }//Метод не используется
 
         public async Task<JsonResult> UpQuestion(string questionid)
         {
@@ -145,7 +152,7 @@ namespace SurveyService.WebUI.Controllers
                 firstid = firstquestion.Id,
                 secondid = secondquestion.Id
             });
-        }
+        }//Метод не используется
 
         public async Task<JsonResult> DownQuestion(string questionid)
         {
@@ -169,14 +176,14 @@ namespace SurveyService.WebUI.Controllers
                 firstid = firstquestion.Id,
                 secondid = secondquestion.Id
             });
-        }
+        }//Метод не используется
 
         public async Task<JsonResult> AddOption(string surveyquestionid)
         {
             var order = optionRepository.GetItems().Where(x => x.QuestionId == surveyquestionid).Count();
             var option = await optionRepository.Create(new Option { Text = "Вариант ответа", Order = order, QuestionId = surveyquestionid });
             return Json(new { option = new Option { Id = option.Id, Text = option.Text }, surveyquestionid });
-        }
+        }//Метод не используется
 
         public async Task<JsonResult> RemoveOption(string optionid)
         {
@@ -191,7 +198,7 @@ namespace SurveyService.WebUI.Controllers
             }
 
             return new JsonResult(optionid);
-        }
+        }//Метод не используется
 
         public async Task<JsonResult> UpOption(string optionid)
         {
@@ -215,7 +222,7 @@ namespace SurveyService.WebUI.Controllers
                 firstid = firstoption.Id,
                 secondid = secondoption.Id
             });
-        }
+        }//Метод не используется
 
         public async Task<JsonResult> DownOption(string optionid)
         {
@@ -239,11 +246,15 @@ namespace SurveyService.WebUI.Controllers
                 firstid = firstoption.Id,
                 secondid = secondoption.Id
             });
-        }
+        }//Метод не используется
 
         public async Task<JsonResult> GotAnswers(string id)
         {
             var survey = surveyRepository.GetItems().Include(x => x.SurveyQuestion).ThenInclude(a => a.UserAnswers).FirstOrDefault(x => x.Id == id);
+            if (survey == null)
+            {
+                return Json(null);
+            }
             bool got = false;
             foreach(var question in survey.SurveyQuestion)
             {
@@ -260,8 +271,9 @@ namespace SurveyService.WebUI.Controllers
         public async Task<JsonResult> Save(string id, string title, string description, string[][] lines, string image)
         {
             Survey survey;
+            survey = surveyRepository.GetItems().Include(x => x.SurveyQuestion).FirstOrDefault(x => x.Id == id);
             byte[] dataimage = Convert.FromBase64String(image);
-            if (id == null)
+            if (id == null || survey == null)
             {
                 var user = UserHelper.GetUser(HttpContext, userRepository);
                 survey = await surveyRepository.Create(new Survey { Title = title, Description = description, DateCreated = DateTime.UtcNow, CreatedById = user.Id, Image = dataimage });
@@ -269,7 +281,6 @@ namespace SurveyService.WebUI.Controllers
             }
             else
             {
-                survey = surveyRepository.GetItems().Include(x => x.SurveyQuestion).FirstOrDefault(x => x.Id == id);
                 survey.Title = title;
                 survey.Description = description;
                 survey.Image = dataimage;
@@ -299,8 +310,8 @@ namespace SurveyService.WebUI.Controllers
 
             for (int i = 0; i < lines.Length; i++)
             {
-                SurveyQuestion question;
-                if (lines[i][0].IndexOf("newquest") == 0)
+                SurveyQuestion question = await surveyQuestionRepository.GetItem(lines[i][0]);
+                if (question == null)
                 {
                     question = await surveyQuestionRepository.Create(new SurveyQuestion
                     {
@@ -314,7 +325,6 @@ namespace SurveyService.WebUI.Controllers
                 }
                 else
                 {
-                    question = await surveyQuestionRepository.GetItem(lines[i][0]);
                     question.QuestionText = lines[i][1];
                     question.Type = int.Parse(lines[i][2]);
                     question.HasOwnAnswer = bool.Parse(lines[i][3]);
@@ -348,13 +358,13 @@ namespace SurveyService.WebUI.Controllers
 
                 for (int j = 5, ord = 0; j < lines[i].Length; j += 2, ord++)
                 {
-                    if (lines[i][j].IndexOf("newopt") == 0)
+                    var option = await optionRepository.GetItem(lines[i][j]);
+                    if (option == null)
                     {
                         await optionRepository.Create(new Option { QuestionId = question.Id, Text = lines[i][j + 1], Order = ord });
                     }
                     else
                     {
-                        var option = await optionRepository.GetItem(lines[i][j]);
                         option.Text = lines[i][j + 1];
                         option.Order = ord;
                         await optionRepository.Update(option);
@@ -394,7 +404,12 @@ namespace SurveyService.WebUI.Controllers
             bool ok = false;
             StringBuilder builder = new StringBuilder();
             var survey = surveyRepository.GetItems().Include(x => x.SurveyQuestion).ThenInclude(y => y.UserAnswers).ThenInclude(z => z.User).Include(x => x.SurveyQuestion).ThenInclude(y => y.Options).ThenInclude(z => z.OptionsForAnswers).FirstOrDefault(x => x.Id == id);
-            foreach(var question in survey.SurveyQuestion.OrderBy(x => x.Order))
+            if (survey == null)
+            {
+                string data = null;
+                return Json(new { name = "Такого опроса больше не существует", data, remove = true });
+            }
+            foreach (var question in survey.SurveyQuestion.OrderBy(x => x.Order))
             {
                 if(ok || question.UserAnswers.Count > 0)
                 {
@@ -418,7 +433,8 @@ namespace SurveyService.WebUI.Controllers
 
             if (!ok)
             {
-                return Json(null);
+                string data = null;
+                return Json(new { name = "Опрос ещё никто не проходил!", data });
             }
             return Json(new { name = survey.Title, data = builder.ToString() });
         }
