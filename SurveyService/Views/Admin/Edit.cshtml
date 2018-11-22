@@ -369,6 +369,26 @@
         display: none;
         margin-bottom: 1em;
     }
+
+    .typeselect {
+        width: 100%;
+        display: none;
+    }
+
+    .minselect {
+        display: none;
+    }
+
+    .ratingoption {
+        margin-top: 1em;
+        margin-left: 5%;
+        display:flex;
+        align-items:center;
+    }
+
+    .maxselect {
+        display: none;
+    }
 </style>
 
 
@@ -404,141 +424,175 @@
                 for (int i = 0; i < surveyquestions.Count(); ++i)
                 {
                     var surveyquestion = surveyquestions.First(x => x.Order == i);
-                    <div id="@surveyquestion.Id" class="box" style="margin-top:1em;">
+            <div id="@surveyquestion.Id" class="box" style="margin-top:1em;">
 
-                        <div style="justify-content: center;display: flex;margin-top:1em;">
-                            @{
-                                idhelper = "move" + surveyquestion.Id;
-                            }
-                            <img id="@idhelper" src="/images/questiondots.png" style="cursor:move;" width="20" height="10">
-                        </div>
+                <div style="justify-content: center;display: flex;margin-top:1em;">
+                    @{
+                        idhelper = "move" + surveyquestion.Id;
+                    }
+                    <img id="@idhelper" src="/images/questiondots.png" style="cursor:move;" width="20" height="10">
+                </div>
 
 
-                        <div class="question-settings">
-                            <div class="leftdiv" style="position: relative;">
-                                <textarea rows="1" class="questiontitleinput" type="text" placeholder="" required oninvalid="this.setCustomValidity('Введите название вопроса')" oninput="setCustomValidity('')">@surveyquestion.QuestionText</textarea>
-                                <label class="questiontitlelabel">Название вопроса</label>
-                            </div>
-                            <div class="rightdiv">
-                                @{
-                                    idhelper = surveyquestion.Id + "select";
-                                }
-                                <select id="@idhelper" style="width:100%;display:none;">
-                                    @if (surveyquestion.Type == 0)
-                                    {
-                                        <option value="0" data-imagesrc="/images/text.png" data-description=" ">Текст</option>
-                                        <option value="1" selected="selected" data-imagesrc="/images/radiobox.png" data-description=" ">Один из списка</option>
-                                        <option value="2" data-imagesrc="/images/checkbox.png" data-description=" ">Несколько из списка</option>
-                                    }
-                                    else if (surveyquestion.Type == 1)
-                                    {
-                                        <option value="0" data-imagesrc="/images/text.png" data-description=" ">Текст</option>
-                                        <option value="1" data-imagesrc="/images/radiobox.png" data-description=" ">Один из списка</option>
-                                        <option value="2" selected="selected" data-imagesrc="/images/checkbox.png" data-description=" ">Несколько из списка</option>
-                                    }
-                                    else if (surveyquestion.Type == 2)
-                                    {
-                                        <option value="0" selected="selected" data-imagesrc="/images/text.png" data-description=" ">Текст</option>
-                                        <option value="1" data-imagesrc="/images/radiobox.png" data-description=" ">Один из списка</option>
-                                        <option value="2" data-imagesrc="/images/checkbox.png" data-description=" ">Несколько из списка</option>
-                                    }
-                                </select>
-                            </div>
-                        </div>
-
+                <div class="question-settings">
+                    <div class="leftdiv" style="position: relative;">
+                        <textarea rows="1" class="questiontitleinput" type="text" placeholder="" required oninvalid="this.setCustomValidity('Введите название вопроса')" oninput="setCustomValidity('')">@surveyquestion.QuestionText</textarea>
+                        <label class="questiontitlelabel">Название вопроса</label>
+                    </div>
+                    <div class="rightdiv">
                         @{
-                            idhelper = "options" + surveyquestion.Id;
+                            idhelper = surveyquestion.Id + "select";
                         }
-                        <div id="@idhelper" name="options">
-                            @{
-                                var options = surveyquestion.Options;
-                                @for (int j = 0; j < options.Count; ++j)
-                                {
-                                    var option = options.First(x => x.Order == j);
-                                    <div id="@option.Id" class="optionseparation">
-
-                                        <div class="optionleft">
-                                            @{
-                                                idhelper = "move" + option.Id;
-                                            }
-                                            <img id="@idhelper" src="/images/optiondots.png" width="10" height="20" style="cursor:move;">
-                                        </div>
-
-                                        <div class="optionright">
-                                            <img id="image" src="/images/radioboxoptions.png" width="20" height="20">
-                                            <input class="option-input" type="text" placeholder="Ответ" required="" oninvalid="this.setCustomValidity('Введите ответ')" oninput="setCustomValidity('')" value="@option.Text">
-                                            <div title="Удалить ответ" name="picture" style="background: url('/images/SurveyIcon.svg') no-repeat -5px -4061px; width: 14px; height: 14px; zoom:1.4; cursor: pointer;" onclick="RemoveOption('@option.Id')"></div>
-                                        </div>
-
-                                    </div>
-                                }
+                        <select id="@idhelper" class="typeselect">
+                            @if (surveyquestion.Type == 0)
+                            {
+                                <option value="0" data-imagesrc="/images/text.png" data-description=" ">Текст</option>
+                                <option value="1" data-imagesrc="/images/star.png" data-description=" ">Рейтинг</option>
+                                <option value="2" selected="selected" data-imagesrc="/images/radiobox.png" data-description=" ">Один из списка</option>
+                                <option value="3" data-imagesrc="/images/checkbox.png" data-description=" ">Несколько из списка</option>
                             }
-                        </div>
+                            else if (surveyquestion.Type == 1)
+                            {
+                                <option value="0" data-imagesrc="/images/text.png" data-description=" ">Текст</option>
+                                <option value="1" data-imagesrc="/images/star.png" data-description=" ">Рейтинг</option>
+                                <option value="2" data-imagesrc="/images/radiobox.png" data-description=" ">Один из списка</option>
+                                <option value="3" selected="selected" data-imagesrc="/images/checkbox.png" data-description=" ">Несколько из списка</option>
+                            }
+                            else if (surveyquestion.Type == 2)
+                            {
+                                <option value="0" selected="selected" data-imagesrc="/images/text.png" data-description=" ">Текст</option>
+                                <option value="1" data-imagesrc="/images/star.png" data-description=" ">Рейтинг</option>
+                                <option value="2" data-imagesrc="/images/radiobox.png" data-description=" ">Один из списка</option>
+                                <option value="3" data-imagesrc="/images/checkbox.png" data-description=" ">Несколько из списка</option>
+                            }
+                            else if (surveyquestion.Type == 3)
+                            {
+                                <option value="0" data-imagesrc="/images/text.png" data-description=" ">Текст</option>
+                                <option value="1" selected="selected" data-imagesrc="/images/star.png" data-description=" ">Рейтинг</option>
+                                <option value="2" data-imagesrc="/images/radiobox.png" data-description=" ">Один из списка</option>
+                                <option value="3" data-imagesrc="/images/checkbox.png" data-description=" ">Несколько из списка</option>
+                            }
+                        </select>
+                    </div>
+                </div>
 
-                        <div id="textoption" style="margin-top:1em;margin-left:5%;display:none">
-                            <input style="width:94.5%;height: 30px;font-size: 15px;" disabled type="text" placeholder="Текстовый ответ">
-                        </div>
-
-
-                        @if (surveyquestion.HasOwnAnswer)
+                @{
+                    idhelper = "options" + surveyquestion.Id;
+                }
+                <div id="@idhelper" name="options">
+                    @if (surveyquestion.Type != 3)
+                    {
+                        var options = surveyquestion.Options;
+                        @for (int j = 0; j < options.Count; ++j)
                         {
-                            <div id="another" style="display:normal;">
-                                <img id="image" src="/images/radioboxoptions.png" width="20" height="20" style="margin-left:5%;">
-                                <input class="option-input" style="width:87%;" disabled type="text" placeholder="Другое...">
-                                <div title="Удалить другое" name="picture" style="background: url('/images/SurveyIcon.svg') no-repeat -5px -4061px; width: 14px; height: 14px; zoom:1.4; cursor: pointer;" onclick="RemoveAnother('@surveyquestion.Id')"></div>
+                            var option = options.First(x => x.Order == j);
+                            <div id="@option.Id" class="optionseparation">
+
+                                <div class="optionleft">
+                                    @{
+                                        idhelper = "move" + option.Id;
+                                    }
+                                    <img id="@idhelper" src="/images/optiondots.png" width="10" height="20" style="cursor:move;">
+                                </div>
+
+                                <div class="optionright">
+                                    <img id="image" src="/images/radioboxoptions.png" width="20" height="20">
+                                    <input class="option-input" type="text" placeholder="Ответ" required="" oninvalid="this.setCustomValidity('Введите ответ')" oninput="setCustomValidity('')" value="@option.Text">
+                                    <div title="Удалить ответ" name="picture" style="background: url('/images/SurveyIcon.svg') no-repeat -5px -4061px; width: 14px; height: 14px; zoom:1.4; cursor: pointer;" onclick="RemoveOption('@option.Id')"></div>
+                                </div>
+
                             </div>
+                                        }
+                                        }
+                </div>
+
+                <div id="textoption" style="margin-top:1em;margin-left:5%;display:none">
+                    <input style="width:94.5%;height: 30px;font-size: 15px;" disabled type="text" placeholder="Текстовый ответ">
+                </div>
+
+                <div id="ratingoption" style="display:none" class="ratingoption">
+                    <div style="width:10%;">
+                        <select id="minselect" class="minselect">
+                            <option>0</option>
+                            <option>1</option>
+                        </select>
+                    </div>
+                    <label style="margin-left:1em;">—</label>
+                    <div style="width:10%;margin-left:1em;">
+                        <select id="maxselect" class="maxselect">
+                            <option>2</option>
+                            <option>3</option>
+                            <option>4</option>
+                            <option>5</option>
+                            <option>6</option>
+                            <option>7</option>
+                            <option>8</option>
+                            <option>9</option>
+                            <option>10</option>
+                        </select>
+                    </div>
+                </div>
+
+
+                @if (surveyquestion.HasOwnAnswer)
+                {
+                    <div id="another" style="display:normal;">
+                        <img id="image" src="/images/radioboxoptions.png" width="20" height="20" style="margin-left:5%;">
+                        <input class="option-input" style="width:87%;" disabled type="text" placeholder="Другое...">
+                        <div title="Удалить другое" name="picture" style="background: url('/images/SurveyIcon.svg') no-repeat -5px -4061px; width: 14px; height: 14px; zoom:1.4; cursor: pointer;" onclick="RemoveAnother('@surveyquestion.Id')"></div>
+                    </div>
+                }
+                else
+                {
+                    <div id="another" style="display:none;">
+                        <img id="image" src="/images/radioboxoptions.png" width="20" height="20" style="margin-left:5%;">
+                        <input class="option-input" style="width:87%;" disabled type="text" placeholder="Другое...">
+                        <div title="Удалить другое" name="picture" style="background: url('/images/SurveyIcon.svg') no-repeat -5px -4061px; width: 14px; height: 14px; zoom:1.4; cursor: pointer;" onclick="RemoveAnother('@surveyquestion.Id')"></div>
+                    </div>
+                }
+
+
+                <div id="addnew" class="addnew" style="margin-top:1em">
+                    <img id="image" src="/images/radioboxoptions.png" width="20" height="20" style="margin-left:5%;">
+                    <input style="height: 30px;font-size: 15px;width:127px" type="text" placeholder="Добавить вариант" onclick="AddOption('@surveyquestion.Id')" onkeydown="OnChangeAdd('@surveyquestion.Id')">
+                    @if (surveyquestion.HasOwnAnswer)
+                    {
+                        <label style="display:none;font-weight:normal"> или <a style="cursor:pointer;font-weight:bold" onclick="AddAnother('@surveyquestion.Id')">ДОБАВИТЬ ВАРИАНТ "ДРУГОЕ"</a></label>
+                    }
+                    else
+                    {
+                        <label style="display:normal;font-weight:normal"> или <a style="cursor:pointer;font-weight:bold" onclick="AddAnother('@surveyquestion.Id')">ДОБАВИТЬ ВАРИАНТ "ДРУГОЕ"</a></label>
+                    }
+                </div>
+
+                <div class="hl" style="margin-top:1em;"></div>
+
+                <div class="beforequestionfooter"></div>
+                <div class="questionfooter" style="margin-top:0.5em;margin-bottom:0.5em;">
+                    <div title="Удалить вопрос" name="picture" style="background: url(/images/SurveyIcon.svg) no-repeat -5px -1203px; width: 14px; height: 18px;margin-right:2em;cursor: pointer;" onclick="RemoveQuestion('@surveyquestion.Id')"></div>
+                    <div class="vl" style="margin-right:2em"></div>
+                    <div style="margin-right:0.5em">
+                        <label style="color:rgba(51, 51, 51, 0.78);">Обязательный вопрос</label>
+                    </div>
+                    <div>
+                        @{
+                            idhelper = surveyquestion.Id + "required";
+                        }
+                        @if (surveyquestion.IsRequired)
+                        {
+                            <input type="checkbox" id="@idhelper" checked style="display:none" />
                         }
                         else
                         {
-                            <div id="another" style="display:none;">
-                                <img id="image" src="/images/radioboxoptions.png" width="20" height="20" style="margin-left:5%;">
-                                <input class="option-input" style="width:87%;" disabled type="text" placeholder="Другое...">
-                                <div title="Удалить другое" name="picture" style="background: url('/images/SurveyIcon.svg') no-repeat -5px -4061px; width: 14px; height: 14px; zoom:1.4; cursor: pointer;" onclick="RemoveAnother('@surveyquestion.Id')"></div>
-                            </div>
+                            <input type="checkbox" id="@idhelper" style="display:none" />
                         }
-
-
-                        <div id="addnew" class="addnew" style="margin-top:1em">
-                            <img id="image" src="/images/radioboxoptions.png" width="20" height="20" style="margin-left:5%;">
-                            <input style="height: 30px;font-size: 15px;width:127px" type="text" placeholder="Добавить вариант" onclick="AddOption('@surveyquestion.Id')" onkeydown="OnChangeAdd('@surveyquestion.Id')">
-                            @if (surveyquestion.HasOwnAnswer)
-                            {
-                                <label style="display:none;font-weight:normal"> или <a style="cursor:pointer;font-weight:bold" onclick="AddAnother('@surveyquestion.Id')">ДОБАВИТЬ ВАРИАНТ "ДРУГОЕ"</a></label>
-                            }
-                            else
-                            {
-                                <label style="display:normal;font-weight:normal"> или <a style="cursor:pointer;font-weight:bold" onclick="AddAnother('@surveyquestion.Id')">ДОБАВИТЬ ВАРИАНТ "ДРУГОЕ"</a></label>
-                            }
-                        </div>
-
-                        <div class="hl" style="margin-top:1em;"></div>
-
-                        <div class="beforequestionfooter"></div>
-                        <div class="questionfooter" style="margin-top:0.5em;margin-bottom:0.5em;">
-                            <div title="Удалить вопрос" name="picture" style="background: url(/images/SurveyIcon.svg) no-repeat -5px -1203px; width: 14px; height: 18px;margin-right:2em;cursor: pointer;" onclick="RemoveQuestion('@surveyquestion.Id')"></div>
-                            <div class="vl" style="margin-right:2em"></div>
-                            <div style="margin-right:0.5em">
-                                <label style="color:rgba(51, 51, 51, 0.78);">Обязательный вопрос</label>
-                            </div>
-                            <div>
-                                @{
-                                    idhelper = surveyquestion.Id + "required";
-                                }
-                                @if (surveyquestion.IsRequired)
-                                {
-                                    <input type="checkbox" id="@idhelper" checked style="display:none" />
-                                }
-                                else
-                                {
-                                    <input type="checkbox" id="@idhelper" style="display:none" />
-                                }
-                                <label for="@idhelper" class="toggle"><span name="span"></span></label>
-                            </div>
-                        </div>
-
+                        <label for="@idhelper" class="toggle"><span name="span"></span></label>
                     </div>
+                </div>
 
-                }
+            </div>
+
+                            }
             }
         </div>
 
@@ -649,7 +703,25 @@
             tolerance: 'pointer'
         });
 
-        $('select').each(function () {
+        $('.minselect').each(function () {
+            $(this).ddslick({
+                width: 200,
+                onSelected: function (selectedData) {
+                }
+            });
+        });
+
+        $('.maxselect').each(function () {
+            $(this).ddslick({
+                width: 200,
+                onSelected: function (selectedData) {
+                }
+            });
+        });
+
+        var firsttime = true;
+
+        $('.typeselect').each(function () {
             $(this).ddslick({
                 width: 200,
                 onSelected: function (selectedData) {
@@ -657,17 +729,69 @@
                     var questid = $("#" + selectid).parent().parent().parent()[0].id;
                     if (selectedData.selectedIndex === 0) {
                         $("#options" + questid).empty();
+                        $("#" + questid + " #ratingoption").hide();
                         $("#" + questid + " #another").hide();
                         $("#" + questid + " #addnew").hide();
                         $("#" + questid + " #addnew label").show();
                         $("#" + questid + " #textoption").show();
                     }
                     else if (selectedData.selectedIndex === 1) {
+                        $("#options" + questid).empty();
+                        $("#" + questid + " #another").hide();
+                        $("#" + questid + " #addnew").hide();
+                        $("#" + questid + " #textoption").hide();
+                        $("#" + questid + " #addnew label").show();
+                        $("#" + questid + " #ratingoption").show();
+
+                        if (firsttime) {
+
+                            @{ 
+                                    List<List<string>> quests = new List<List<string>>();
+                                    foreach(var quest in Model.SurveyQuestion)
+                                    {
+                                        if (quest.Type == 3)
+                                        {
+                                            List<string> q = new List<string>();
+                                            q.Add(quest.Id);
+                                            foreach (var opt in quest.Options.OrderBy(x => x.Order))
+                                            {
+                                                q.Add(opt.Text);
+                                            }
+                                            quests.Add(q);
+                                        }
+                                    }
+                                }
+
+                            
+                            var quests = '@Newtonsoft.Json.JsonConvert.SerializeObject(quests)';
+                            while (quests.indexOf('&quot;') >= 0) {
+                                quests = quests.replace('&quot;', '\"');
+                            }
+
+                            quests = JSON.parse(quests);
+
+                            for (var j = 0; j < quests.length; j++){
+                                if (questid === quests[j][0]) {
+                                    $("#" + questid + " #ratingoption #minselect").ddslick('select', { index: parseInt(quests[j][1]) });
+                                    $("#" + questid + " #ratingoption #maxselect").ddslick('select', { index: parseInt(quests[j][quests[j].length - 1]) - 2 });
+                                }
+                            }
+
+                        }
+                        else {
+                            $("#" + questid + " #ratingoption #minselect").ddslick('select', { index: 1 });
+                            $("#" + questid + " #ratingoption #maxselect").ddslick('select', { index: 3 });
+                        }
+
+                    }
+                    else if (selectedData.selectedIndex === 2) {
+                        $("#" + questid + " #ratingoption").hide();
                         $("#" + questid + " #textoption").hide();
                         $("#" + questid + " #addnew").show();
                         $("#" + questid + " #image").attr("src", "/images/radioboxoptions.png");
                     }
-                    else if (selectedData.selectedIndex === 2) {
+                    else if (selectedData.selectedIndex === 3) {
+                        $("#" + questid + " #ratingoption").hide();
                         $("#" + questid + " #textoption").hide();
                         $("#" + questid + " #addnew").show();
                         $("#" + questid + " #image").attr("src", "/images/checkboxoptions.png");
@@ -675,6 +799,7 @@
                 }
             });
         });
+        firsttime = false;
 
         MarginHead();
 
@@ -852,17 +977,30 @@
                 var questid = $("#" + selectid).parent().parent().parent()[0].id;
                 if (selectedData.selectedIndex === 0) {
                     $("#options" + questid).empty();
+                    $("#" + questid + " #ratingoption").hide();
                     $("#" + questid + " #another").hide();
                     $("#" + questid + " #addnew").hide();
                     $("#" + questid + " #addnew label").show();
                     $("#" + questid + " #textoption").show();
                 }
                 else if (selectedData.selectedIndex === 1) {
+                    $("#options" + questid).empty();
+                    $("#" + questid + " #another").hide();
+                    $("#" + questid + " #addnew").hide();
+                    $("#" + questid + " #textoption").hide();
+                    $("#" + questid + " #addnew label").show();
+                    $("#" + questid + " #ratingoption").show();
+                    $("#" + questid + " #ratingoption #minselect").ddslick('select', { index: 1 });
+                    $("#" + questid + " #ratingoption #maxselect").ddslick('select', { index: 3 }); 
+                }
+                else if (selectedData.selectedIndex === 2) {
+                    $("#" + questid + " #ratingoption").hide();
                     $("#" + questid + " #textoption").hide();
                     $("#" + questid + " #addnew").show();
                     $("#" + questid + " #image").attr("src", "/images/radioboxoptions.png");
                 }
-                else if (selectedData.selectedIndex === 2) {
+                else if (selectedData.selectedIndex === 3) {
+                    $("#" + questid + " #ratingoption").hide();
                     $("#" + questid + " #textoption").hide();
                     $("#" + questid + " #addnew").show();
                     $("#" + questid + " #image").attr("src", "/images/checkboxoptions.png");
@@ -945,8 +1083,9 @@
         <div class=\"rightdiv\">\
             <select id=\"newquest{ID}select\" style=\"width:100%;display:none;\">\
                 <option value=\"0\" data-imagesrc=\"/images/text.png\" data-description=\" \">Текст</option>\
-                <option value=\"1\" selected=\"selected\" data-imagesrc=\"/images/radiobox.png\" data-description=\" \">Один из списка</option>\
-                <option value=\"2\" data-imagesrc=\"/images/checkbox.png\" data-description=\" \">Несколько из списка</option>\
+                <option value=\"1\" data-imagesrc=\"/images/star.png\" data-description=\" \">Рейтинг</option>\
+                <option value=\"2\" selected=\"selected\" data-imagesrc=\"/images/radiobox.png\" data-description=\" \">Один из списка</option>\
+                <option value=\"3\" data-imagesrc=\"/images/checkbox.png\" data-description=\" \">Несколько из списка</option>\
             </select>\
         </div>\
     </div>\
@@ -958,6 +1097,28 @@
         <input style=\"width:94.5%;height: 30px;font-size: 15px;\" disabled type=\"text\" placeholder=\"Текстовый ответ\">\
     </div>\
 \
+        <div id=\"ratingoption\" style=\"display:none\" class=\"ratingoption\">\
+                    <div style=\"width:10%;\">\
+                        <select id=\"minselect\" class=\"minselect\">\
+                            <option>0</option>\
+                            <option>1</option>\
+                        </select>\
+                    </div>\
+                    <label style=\"margin-left:1em;\">—</label>\
+                    <div style=\"width:10%;margin-left:1em;\">\
+                        <select id=\"maxselect\" class=\"maxselect\">\
+                            <option>2</option>\
+                            <option>3</option>\
+                            <option>4</option>\
+                            <option>5</option>\
+                            <option>6</option>\
+                            <option>7</option>\
+                            <option>8</option>\
+                            <option>9</option>\
+                            <option>10</option>\
+                        </select>\
+                    </div>\
+                </div>\
 \
     <div id=\"another\" style=\"display:none;\">\
         <img id=\"image\" src=\"/images/radioboxoptions.png\" width=\"20\" height=\"20\" style=\"margin-left:5%;\">\
@@ -1003,6 +1164,17 @@
 
 
         $("#questions").append(newquestion);
+        $('#newquest' + addedquest + ' #minselect').ddslick({
+            width: 200,
+            onSelected: function (selectedData) {
+            }
+        });
+
+        $('#newquest' + addedquest + ' #maxselect').ddslick({
+            width: 200,
+            onSelected: function (selectedData) {
+            }
+        });
         MakeSelectSlick('newquest' + addedquest + 'select');
         autosize($('#newquest' + addedquest + ' div div textarea'));
         $('#optionsnewquest' + addedquest).sortable({
@@ -1105,23 +1277,23 @@
                         var id = questiondivs[i].id;
                         question.push(id);
                         question.push($("#" + id + " div div textarea").val());
-
-                        $("#" + id + "select").ddslick('destroy');
-                        var select = $("#" + id + "select").val();
+                        
+                        var select = $("#" + id + "select").data('ddslick').selectedIndex;;
                         var type;
-                        if (select === "0") {
+                        if (select === 0) {
                             type = "2"
                         }
-                        else if (select === "1") {
+                        else if (select === 1) {
+                            type = "3"
+                        }
+                        else if (select === 2) {
                             type = "0"
                         }
-                        else if (select === "2") {
+                        else if (select === 3) {
                             type = "1"
                         }
 
                         question.push(type);
-
-                        MakeSelectSlick(id + "select");
 
                         if ($('#' + id + ' #addnew label').css('display') == 'none') {
                             question.push("True");
@@ -1136,8 +1308,15 @@
                         else {
                             question.push("False");
                         }
-
-                        if (select != 0) {
+                        if (select === 1) {
+                            var minselect = $("#" + id + " #minselect").data('ddslick').selectedIndex;
+                            var maxselect = $("#" + id + " #maxselect").data('ddslick').selectedIndex + 2;
+                            for (var j = minselect; j <= maxselect; j++) {
+                                question.push("newoption" + j);
+                                question.push(j);
+                            }
+                        }
+                        if (select === 2 || select === 3) {
                             var options = $("#options" + id).children();
                             for (var j = 0; j < options.length; j++) {
                                 var optionid = options[j].id;
@@ -1212,6 +1391,7 @@
                             })
 
                             $('#left-menu', $(clonedDoc)).remove();
+                            $(".container.body-content", $(clonedDoc)).css("zoom", "4");
                             $(".container.body-content", $(clonedDoc)).css("width", "1000px");
                             $(".container.body-content", $(clonedDoc)).css("height", "1000px");
                             var color = $("body").css("background-color");
@@ -1232,9 +1412,11 @@
                             }
                         })
 
-                       // document.body.appendChild(canvas);
+                        //document.body.appendChild(canvas);
 
                         canvas = crop(canvas, { x: 0, y: 0 }, { x: canvas.width, y: canvas.width });
+
+                        //document.body.appendChild(canvas);
                         var img = canvas.toDataURL("image/png");
                         img = img.replace('data:image/png;base64,', '');
 
@@ -1253,7 +1435,6 @@
                                     $("#save-message").dialog("close");
                                 }
                             });
-                        $("#save-message").dialog("close");
                         });
                 }
             }

@@ -18,7 +18,7 @@ namespace SurveyService.Models
         public int Order { get; set; }
         public bool IsRequired { get; set; }
         /// <summary>
-        /// 3 варианта: radio, checkbox, text,
+        /// 4 варианта: radio, checkbox, text, rating,
         /// </summary>
         public int Type { get; set; }
         public bool HasOwnAnswer { get; set; }

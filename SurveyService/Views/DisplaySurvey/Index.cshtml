@@ -22,10 +22,11 @@
                         }
                     </div>
 
-                    <ul class="list-unstyled">
+                    <ul class="list-unstyled @(question.Type == 3 ? "rating" : "")">
                         @switch (question.Type)
                         {
                             case 0: /*Радиобаттон*/
+                            case 3: /*Рейтинг*/
                                 {
                                     @foreach (var Option in question.Options)
                                     {
