@@ -14,6 +14,7 @@
 <script src="~/js/polyfill.min.js"></script>
 <script src="~/js/html2canvas.min.js"></script>
 <link rel="stylesheet" href="~/lib/jquery-ui-1.12.1/jquery-ui.css" />
+<link rel="stylesheet" href="~/css/EditCreate.css" />
 
 
 
@@ -21,374 +22,8 @@
 
 <style>
 
-    a.dd-selected {
-        color: rgba(51, 51, 51, 0.78);
-    }
-
-    label.dd-selected-text {
-        cursor: pointer;
-        font-size: 14px;
-    }
-
-    a.dd-option {
-        color: rgba(51, 51, 51, 0.78);
-    }
-
-    label.dd-option-text {
-        cursor: pointer;
-        color: rgba(51, 51, 51, 0.78);
-        font-size: 14px;
-    }
-
-    .dd-container,
-    .dd-select,
-    .dd-options.dd-click-off-close {
-        width: 100% !important;
-    }
-
-    .question-settings {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        /*width: 90%;*/
-        margin-left: 5%;
-    }
-
-    .leftdiv {
-        width: 60%;
-        margin-right: 0.5em;
-        margin-top: 1em;
-    }
-
-    .rightdiv {
-        width: 40%;
-    }
-
-    .contentBox {
-        background-color: white;
-        border: 1px solid;
-        width: 742px;
-        margin-top: 1em;
-    }
-
-    input[type=text] {
-        transition: 0.6s;
-        border: none;
-        border-bottom: 1px solid #CCC;
-        background-color: transparent;
-    }
-
-    textarea {
-        transition: 0.6s;
-        border: none;
-        border-bottom: 1px solid #CCC;
-        background-color: transparent;
-    }
-
-    .box {
-        /*border-top-style: groove;*/
-        /*border-top-width: thin;*/
-    }
-
-
-        .box.header input,
-        .box.header textarea {
-            width: 100%;
-        }
-
-    input:focus,
-    textarea:focus {
-        outline: none;
-    }
-
-    .hl {
-        border-bottom: 1px solid #c7c7c7;
-        /*margin-left: auto;*/
-        /* margin-right: auto;*/
-        /* width: 95%*/
-    }
-
-    .vl {
-        border-right: 1px solid #c7c7c7; /* Параметры линии */
-        height: 30px;
-        width: 1px;
-    }
-
-    .questionfooter {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-    }
-
-    .optionseparation {
-        display: flex;
-        align-items: center;
-        margin-top: 1em;
-    }
-
-    .optionleft {
-        width: 5%;
-        display: flex;
-    }
-
-    .optionright {
-        width: 95%;
-        display: flex;
-        align-items: center;
-    }
-
-    #left-menu {
-        top: 60px;
-        right: -100px;
-        position: fixed;
-        position: absolute;
-        -webkit-transition: all .3s cubic-bezier(0.4,0.0,0.2,1);
-        transition: all .4s cubic-bezier(0.07, 0.01, 0.9, 0.99);
-        height: 135px;
-        width: 50px;
-        background-color: white;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        box-shadow: 0 4px 13px rgba(0,0,0,0.25), 0 0px 4px rgba(0,0,0,0.22);
-    }
-
-        #left-menu > div, #left-menu > a {
-            margin: 5px 0 5px 0;
-            opacity: .54;
-        }
-
-            #left-menu > div:hover, #left-menu > a:hover {
-                opacity: 1;
-            }
-
-    html, body {
-        height: 100%;
-    }
-
-    .toggle {
-        position: relative;
-        display: block;
-        width: 40px;
-        height: 20px;
-        cursor: pointer;
-        -webkit-tap-highlight-color: transparent;
-        transform: translate3d(0, 0, 0);
-    }
-
-        .toggle:before {
-            content: "";
-            position: relative;
-            top: 3px;
-            left: 3px;
-            width: 34px;
-            height: 14px;
-            display: block;
-            background: #9A9999;
-            border-radius: 8px;
-            transition: background 0.2s ease;
-        }
-
-        .toggle span {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 20px;
-            height: 20px;
-            display: block;
-            border: 1px solid darkgrey;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 3px 8px rgba(154, 153, 153, 0.5);
-            transition: all 0.2s ease;
-        }
-
-            .toggle span:before {
-                content: "";
-                position: absolute;
-                display: block;
-                margin: -18px;
-                width: 56px;
-                height: 56px;
-                background: rgba(79, 46, 220, 0.5);
-                border-radius: 50%;
-                transform: scale(0);
-                opacity: 1;
-                pointer-events: none;
-            }
-
-    input[type=checkbox]:checked + .toggle:before {
-        background: #947ADA;
-    }
-
-    input[type=checkbox]:checked + .toggle span {
-        background: #4F2EDC;
-        transform: translateX(20px);
-        transition: all 0.2s cubic-bezier(0.8, 0.4, 0.3, 1.25), background 0.15s ease;
-        box-shadow: 0 3px 8px rgba(79, 46, 220, 0.2);
-    }
-
-        input[type=checkbox]:checked + .toggle span:before {
-            transform: scale(1);
-            opacity: 0;
-            transition: all 0.4s ease;
-        }
-
-    .center {
-        position: absolute;
-        top: calc(50% - 10px);
-        left: calc(50% - 20px);
-    }
-
-    .form-input {
-        margin-top: 5%;
-        width: 90%;
-        margin-left: 5%;
-        position: relative;
-    }
-
-    div[name=picture] {
-        opacity: .54;
-    }
-
-        div[name=picture]:hover {
-            opacity: 1;
-        }
-
-    #another {
-        display: flex;
-        align-items: center;
-        margin-top: 1em;
-    }
-
-    .option-input {
-        width: 92%;
-        height: 30px;
-        font-size: 15px;
-        margin-left: 5px;
-    }
-
-    #questions {
-        margin-left: 5%;
-    }
-
-        #questions .box {
-            border-top-style: groove;
-            border-top-width: thin;
-            width: 95%;
-        }
-
-            #questions .box:last-child {
-                border-bottom-style: groove;
-                border-bottom-width: thin;
-            }
-
-    .surveynameinput {
-        height: 46px;
-        font-size: 30px;
-        position: relative;
-        background: none;
-        z-index: 2;
-    }
-
-        .surveynameinput:focus ~ .surveynamelabel,
-        .surveynameinput:not(:focus):valid ~ .surveynamelabel {
-            top: -5px;
-            font-size: 12px;
-            padding-left: 1.5px;
-        }
-
-    .surveynamelabel {
-        position: absolute;
-        z-index: 1;
-        top: 50%;
-        left: 0;
-        margin-top: -0.7em;
-        transition: .3s;
-        font-size: 30px;
-        color: grey;
-    }
-
-    .surveydescriptioninput {
-        resize: none;
-        font-size: 20px;
-        position: relative;
-        background: none;
-        z-index: 2;
-    }
-
-        .surveydescriptioninput:focus + .surveydescriptionlabel,
-        .surveydescriptioninputfilled + .surveydescriptionlabel {
-            top: -5px;
-            font-size: 12px;
-            padding-left: 1.5px;
-        }
-
-    .surveydescriptionlabel {
-        position: absolute;
-        z-index: 1;
-        top: 50%;
-        left: 0;
-        margin-top: -0.8em;
-        transition: .3s;
-        font-size: 20px;
-        color: grey;
-    }
-
-    .questiontitleinput {
-        position: relative;
-        background: none;
-        z-index: 2;
-        resize: none;
-        width: 90%;
-        font-size: 20px;
-        margin-right: 5%;
-    }
-
-        .questiontitleinput:focus ~ .questiontitlelabel,
-        .questiontitleinput:not(:focus):valid ~ .questiontitlelabel {
-            top: -5px;
-            font-size: 12px;
-            padding-left: 1.5px;
-        }
-
-    .questiontitlelabel {
-        position: absolute;
-        z-index: 1;
-        top: 50%;
-        left: 0;
-        margin-top: -0.7em;
-        transition: .3s;
-        font-size: 20px;
-        color: grey;
-        font-weight: normal;
-    }
-
-    .beforequestionfooter{
-        display: none;
-        margin-bottom: 1em;
-    }
-
-    .typeselect {
-        width: 100%;
-        display: none;
-    }
-
-    .minselect {
-        display: none;
-    }
-
-    .ratingoption {
-        margin-top: 1em;
-        margin-left: 5%;
-        display:flex;
-        align-items:center;
-    }
-
-    .maxselect {
-        display: none;
-    }
+    
+   
 </style>
 
 
@@ -502,23 +137,23 @@
                                 </div>
 
                             </div>
-                                        }
-                                        }
+                        }
+                    }
                 </div>
 
-                <div id="textoption" style="margin-top:1em;margin-left:5%;display:none">
+                <div id="textoption" style="margin-top:1em;margin-left:5%;@(surveyquestion.Type == 2 ? "" : "display:none");">
                     <input style="width:94.5%;height: 30px;font-size: 15px;" disabled type="text" placeholder="Текстовый ответ">
                 </div>
 
-                <div id="ratingoption" style="display:none" class="ratingoption">
-                    <div style="width:10%;">
+                <div id="ratingoption" style="@(surveyquestion.Type == 3 ? "" : "display:none");" class="ratingoption">
+                    <div class="minselectdiv">
                         <select id="minselect" class="minselect">
                             <option>0</option>
                             <option>1</option>
                         </select>
                     </div>
                     <label style="margin-left:1em;">—</label>
-                    <div style="width:10%;margin-left:1em;">
+                    <div class="maxselectdiv">
                         <select id="maxselect" class="maxselect">
                             <option>2</option>
                             <option>3</option>
@@ -533,36 +168,18 @@
                     </div>
                 </div>
 
-
-                @if (surveyquestion.HasOwnAnswer)
-                {
-                    <div id="another" style="display:normal;">
-                        <img id="image" src="/images/radioboxoptions.png" width="20" height="20" style="margin-left:5%;">
-                        <input class="option-input" style="width:87%;" disabled type="text" placeholder="Другое...">
-                        <div title="Удалить другое" name="picture" style="background: url('/images/SurveyIcon.svg') no-repeat -5px -4061px; width: 14px; height: 14px; zoom:1.4; cursor: pointer;" onclick="RemoveAnother('@surveyquestion.Id')"></div>
-                    </div>
-                }
-                else
-                {
-                    <div id="another" style="display:none;">
-                        <img id="image" src="/images/radioboxoptions.png" width="20" height="20" style="margin-left:5%;">
-                        <input class="option-input" style="width:87%;" disabled type="text" placeholder="Другое...">
-                        <div title="Удалить другое" name="picture" style="background: url('/images/SurveyIcon.svg') no-repeat -5px -4061px; width: 14px; height: 14px; zoom:1.4; cursor: pointer;" onclick="RemoveAnother('@surveyquestion.Id')"></div>
-                    </div>
-                }
+                
+                <div id="another" style="@((surveyquestion.Type == 0 || surveyquestion.Type == 1) && surveyquestion.HasOwnAnswer ? "" : "display:none");">
+                    <img id="image" src="/images/radioboxoptions.png" width="20" height="20" style="margin-left:5%;">
+                    <input class="option-input" style="width:87%;" disabled type="text" placeholder="Другое...">
+                    <div title="Удалить другое" name="picture" style="background: url('/images/SurveyIcon.svg') no-repeat -5px -4061px; width: 14px; height: 14px; zoom:1.4; cursor: pointer;" onclick="RemoveAnother('@surveyquestion.Id')"></div>
+                </div>
 
 
-                <div id="addnew" class="addnew" style="margin-top:1em">
+                <div id="addnew" class="addnew" style="margin-top:1em; @((surveyquestion.Type == 0 || surveyquestion.Type == 1) ? "" : "display:none");">
                     <img id="image" src="/images/radioboxoptions.png" width="20" height="20" style="margin-left:5%;">
                     <input style="height: 30px;font-size: 15px;width:127px" type="text" placeholder="Добавить вариант" onclick="AddOption('@surveyquestion.Id')" onkeydown="OnChangeAdd('@surveyquestion.Id')">
-                    @if (surveyquestion.HasOwnAnswer)
-                    {
-                        <label style="display:none;font-weight:normal"> или <a style="cursor:pointer;font-weight:bold" onclick="AddAnother('@surveyquestion.Id')">ДОБАВИТЬ ВАРИАНТ "ДРУГОЕ"</a></label>
-                    }
-                    else
-                    {
-                        <label style="display:normal;font-weight:normal"> или <a style="cursor:pointer;font-weight:bold" onclick="AddAnother('@surveyquestion.Id')">ДОБАВИТЬ ВАРИАНТ "ДРУГОЕ"</a></label>
-                    }
+                    <label style="@(surveyquestion.HasOwnAnswer ? "display:none" : "");font-weight:normal"> или <a style="cursor:pointer;font-weight:bold" onclick="AddAnother('@surveyquestion.Id')">ДОБАВИТЬ ВАРИАНТ "ДРУГОЕ"</a></label>
                 </div>
 
                 <div class="hl" style="margin-top:1em;"></div>
@@ -578,14 +195,7 @@
                         @{
                             idhelper = surveyquestion.Id + "required";
                         }
-                        @if (surveyquestion.IsRequired)
-                        {
-                            <input type="checkbox" id="@idhelper" checked style="display:none" />
-                        }
-                        else
-                        {
-                            <input type="checkbox" id="@idhelper" style="display:none" />
-                        }
+                        <input type="checkbox" id="@idhelper" @(surveyquestion.IsRequired ? "checked" : "") style="display:none" />
                         <label for="@idhelper" class="toggle"><span name="span"></span></label>
                     </div>
                 </div>
@@ -736,7 +346,8 @@
                         $("#" + questid + " #textoption").show();
                     }
                     else if (selectedData.selectedIndex === 1) {
-                        $("#options" + questid).empty();
+                        if ($("#" + questid + " #ratingoption").css("display") != "flex") {
+                            $("#options" + questid).empty();
                         $("#" + questid + " #another").hide();
                         $("#" + questid + " #addnew").hide();
                         $("#" + questid + " #textoption").hide();
@@ -783,6 +394,7 @@
                             $("#" + questid + " #ratingoption #maxselect").ddslick('select', { index: 3 });
                         }
 
+                        }
                     }
                     else if (selectedData.selectedIndex === 2) {
                         $("#" + questid + " #ratingoption").hide();
@@ -984,14 +596,16 @@
                     $("#" + questid + " #textoption").show();
                 }
                 else if (selectedData.selectedIndex === 1) {
-                    $("#options" + questid).empty();
-                    $("#" + questid + " #another").hide();
-                    $("#" + questid + " #addnew").hide();
-                    $("#" + questid + " #textoption").hide();
-                    $("#" + questid + " #addnew label").show();
-                    $("#" + questid + " #ratingoption").show();
-                    $("#" + questid + " #ratingoption #minselect").ddslick('select', { index: 1 });
-                    $("#" + questid + " #ratingoption #maxselect").ddslick('select', { index: 3 }); 
+                    if ($("#" + questid + " #ratingoption").css("display") != "flex") {
+                        $("#options" + questid).empty();
+                        $("#" + questid + " #another").hide();
+                        $("#" + questid + " #addnew").hide();
+                        $("#" + questid + " #textoption").hide();
+                        $("#" + questid + " #addnew label").show();
+                        $("#" + questid + " #ratingoption").show();
+                        $("#" + questid + " #ratingoption #minselect").ddslick('select', { index: 1 });
+                        $("#" + questid + " #ratingoption #maxselect").ddslick('select', { index: 3 });
+                    }
                 }
                 else if (selectedData.selectedIndex === 2) {
                     $("#" + questid + " #ratingoption").hide();
@@ -1098,14 +712,14 @@
     </div>\
 \
         <div id=\"ratingoption\" style=\"display:none\" class=\"ratingoption\">\
-                    <div style=\"width:10%;\">\
+                    <div class=\"minselectdiv\">\
                         <select id=\"minselect\" class=\"minselect\">\
                             <option>0</option>\
                             <option>1</option>\
                         </select>\
                     </div>\
                     <label style=\"margin-left:1em;\">—</label>\
-                    <div style=\"width:10%;margin-left:1em;\">\
+                    <div class=\"maxselectdiv\">\
                         <select id=\"maxselect\" class=\"maxselect\">\
                             <option>2</option>\
                             <option>3</option>\

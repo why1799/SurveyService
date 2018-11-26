@@ -1,0 +1,386 @@
+﻿a.dd-selected {
+    color: rgba(51, 51, 51, 0.78);
+}
+
+label.dd-selected-text {
+    cursor: pointer;
+    font-size: 14px;
+}
+
+a.dd-option {
+    color: rgba(51, 51, 51, 0.78);
+}
+
+label.dd-option-text {
+    cursor: pointer;
+    color: rgba(51, 51, 51, 0.78);
+    font-size: 14px;
+}
+
+.dd-container,
+.dd-select,
+.dd-options.dd-click-off-close {
+    width: 100% !important;
+}
+
+.question-settings {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    /*width: 90%;*/
+    margin-left: 5%;
+}
+
+.leftdiv {
+    width: 60%;
+    margin-right: 0.5em;
+    margin-top: 1em;
+}
+
+.rightdiv {
+    width: 40%;
+}
+
+.contentBox {
+    background-color: white;
+    border: 1px solid;
+    width: 742px;
+    margin-top: 1em;
+}
+
+input[type=text] {
+    transition: 0.6s;
+    border: none;
+    border-bottom: 1px solid #CCC;
+    background-color: transparent;
+}
+
+textarea {
+    transition: 0.6s;
+    border: none;
+    border-bottom: 1px solid #CCC;
+    background-color: transparent;
+}
+
+.box {
+    /*border-top-style: groove;*/
+    /*border-top-width: thin;*/
+}
+
+
+    .box.header input,
+    .box.header textarea {
+        width: 100%;
+    }
+
+input:focus,
+textarea:focus {
+    outline: none;
+}
+
+.hl {
+    border-bottom: 1px solid #c7c7c7;
+    /*margin-left: auto;*/
+    /* margin-right: auto;*/
+    /* width: 95%*/
+}
+
+.vl {
+    border-right: 1px solid #c7c7c7; /* Параметры линии */
+    height: 30px;
+    width: 1px;
+}
+
+.questionfooter {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.optionseparation {
+    display: flex;
+    align-items: center;
+    margin-top: 1em;
+}
+
+.optionleft {
+    width: 5%;
+    display: flex;
+}
+
+.optionright {
+    width: 95%;
+    display: flex;
+    align-items: center;
+}
+
+#left-menu {
+    top: 60px;
+    right: -100px;
+    position: fixed;
+    position: absolute;
+    -webkit-transition: all .3s cubic-bezier(0.4,0.0,0.2,1);
+    transition: all .4s cubic-bezier(0.07, 0.01, 0.9, 0.99);
+    height: 135px;
+    width: 50px;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 4px 13px rgba(0,0,0,0.25), 0 0px 4px rgba(0,0,0,0.22);
+}
+
+    #left-menu > div, #left-menu > a {
+        margin: 5px 0 5px 0;
+        opacity: .54;
+    }
+
+        #left-menu > div:hover, #left-menu > a:hover {
+            opacity: 1;
+        }
+
+html, body {
+    height: 100%;
+}
+
+.toggle {
+    position: relative;
+    display: block;
+    width: 40px;
+    height: 20px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transform: translate3d(0, 0, 0);
+}
+
+    .toggle:before {
+        content: "";
+        position: relative;
+        top: 3px;
+        left: 3px;
+        width: 34px;
+        height: 14px;
+        display: block;
+        background: #9A9999;
+        border-radius: 8px;
+        transition: background 0.2s ease;
+    }
+
+    .toggle span {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 20px;
+        height: 20px;
+        display: block;
+        border: 1px solid darkgrey;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 3px 8px rgba(154, 153, 153, 0.5);
+        transition: all 0.2s ease;
+    }
+
+        .toggle span:before {
+            content: "";
+            position: absolute;
+            display: block;
+            margin: -18px;
+            width: 56px;
+            height: 56px;
+            background: rgba(79, 46, 220, 0.5);
+            border-radius: 50%;
+            transform: scale(0);
+            opacity: 1;
+            pointer-events: none;
+        }
+
+input[type=checkbox]:checked + .toggle:before {
+    background: #947ADA;
+}
+
+input[type=checkbox]:checked + .toggle span {
+    background: #4F2EDC;
+    transform: translateX(20px);
+    transition: all 0.2s cubic-bezier(0.8, 0.4, 0.3, 1.25), background 0.15s ease;
+    box-shadow: 0 3px 8px rgba(79, 46, 220, 0.2);
+}
+
+    input[type=checkbox]:checked + .toggle span:before {
+        transform: scale(1);
+        opacity: 0;
+        transition: all 0.4s ease;
+    }
+
+.center {
+    position: absolute;
+    top: calc(50% - 10px);
+    left: calc(50% - 20px);
+}
+
+.form-input {
+    margin-top: 5%;
+    width: 90%;
+    margin-left: 5%;
+    position: relative;
+}
+
+div[name=picture] {
+    opacity: .54;
+}
+
+    div[name=picture]:hover {
+        opacity: 1;
+    }
+
+#another {
+    display: flex;
+    align-items: center;
+    margin-top: 1em;
+}
+
+.option-input {
+    width: 92%;
+    height: 30px;
+    font-size: 15px;
+    margin-left: 5px;
+}
+
+#questions {
+    margin-left: 5%;
+}
+
+    #questions .box {
+        border-top-style: groove;
+        border-top-width: thin;
+        width: 95%;
+    }
+
+        #questions .box:last-child {
+            border-bottom-style: groove;
+            border-bottom-width: thin;
+        }
+
+.surveynameinput {
+    height: 46px;
+    font-size: 30px;
+    position: relative;
+    background: none;
+    z-index: 2;
+}
+
+    .surveynameinput:focus ~ .surveynamelabel,
+    .surveynameinput:not(:focus):valid ~ .surveynamelabel {
+        top: -5px;
+        font-size: 12px;
+        padding-left: 1.5px;
+    }
+
+.surveynamelabel {
+    position: absolute;
+    z-index: 1;
+    top: 50%;
+    left: 0;
+    margin-top: -0.7em;
+    transition: .3s;
+    font-size: 30px;
+    color: grey;
+}
+
+.surveydescriptioninput {
+    resize: none;
+    font-size: 20px;
+    position: relative;
+    background: none;
+    z-index: 2;
+}
+
+    .surveydescriptioninput:focus + .surveydescriptionlabel,
+    .surveydescriptioninputfilled + .surveydescriptionlabel {
+        top: -5px;
+        font-size: 12px;
+        padding-left: 1.5px;
+    }
+
+.surveydescriptionlabel {
+    position: absolute;
+    z-index: 1;
+    top: 50%;
+    left: 0;
+    margin-top: -0.8em;
+    transition: .3s;
+    font-size: 20px;
+    color: grey;
+}
+
+.questiontitleinput {
+    position: relative;
+    background: none;
+    z-index: 2;
+    resize: none;
+    width: 90%;
+    font-size: 20px;
+    margin-right: 5%;
+}
+
+    .questiontitleinput:focus ~ .questiontitlelabel,
+    .questiontitleinput:not(:focus):valid ~ .questiontitlelabel {
+        top: -5px;
+        font-size: 12px;
+        padding-left: 1.5px;
+    }
+
+.questiontitlelabel {
+    position: absolute;
+    z-index: 1;
+    top: 50%;
+    left: 0;
+    margin-top: -0.7em;
+    transition: .3s;
+    font-size: 20px;
+    color: grey;
+    font-weight: normal;
+}
+
+.beforequestionfooter {
+    display: none;
+    margin-bottom: 1em;
+}
+
+.typeselect {
+    width: 100%;
+    display: none;
+}
+
+.minselect {
+    display: none;
+}
+
+.ratingoption {
+    margin-top: 0.5em;
+    margin-left: 5%;
+    display: flex;
+    align-items: center;
+}
+
+.maxselect {
+    display: none;
+}
+
+.minselectdiv,
+.maxselectdiv {
+    width: 10%;
+}
+
+.maxselectdiv {
+    margin-left: 1em;
+}
+
+    .minselectdiv .dd-selected,
+    .maxselectdiv .dd-selected,
+    .minselectdiv .dd-option,
+    .maxselectdiv .dd-option {
+        padding: 7px;
+        padding-left: 9px;
+        height: 35px;
+    }
