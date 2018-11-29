@@ -590,14 +590,14 @@ function previewFile() {
 
 function ImageLoaded() {
     $("#deleteimagebutton").show();
-    $(".box.header").css("margin-top", "");
+    $(".form-container").css("padding-top", "");
 }
 
 function DeleteAddedImage() {
     $("#addedimage").attr('src', '');
     $("#deleteimagebutton").hide();
     $(".imagediv").hide();
-    $(".box.header").css("margin-top", "83px");
+    $(".form-container").css("padding-top", "30px");
     $('#uploadinput').val("")
 }
 

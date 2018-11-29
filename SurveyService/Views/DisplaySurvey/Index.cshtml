@@ -25,7 +25,7 @@
 
     
     <form id="questonForm" asp-controller="DisplaySurvey" asp-action="SetResult" method="post">
-        <div class="content-box">
+        <div class="content-box" style="@(imgSrc == "" ? "padding-top: 30px;" : "")">
             <h2>@Model.Title</h2>
             <h4>@Model.Description</h4>
             @foreach (var question in Model.SurveyQuestion)

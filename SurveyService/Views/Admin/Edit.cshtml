@@ -26,11 +26,23 @@
     #left-menu {
         height: 160px;
     }
-
 </style>
 
 
-<div class="form-container">
+@{
+    string imgSrc;
+    if (Model.AddedImage == null || Model.AddedImage.Length == 0)
+    {
+        imgSrc = "";
+    }
+    else
+    {
+        var base64 = Convert.ToBase64String(Model.AddedImage);
+        imgSrc = String.Format("data:image/png;base64,{0}", base64);
+    }
+}
+
+<div class="form-container" style="@(imgSrc == "" ? "padding-top: 30px;" : "")">
 
     <form id="SurveyForm">
         <div style="position: relative;">
@@ -43,19 +55,8 @@
             </div>
         </div>
 
-        @{
-            string imgSrc;
-            if (Model.AddedImage == null || Model.AddedImage.Length == 0)
-            {
-                imgSrc = "";
-            }
-            else
-            {
-                var base64 = Convert.ToBase64String(Model.AddedImage);
-                imgSrc = String.Format("data:image/png;base64,{0}", base64);
-            }
-        }
-        <div class="box header" style="@(imgSrc == "" ? "margin-top: 83px;" : "")">
+
+        <div class="box header">
 
             <div class="imagediv" style="@(imgSrc == "" ? "display:none;" : "")">
                 <img id="addedimage" src="@imgSrc" onload="ImageLoaded()" />
