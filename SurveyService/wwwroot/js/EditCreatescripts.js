@@ -589,9 +589,6 @@ function previewFile() {
 }
 
 function ImageLoaded() {
-    var px = $("#addedimage").css("height");
-    px = parseFloat(px.substring(0, px.length - 2)) - 20;
-    $("#deleteimagebutton").css("top", px + "px");
     $("#deleteimagebutton").show();
     $(".box.header").css("margin-top", "");
 }

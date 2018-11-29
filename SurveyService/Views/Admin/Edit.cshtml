@@ -58,7 +58,7 @@
         <div class="box header" style="@(imgSrc == "" ? "margin-top: 83px;" : "")">
 
             <div class="imagediv" style="@(imgSrc == "" ? "display:none;" : "")">
-                <img id="addedimage" src="@imgSrc" onload="ImageLoaded()">
+                <img id="addedimage" src="@imgSrc" onload="ImageLoaded()" />
                 <input id="uploadinput" type="file" onchange="previewFile()" accept=".jpg, .jpeg, .png, .tif, .bmp, .gif">
                 <div title="Удалить" id="deleteimagebutton" style="display:none;" onclick="DeleteAddedImage()"></div>
             </div>

@@ -415,7 +415,8 @@ div[name=picture] {
         height: 20px;
         cursor: pointer;
         opacity: .54;
-        right: 0px;
+        right: 2px;
+        top: 2px;
         position: absolute;
     }
 

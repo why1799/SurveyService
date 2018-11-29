@@ -8,10 +8,26 @@
 <link rel="stylesheet" href="~/css/DisplaySurvey.css" />
 <div class="form-container">
     @*style="min-width: 500px;"*@
-    <h2>@Model.Title</h2>
-    <h4>@Model.Description</h4>
+
+    @{
+        string imgSrc;
+        if (Model.AddedImage == null || Model.AddedImage.Length == 0)
+        {
+            imgSrc = "";
+        }
+        else
+        {
+            var base64 = Convert.ToBase64String(Model.AddedImage);
+            imgSrc = String.Format("data:image/png;base64,{0}", base64);
+        }
+    }
+    <img id="addedimage" src="@imgSrc" style="@(imgSrc == "" ? "display:none;" : "")" />
+
+    
     <form id="questonForm" asp-controller="DisplaySurvey" asp-action="SetResult" method="post">
         <div class="content-box">
+            <h2>@Model.Title</h2>
+            <h4>@Model.Description</h4>
             @foreach (var question in Model.SurveyQuestion)
             {
                 <div class="question-card">
@@ -73,8 +89,8 @@
                             case 2: /*Только текстовый ответ*/
                                 {
                                     <li>
-                                        <textarea id="@question.Id" data-mycastomtextanswer="trye" rows="1" style="resize:none;width:100%;" placeholder="" autocomplete="off"  @(question.IsRequired == true ? "data-val-required = The IsSelected field is required. data-rule-customText = " + question.Id + " class=input-validation-error" : "")>@(question.UserAnswers?.SingleOrDefault()?.OwnAnswerText)</textarea>
-                                        <br/>
+                                        <textarea id="@question.Id" data-mycastomtextanswer="trye" rows="1" style="resize:none;width:100%;" placeholder="" autocomplete="off" @(question.IsRequired == true ? "data-val-required = The IsSelected field is required. data-rule-customText = " + question.Id + " class=input-validation-error" : "")>@(question.UserAnswers?.SingleOrDefault()?.OwnAnswerText)</textarea>
+                                        <br />
                                     </li>
                                     break;
                                 }

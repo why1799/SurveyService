@@ -1,6 +1,15 @@
 ﻿body {
 }
 
+.form-container {
+    width: 660px;
+}
+
+.modal-box {
+    padding: 0px;
+    padding-bottom: 30px;
+}
+
 h2, h4 {
     text-align: center;
 }
@@ -54,4 +63,15 @@ textarea {
 
 ul.rating li:not(:first-child) {
     margin-left: 1em;
+}
+
+#addedimage {
+    width: 100%;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.content-box {
+    margin-left: 5%;
+    width: 90%;
 }
