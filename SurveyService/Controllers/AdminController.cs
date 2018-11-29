@@ -268,15 +268,16 @@ namespace SurveyService.WebUI.Controllers
         }
 
         [HttpPost]
-        public async Task<JsonResult> Save(string id, string title, string description, string[][] lines, string image)
+        public async Task<JsonResult> Save(string id, string title, string description, string[][] lines, string image, string addedimage)
         {
             Survey survey;
             survey = surveyRepository.GetItems().Include(x => x.SurveyQuestion).FirstOrDefault(x => x.Id == id);
             byte[] dataimage = Convert.FromBase64String(image);
+            byte[] addeddataimage = Convert.FromBase64String(addedimage == null ? "" : addedimage);
             if (id == null || survey == null)
             {
                 var user = UserHelper.GetUser(HttpContext, userRepository);
-                survey = await surveyRepository.Create(new Survey { Title = title, Description = description, DateCreated = DateTime.UtcNow, CreatedById = user.Id, Image = dataimage });
+                survey = await surveyRepository.Create(new Survey { Title = title, Description = description, DateCreated = DateTime.UtcNow, CreatedById = user.Id, Image = dataimage, AddedImage = addeddataimage });
                 id = survey.Id;
             }
             else
@@ -284,6 +285,7 @@ namespace SurveyService.WebUI.Controllers
                 survey.Title = title;
                 survey.Description = description;
                 survey.Image = dataimage;
+                survey.AddedImage = addeddataimage;
                 await surveyRepository.Update(survey);
                 List<SurveyQuestion> questions = new List<SurveyQuestion>();
                 foreach(var question in survey.SurveyQuestion)

@@ -14,16 +14,19 @@
 <script src="~/js/polyfill.min.js"></script>
 <script src="~/js/html2canvas.min.js"></script>
 <link rel="stylesheet" href="~/lib/jquery-ui-1.12.1/jquery-ui.css" />
+<script src="~/js/EditCreatescripts.js"></script>
 <link rel="stylesheet" href="~/css/EditCreate.css" />
+<script src="~/js/Messages.js"></script>
 
 
 
 
 
 <style>
+    #left-menu {
+        height: 160px;
+    }
 
-    
-   
 </style>
 
 
@@ -35,10 +38,30 @@
                 <div title="Добавить вопрос" style="background: url(/images/SurveyIcon.svg) no-repeat -2px -3168px; width: 20px; height: 24px; cursor: pointer;" onclick="AddQuestion()"></div>
                 <div title="Удалить опрос" style="background: url(/images/SurveyIcon.svg) no-repeat -5px -1203px; width: 14px; height: 18px; cursor: pointer;" onclick="RemoveSurvey('@Model.Id')"></div>
                 <div title="Сохранить опрос" id="savebutton" style="background:url(/images/save.svg) no-repeat; width: 20px; height: 20px; cursor: pointer;" onclick="Save()"></div>
+                <div title="Добавить картинку" id="addpicture" style="background:url(/images/addpicture.svg) no-repeat; width: 20px; height: 20px; cursor: pointer;" onclick="AddImage()"></div>
                 <a href="@Url.Action("Index", "DisplaySurvey", new { id = Model.Id })" title="Посмотреть опрос" style="background: url(/images/SurveyIcon.svg) no-repeat -1px -2620px; width: 22px; height: 16px; cursor: pointer;"></a>
             </div>
         </div>
-        <div class="box header">
+
+        @{
+            string imgSrc;
+            if (Model.AddedImage == null || Model.AddedImage.Length == 0)
+            {
+                imgSrc = "";
+            }
+            else
+            {
+                var base64 = Convert.ToBase64String(Model.AddedImage);
+                imgSrc = String.Format("data:image/png;base64,{0}", base64);
+            }
+        }
+        <div class="box header" style="@(imgSrc == "" ? "margin-top: 83px;" : "")">
+
+            <div class="imagediv" style="@(imgSrc == "" ? "display:none;" : "")">
+                <img id="addedimage" src="@imgSrc" onload="ImageLoaded()">
+                <input id="uploadinput" type="file" onchange="previewFile()" accept=".jpg, .jpeg, .png, .tif, .bmp, .gif">
+                <div title="Удалить" id="deleteimagebutton" style="display:none;" onclick="DeleteAddedImage()"></div>
+            </div>
 
             <div class="form-input">
                 <input id="SurveyName" class="surveynameinput" type="text" placeholder="" required autocomplete="off"
@@ -47,7 +70,7 @@
                 <lable class="surveynamelabel">Название опроса</lable>
             </div>
             <div class="form-input">
-                <textarea id="SurveyDescription" class="surveydescriptioninput @((Model.Description == "" || Model.Description == null) ? "" : "surveydescriptioninputfilled")" rows="1" placeholder="">@Model.Description</textarea>
+                <textarea id="SurveyDescription" oninput="DescriptionInput()" class="surveydescriptioninput @((Model.Description == "" || Model.Description == null) ? "" : "surveydescriptioninputfilled")" rows="1" placeholder="">@Model.Description</textarea>
                 <lable class="surveydescriptionlabel">Описание (не обязательно)</lable>
             </div>
         </div>
@@ -59,150 +82,150 @@
                 for (int i = 0; i < surveyquestions.Count(); ++i)
                 {
                     var surveyquestion = surveyquestions.First(x => x.Order == i);
-            <div id="@surveyquestion.Id" class="box" style="margin-top:1em;">
+                    <div id="@surveyquestion.Id" class="box" style="margin-top:1em;">
 
-                <div style="justify-content: center;display: flex;margin-top:1em;">
-                    @{
-                        idhelper = "move" + surveyquestion.Id;
-                    }
-                    <img id="@idhelper" src="/images/questiondots.png" style="cursor:move;" width="20" height="10">
-                </div>
-
-
-                <div class="question-settings">
-                    <div class="leftdiv" style="position: relative;">
-                        <textarea rows="1" class="questiontitleinput" type="text" placeholder="" required oninvalid="this.setCustomValidity('Введите название вопроса')" oninput="setCustomValidity('')">@surveyquestion.QuestionText</textarea>
-                        <label class="questiontitlelabel">Название вопроса</label>
-                    </div>
-                    <div class="rightdiv">
-                        @{
-                            idhelper = surveyquestion.Id + "select";
-                        }
-                        <select id="@idhelper" class="typeselect">
-                            @if (surveyquestion.Type == 0)
-                            {
-                                <option value="0" data-imagesrc="/images/text.png" data-description=" ">Текст</option>
-                                <option value="1" data-imagesrc="/images/star.png" data-description=" ">Рейтинг</option>
-                                <option value="2" selected="selected" data-imagesrc="/images/radiobox.png" data-description=" ">Один из списка</option>
-                                <option value="3" data-imagesrc="/images/checkbox.png" data-description=" ">Несколько из списка</option>
+                        <div style="justify-content: center;display: flex;margin-top:1em;">
+                            @{
+                                idhelper = "move" + surveyquestion.Id;
                             }
-                            else if (surveyquestion.Type == 1)
-                            {
-                                <option value="0" data-imagesrc="/images/text.png" data-description=" ">Текст</option>
-                                <option value="1" data-imagesrc="/images/star.png" data-description=" ">Рейтинг</option>
-                                <option value="2" data-imagesrc="/images/radiobox.png" data-description=" ">Один из списка</option>
-                                <option value="3" selected="selected" data-imagesrc="/images/checkbox.png" data-description=" ">Несколько из списка</option>
-                            }
-                            else if (surveyquestion.Type == 2)
-                            {
-                                <option value="0" selected="selected" data-imagesrc="/images/text.png" data-description=" ">Текст</option>
-                                <option value="1" data-imagesrc="/images/star.png" data-description=" ">Рейтинг</option>
-                                <option value="2" data-imagesrc="/images/radiobox.png" data-description=" ">Один из списка</option>
-                                <option value="3" data-imagesrc="/images/checkbox.png" data-description=" ">Несколько из списка</option>
-                            }
-                            else if (surveyquestion.Type == 3)
-                            {
-                                <option value="0" data-imagesrc="/images/text.png" data-description=" ">Текст</option>
-                                <option value="1" selected="selected" data-imagesrc="/images/star.png" data-description=" ">Рейтинг</option>
-                                <option value="2" data-imagesrc="/images/radiobox.png" data-description=" ">Один из списка</option>
-                                <option value="3" data-imagesrc="/images/checkbox.png" data-description=" ">Несколько из списка</option>
-                            }
-                        </select>
-                    </div>
-                </div>
+                            <img id="@idhelper" src="/images/questiondots.png" style="cursor:move;" width="20" height="10">
+                        </div>
 
-                @{
-                    idhelper = "options" + surveyquestion.Id;
-                }
-                <div id="@idhelper" name="options">
-                    @if (surveyquestion.Type != 3)
-                    {
-                        var options = surveyquestion.Options;
-                        @for (int j = 0; j < options.Count; ++j)
-                        {
-                            var option = options.First(x => x.Order == j);
-                            <div id="@option.Id" class="optionseparation">
 
-                                <div class="optionleft">
-                                    @{
-                                        idhelper = "move" + option.Id;
-                                    }
-                                    <img id="@idhelper" src="/images/optiondots.png" width="10" height="20" style="cursor:move;">
-                                </div>
-
-                                <div class="optionright">
-                                    <img id="image" src="/images/radioboxoptions.png" width="20" height="20">
-                                    <input class="option-input" type="text" placeholder="Ответ" required="" oninvalid="this.setCustomValidity('Введите ответ')" oninput="setCustomValidity('')" value="@option.Text">
-                                    <div title="Удалить ответ" name="picture" style="background: url('/images/SurveyIcon.svg') no-repeat -5px -4061px; width: 14px; height: 14px; zoom:1.4; cursor: pointer;" onclick="RemoveOption('@option.Id')"></div>
-                                </div>
-
+                        <div class="question-settings">
+                            <div class="leftdiv" style="position: relative;">
+                                <textarea rows="1" class="questiontitleinput" type="text" placeholder="" required oninvalid="this.setCustomValidity('Введите название вопроса')" oninput="setCustomValidity('')">@surveyquestion.QuestionText</textarea>
+                                <label class="questiontitlelabel">Название вопроса</label>
                             </div>
-                        }
-                    }
-                </div>
+                            <div class="rightdiv">
+                                @{
+                                    idhelper = surveyquestion.Id + "select";
+                                }
+                                <select id="@idhelper" class="typeselect">
+                                    @if (surveyquestion.Type == 0)
+                                    {
+                                        <option value="0" data-imagesrc="/images/text.png" data-description=" ">Текст</option>
+                                        <option value="1" data-imagesrc="/images/star.png" data-description=" ">Рейтинг</option>
+                                        <option value="2" selected="selected" data-imagesrc="/images/radiobox.png" data-description=" ">Один из списка</option>
+                                        <option value="3" data-imagesrc="/images/checkbox.png" data-description=" ">Несколько из списка</option>
+                                    }
+                                    else if (surveyquestion.Type == 1)
+                                    {
+                                        <option value="0" data-imagesrc="/images/text.png" data-description=" ">Текст</option>
+                                        <option value="1" data-imagesrc="/images/star.png" data-description=" ">Рейтинг</option>
+                                        <option value="2" data-imagesrc="/images/radiobox.png" data-description=" ">Один из списка</option>
+                                        <option value="3" selected="selected" data-imagesrc="/images/checkbox.png" data-description=" ">Несколько из списка</option>
+                                    }
+                                    else if (surveyquestion.Type == 2)
+                                    {
+                                        <option value="0" selected="selected" data-imagesrc="/images/text.png" data-description=" ">Текст</option>
+                                        <option value="1" data-imagesrc="/images/star.png" data-description=" ">Рейтинг</option>
+                                        <option value="2" data-imagesrc="/images/radiobox.png" data-description=" ">Один из списка</option>
+                                        <option value="3" data-imagesrc="/images/checkbox.png" data-description=" ">Несколько из списка</option>
+                                    }
+                                    else if (surveyquestion.Type == 3)
+                                    {
+                                        <option value="0" data-imagesrc="/images/text.png" data-description=" ">Текст</option>
+                                        <option value="1" selected="selected" data-imagesrc="/images/star.png" data-description=" ">Рейтинг</option>
+                                        <option value="2" data-imagesrc="/images/radiobox.png" data-description=" ">Один из списка</option>
+                                        <option value="3" data-imagesrc="/images/checkbox.png" data-description=" ">Несколько из списка</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
 
-                <div id="textoption" style="margin-top:1em;margin-left:5%;@(surveyquestion.Type == 2 ? "" : "display:none");">
-                    <input style="width:94.5%;height: 30px;font-size: 15px;" disabled type="text" placeholder="Текстовый ответ">
-                </div>
-
-                <div id="ratingoption" style="@(surveyquestion.Type == 3 ? "" : "display:none");" class="ratingoption">
-                    <div class="minselectdiv">
-                        <select id="minselect" class="minselect">
-                            <option>0</option>
-                            <option>1</option>
-                        </select>
-                    </div>
-                    <label style="margin-left:1em;">—</label>
-                    <div class="maxselectdiv">
-                        <select id="maxselect" class="maxselect">
-                            <option>2</option>
-                            <option>3</option>
-                            <option>4</option>
-                            <option>5</option>
-                            <option>6</option>
-                            <option>7</option>
-                            <option>8</option>
-                            <option>9</option>
-                            <option>10</option>
-                        </select>
-                    </div>
-                </div>
-
-                
-                <div id="another" style="@((surveyquestion.Type == 0 || surveyquestion.Type == 1) && surveyquestion.HasOwnAnswer ? "" : "display:none");">
-                    <img id="image" src="/images/radioboxoptions.png" width="20" height="20" style="margin-left:5%;">
-                    <input class="option-input" style="width:87%;" disabled type="text" placeholder="Другое...">
-                    <div title="Удалить другое" name="picture" style="background: url('/images/SurveyIcon.svg') no-repeat -5px -4061px; width: 14px; height: 14px; zoom:1.4; cursor: pointer;" onclick="RemoveAnother('@surveyquestion.Id')"></div>
-                </div>
-
-
-                <div id="addnew" class="addnew" style="margin-top:1em; @((surveyquestion.Type == 0 || surveyquestion.Type == 1) ? "" : "display:none");">
-                    <img id="image" src="/images/radioboxoptions.png" width="20" height="20" style="margin-left:5%;">
-                    <input style="height: 30px;font-size: 15px;width:127px" type="text" placeholder="Добавить вариант" onclick="AddOption('@surveyquestion.Id')" onkeydown="OnChangeAdd('@surveyquestion.Id')">
-                    <label style="@(surveyquestion.HasOwnAnswer ? "display:none" : "");font-weight:normal"> или <a style="cursor:pointer;font-weight:bold" onclick="AddAnother('@surveyquestion.Id')">ДОБАВИТЬ ВАРИАНТ "ДРУГОЕ"</a></label>
-                </div>
-
-                <div class="hl" style="margin-top:1em;"></div>
-
-                <div class="beforequestionfooter"></div>
-                <div class="questionfooter" style="margin-top:0.5em;margin-bottom:0.5em;">
-                    <div title="Удалить вопрос" name="picture" style="background: url(/images/SurveyIcon.svg) no-repeat -5px -1203px; width: 14px; height: 18px;margin-right:2em;cursor: pointer;" onclick="RemoveQuestion('@surveyquestion.Id')"></div>
-                    <div class="vl" style="margin-right:2em"></div>
-                    <div style="margin-right:0.5em">
-                        <label style="color:rgba(51, 51, 51, 0.78);">Обязательный вопрос</label>
-                    </div>
-                    <div>
                         @{
-                            idhelper = surveyquestion.Id + "required";
+                            idhelper = "options" + surveyquestion.Id;
                         }
-                        <input type="checkbox" id="@idhelper" @(surveyquestion.IsRequired ? "checked" : "") style="display:none" />
-                        <label for="@idhelper" class="toggle"><span name="span"></span></label>
-                    </div>
-                </div>
+                        <div id="@idhelper" name="options">
+                            @if (surveyquestion.Type != 3)
+                            {
+                                var options = surveyquestion.Options;
+                                @for (int j = 0; j < options.Count; ++j)
+                                {
+                                    var option = options.First(x => x.Order == j);
+                                    <div id="@option.Id" class="optionseparation">
 
-            </div>
+                                        <div class="optionleft">
+                                            @{
+                                                idhelper = "move" + option.Id;
+                                            }
+                                            <img id="@idhelper" src="/images/optiondots.png" width="10" height="20" style="cursor:move;">
+                                        </div>
 
+                                        <div class="optionright">
+                                            <img id="image" src="/images/radioboxoptions.png" width="20" height="20">
+                                            <input class="option-input" type="text" placeholder="Ответ" required="" oninvalid="this.setCustomValidity('Введите ответ')" oninput="setCustomValidity('')" value="@option.Text">
+                                            <div title="Удалить ответ" name="picture" style="background: url('/images/SurveyIcon.svg') no-repeat -5px -4061px; width: 14px; height: 14px; zoom:1.4; cursor: pointer;" onclick="RemoveOption('@option.Id')"></div>
+                                        </div>
+
+                                    </div>
+                                }
                             }
+                        </div>
+
+                        <div id="textoption" style="margin-top:1em;margin-left:5%;@(surveyquestion.Type == 2 ? "" : "display:none");">
+                            <input style="width:94.5%;height: 30px;font-size: 15px;" disabled type="text" placeholder="Текстовый ответ">
+                        </div>
+
+                        <div id="ratingoption" style="@(surveyquestion.Type == 3 ? "" : "display:none");" class="ratingoption">
+                            <div class="minselectdiv">
+                                <select id="minselect" class="minselect">
+                                    <option>0</option>
+                                    <option>1</option>
+                                </select>
+                            </div>
+                            <label style="margin-left:1em;">—</label>
+                            <div class="maxselectdiv">
+                                <select id="maxselect" class="maxselect">
+                                    <option>2</option>
+                                    <option>3</option>
+                                    <option>4</option>
+                                    <option>5</option>
+                                    <option>6</option>
+                                    <option>7</option>
+                                    <option>8</option>
+                                    <option>9</option>
+                                    <option>10</option>
+                                </select>
+                            </div>
+                        </div>
+
+
+                        <div id="another" style="@((surveyquestion.Type == 0 || surveyquestion.Type == 1) && surveyquestion.HasOwnAnswer ? "" : "display:none");">
+                            <img id="image" src="/images/radioboxoptions.png" width="20" height="20" style="margin-left:5%;">
+                            <input class="option-input" style="width:87%;" disabled type="text" placeholder="Другое...">
+                            <div title="Удалить другое" name="picture" style="background: url('/images/SurveyIcon.svg') no-repeat -5px -4061px; width: 14px; height: 14px; zoom:1.4; cursor: pointer;" onclick="RemoveAnother('@surveyquestion.Id')"></div>
+                        </div>
+
+
+                        <div id="addnew" class="addnew" style="margin-top:1em; @((surveyquestion.Type == 0 || surveyquestion.Type == 1) ? "" : "display:none");">
+                            <img id="image" src="/images/radioboxoptions.png" width="20" height="20" style="margin-left:5%;">
+                            <input style="height: 30px;font-size: 15px;width:127px" type="text" placeholder="Добавить вариант" onclick="AddOption('@surveyquestion.Id')" onkeydown="OnChangeAdd('@surveyquestion.Id')">
+                            <label style="@(surveyquestion.HasOwnAnswer ? "display:none" : "");font-weight:normal"> или <a style="cursor:pointer;font-weight:bold" onclick="AddAnother('@surveyquestion.Id')">ДОБАВИТЬ ВАРИАНТ "ДРУГОЕ"</a></label>
+                        </div>
+
+                        <div class="hl" style="margin-top:1em;"></div>
+
+                        <div class="beforequestionfooter"></div>
+                        <div class="questionfooter" style="margin-top:0.5em;margin-bottom:0.5em;">
+                            <div title="Удалить вопрос" name="picture" style="background: url(/images/SurveyIcon.svg) no-repeat -5px -1203px; width: 14px; height: 18px;margin-right:2em;cursor: pointer;" onclick="RemoveQuestion('@surveyquestion.Id')"></div>
+                            <div class="vl" style="margin-right:2em"></div>
+                            <div style="margin-right:0.5em">
+                                <label style="color:rgba(51, 51, 51, 0.78);">Обязательный вопрос</label>
+                            </div>
+                            <div>
+                                @{
+                                    idhelper = surveyquestion.Id + "required";
+                                }
+                                <input type="checkbox" id="@idhelper" @(surveyquestion.IsRequired ? "checked" : "") style="display:none" />
+                                <label for="@idhelper" class="toggle"><span name="span"></span></label>
+                            </div>
+                        </div>
+
+                    </div>
+
+                }
             }
         </div>
 
@@ -211,43 +234,6 @@
     </form>
 
 </div>
-<!--
-    <div style="border-bottom-style: groove; border-width: thin; margin-top:0em">
-
-</div>
-    -->
-
-<div id="error-message" title="Ошибка сохранение!" style="display:none">
-    <p>
-        Необходимо добавить вопрос!
-    </p>
-</div>
-
-<div id="error-message2" title="" style="display:none">
-    <p>
-        Опрос нельзя изменять, поскольку его уже проходили!
-    </p>
-</div>
-
-<div id="save-message" title="Сохранение!" style="display:none">
-    <p>
-        Опрос сохраняется!
-    </p>
-    <img src="~/images/loading.gif" width="115" height="115" style="display: block;margin: 0 auto;" />
-</div>
-
-<div id="remove-message" title="Удаление!" style="display:none">
-    <p>
-        Опрос удаляется!
-    </p>
-    <img src="~/images/loading.gif" width="115" height="115" style="display: block;margin: 0 auto;" />
-</div>
-
-<div id="remove-ask-message" title="Удалить опрос?" style="display:none">
-    <p>
-        Этот опрос будет удалён навсегда. Вы уверены?
-    </p>
-</div>
 
 <script>
     var addedquest;
@@ -255,163 +241,32 @@
     var check;
 
     $(document).ready(function () {
-        addedquest = 0;
-        addedopt = 0;
-        autosize($('textarea'));
-       
-        $(window).scroll(function (e) {
-            $('#left-menu').css('top', $(window).scrollTop() + 60 + 'px')
-        });
+        OnReady();
 
-        $(window).resize(function () {
-            try {
-                $("#save-message").dialog('widget').css({ 'margin-top': '0em' });
-                $("#save-message").dialog("option", "position", { my: "top", at: "top", of: window });
-                $("#save-message").dialog('widget').css({ 'margin-top': '5em' });
-            }
-            catch(e){ }
-            try {
-                $("#error-message").dialog('widget').css({ 'margin-top': '0em' });
-                $("#error-message").dialog("option", "position", { my: "top", at: "top", of: window });
-                $("#error-message").dialog('widget').css({ 'margin-top': '5em' });
-            }
-            catch (e){ }
-            try {
-                $("#error-message2").dialog('widget').css({ 'margin-top': '0em' });
-                $("#error-message2").dialog("option", "position", { my: "top", at: "top", of: window });
-                $("#error-message2").dialog('widget').css({ 'margin-top': '5em' });
-            }
-            catch (e){ }
-            try {
-                $("#remove-message").dialog('widget').css({ 'margin-top': '0em' });
-                $("#remove-message").dialog("option", "position", { my: "top", at: "top", of: window });
-                $("#remove-message").dialog('widget').css({ 'margin-top': '5em' });
-            }
-            catch (e) { }
-            try {
-                $("#remove-ask-message").dialog('widget').css({ 'margin-top': '0em' });
-                $("#remove-ask-message").dialog("option", "position", { my: "top", at: "top", of: window });
-                $("#remove-ask-message").dialog('widget').css({ 'margin-top': '5em' });
-            }
-            catch (e) { }
-        });
-
-        $("div[name=options]").each(function () {
-            $(this).sortable({
-                axis: 'y',
-                containment: this,
-                opacity: 1,
-                tolerance: 'pointer'
-            });
-        });
-
-
-        $('#questions').sortable({
-            axis: 'y',
-            containment: '#questions',
-            opacity: 1,
-            tolerance: 'pointer'
-        });
-
-        $('.minselect').each(function () {
-            $(this).ddslick({
-                width: 200,
-                onSelected: function (selectedData) {
+        @{
+            List<List<string>> quests = new List<List<string>>();
+            foreach (var quest in Model.SurveyQuestion)
+            {
+                if (quest.Type == 3)
+                {
+                    List<string> q = new List<string>();
+                    q.Add(quest.Id);
+                    foreach (var opt in quest.Options.OrderBy(x => x.Order))
+                    {
+                        q.Add(opt.Text);
+                    }
+                    quests.Add(q);
                 }
-            });
-        });
+            }
+        }
 
-        $('.maxselect').each(function () {
-            $(this).ddslick({
-                width: 200,
-                onSelected: function (selectedData) {
-                }
-            });
-        });
+        var quests = '@Newtonsoft.Json.JsonConvert.SerializeObject(quests)';
+        while (quests.indexOf('&quot;') >= 0) {
+            quests = quests.replace('&quot;', '\"');
+        }
+        quests = JSON.parse(quests);
 
-        var firsttime = true;
-
-        $('.typeselect').each(function () {
-            $(this).ddslick({
-                width: 200,
-                onSelected: function (selectedData) {
-                    var selectid = selectedData.original[0].id;
-                    var questid = $("#" + selectid).parent().parent().parent()[0].id;
-                    if (selectedData.selectedIndex === 0) {
-                        $("#options" + questid).empty();
-                        $("#" + questid + " #ratingoption").hide();
-                        $("#" + questid + " #another").hide();
-                        $("#" + questid + " #addnew").hide();
-                        $("#" + questid + " #addnew label").show();
-                        $("#" + questid + " #textoption").show();
-                    }
-                    else if (selectedData.selectedIndex === 1) {
-                        if ($("#" + questid + " #ratingoption").css("display") != "flex") {
-                            $("#options" + questid).empty();
-                        $("#" + questid + " #another").hide();
-                        $("#" + questid + " #addnew").hide();
-                        $("#" + questid + " #textoption").hide();
-                        $("#" + questid + " #addnew label").show();
-                        $("#" + questid + " #ratingoption").show();
-
-                        if (firsttime) {
-
-                            @{ 
-                                    List<List<string>> quests = new List<List<string>>();
-                                    foreach(var quest in Model.SurveyQuestion)
-                                    {
-                                        if (quest.Type == 3)
-                                        {
-                                            List<string> q = new List<string>();
-                                            q.Add(quest.Id);
-                                            foreach (var opt in quest.Options.OrderBy(x => x.Order))
-                                            {
-                                                q.Add(opt.Text);
-                                            }
-                                            quests.Add(q);
-                                        }
-                                    }
-                                }
-
-                            
-                            var quests = '@Newtonsoft.Json.JsonConvert.SerializeObject(quests)';
-                            while (quests.indexOf('&quot;') >= 0) {
-                                quests = quests.replace('&quot;', '\"');
-                            }
-
-                            quests = JSON.parse(quests);
-
-                            for (var j = 0; j < quests.length; j++){
-                                if (questid === quests[j][0]) {
-                                    $("#" + questid + " #ratingoption #minselect").ddslick('select', { index: parseInt(quests[j][1]) });
-                                    $("#" + questid + " #ratingoption #maxselect").ddslick('select', { index: parseInt(quests[j][quests[j].length - 1]) - 2 });
-                                }
-                            }
-
-                        }
-                        else {
-                            $("#" + questid + " #ratingoption #minselect").ddslick('select', { index: 1 });
-                            $("#" + questid + " #ratingoption #maxselect").ddslick('select', { index: 3 });
-                        }
-
-                        }
-                    }
-                    else if (selectedData.selectedIndex === 2) {
-                        $("#" + questid + " #ratingoption").hide();
-                        $("#" + questid + " #textoption").hide();
-                        $("#" + questid + " #addnew").show();
-                        $("#" + questid + " #image").attr("src", "/images/radioboxoptions.png");
-                    }
-                    else if (selectedData.selectedIndex === 3) {
-                        $("#" + questid + " #ratingoption").hide();
-                        $("#" + questid + " #textoption").hide();
-                        $("#" + questid + " #addnew").show();
-                        $("#" + questid + " #image").attr("src", "/images/checkboxoptions.png");
-                    }
-                }
-            });
-        });
-        firsttime = false;
+        MakeTypeSelectSlickOnReady(quests);
 
         MarginHead();
 
@@ -429,436 +284,15 @@
         });
     });
 
-    $('.surveydescriptioninput').on('input', function () {
-        var $this = $(this);
-        if ($this.val() == '') {
-            $this.removeClass('surveydescriptioninputfilled');
-        } else {
-            $this.addClass('surveydescriptioninputfilled');
-        }
-    });
-
-    function MarginHead() {
-        if ($("#questions").children().length === 0) {
-            $(".header").css("margin-bottom", "5em");
-        }
-        else {
-            $(".header").css("margin-bottom", "");
-        }
-
-    }
-
-    function Show() {
-        var url = '@Url.Action("Index", "DisplaySurvey", new { id = "--ID--" })';
-        url = url.replace("--ID--", "@Model.Id");
-        window.location.href = url;
-    }
-
-    function ErrorMessage2(type) {
-        var tit;
-        if (type === 0) {
-            tit = "Ошибка сохранение!";
-        }
-        else {
-            tit = "Уведомление";
-        }
-
-
-        $("#error-message2").dialog({
-            width: 280,
-            height: 170,
-            resizable: false,
-            modal: true,
-            draggable: false,
-            title: tit,
-
-            closeOnEscape: false,
-            open: function (event, ui) {
-                $(event.target).dialog('widget')
-                    .css("box-shadow", "0 10px 28px rgba(0,0,0,0.25), 0 0px 10px rgba(0,0,0,0.22)")
-                    .css("border-radius", "10px")
-                    .css({ position: 'fixed' })
-                    .position({ my: 'top', at: 'top', of: window })
-                    .css({ 'margin-top': '5em' });
-                $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
-            },
-
-            close: function (event, ui) {
-                $(event.target).dialog('widget')
-                    .css({ 'margin-top': '0em' });
-            },
-
-            buttons: {
-                Ok: function () {
-                    $(this).dialog("close");
-                }
-            }
-        });
-    }
-
-    function ErrorMessage() {
-
-        $("#error-message").dialog({
-            width: 280,
-            height: 150,
-            resizable: false,
-            modal: true,
-            draggable: false,
-
-            closeOnEscape: false,
-            open: function (event, ui) {
-                $(event.target).dialog('widget')
-                    .css("box-shadow", "0 10px 28px rgba(0,0,0,0.25), 0 0px 10px rgba(0,0,0,0.22)")
-                    .css("border-radius", "10px")
-                    .css({ position: 'fixed' })
-                    .position({ my: 'top', at: 'top', of: window })
-                    .css({ 'margin-top': '5em' });
-                $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
-            },
-
-            close: function (event, ui) {
-                $(event.target).dialog('widget')
-                    .css({ 'margin-top': '0em' });
-            },
-
-            buttons: {
-                Ok: function () {
-                    $(this).dialog("close");
-                }
-            }
-        });
-    }
-
-    function SaveMessage() {
-        $("#save-message").dialog({
-            width: 280,
-            height: 205,
-            resizable: false,
-            modal: true,
-            draggable: false,
-
-            closeOnEscape: false,
-            open: function (event, ui) {
-                $(event.target).dialog('widget')
-                    .css("box-shadow", "0 10px 28px rgba(0,0,0,0.25), 0 0px 10px rgba(0,0,0,0.22)")
-                    .css("border-radius", "10px")
-                    .css({ position: 'fixed' })
-                    .position({ my: 'top', at: 'top', of: window })
-                    .css({ 'margin-top': '5em' });
-                $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
-            },
-
-            close: function (event, ui) {
-                $(event.target).dialog('widget')
-                    .css({ 'margin-top': '0em' });
-            }
-        });
-    }
-
-    function RemoveMessage() {
-        $("#remove-message").dialog({
-            width: 280,
-            height: 205,
-            resizable: false,
-            modal: true,
-            draggable: false,
-
-            closeOnEscape: false,
-            open: function (event, ui) {
-                $(event.target).dialog('widget')
-                    .css("box-shadow", "0 10px 28px rgba(0,0,0,0.25), 0 0px 10px rgba(0,0,0,0.22)")
-                    .css("border-radius", "10px")
-                    .css({ position: 'fixed' })
-                    .position({ my: 'top', at: 'top', of: window })
-                    .css({ 'margin-top': '5em' });
-                $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
-            },
-
-            close: function (event, ui) {
-                $(event.target).dialog('widget')
-                    .css({ 'margin-top': '0em' });
-            }
-        });
-    }
-
-    function MakeSelectSlick(selectid) {
-        $('#' + selectid).ddslick({
-            width: 200,
-            onSelected: function (selectedData) {
-                var selectid = selectedData.original[0].id;
-                var questid = $("#" + selectid).parent().parent().parent()[0].id;
-                if (selectedData.selectedIndex === 0) {
-                    $("#options" + questid).empty();
-                    $("#" + questid + " #ratingoption").hide();
-                    $("#" + questid + " #another").hide();
-                    $("#" + questid + " #addnew").hide();
-                    $("#" + questid + " #addnew label").show();
-                    $("#" + questid + " #textoption").show();
-                }
-                else if (selectedData.selectedIndex === 1) {
-                    if ($("#" + questid + " #ratingoption").css("display") != "flex") {
-                        $("#options" + questid).empty();
-                        $("#" + questid + " #another").hide();
-                        $("#" + questid + " #addnew").hide();
-                        $("#" + questid + " #textoption").hide();
-                        $("#" + questid + " #addnew label").show();
-                        $("#" + questid + " #ratingoption").show();
-                        $("#" + questid + " #ratingoption #minselect").ddslick('select', { index: 1 });
-                        $("#" + questid + " #ratingoption #maxselect").ddslick('select', { index: 3 });
-                    }
-                }
-                else if (selectedData.selectedIndex === 2) {
-                    $("#" + questid + " #ratingoption").hide();
-                    $("#" + questid + " #textoption").hide();
-                    $("#" + questid + " #addnew").show();
-                    $("#" + questid + " #image").attr("src", "/images/radioboxoptions.png");
-                }
-                else if (selectedData.selectedIndex === 3) {
-                    $("#" + questid + " #ratingoption").hide();
-                    $("#" + questid + " #textoption").hide();
-                    $("#" + questid + " #addnew").show();
-                    $("#" + questid + " #image").attr("src", "/images/checkboxoptions.png");
-                }
-            }
-        });
-
-    }
-
-    function RemoveSurvey(surveyid) {
-        $("#remove-ask-message").dialog({
-            width: 280,
-            height: 170,
-            resizable: false,
-            modal: true,
-            draggable: false,
-
-            closeOnEscape: false,
-            open: function (event, ui) {
-                $(event.target).dialog('widget')
-                    .css("box-shadow", "0 10px 28px rgba(0,0,0,0.25), 0 0px 10px rgba(0,0,0,0.22)")
-                    .css("border-radius", "10px")
-                    .css({ position: 'fixed' })
-                    .position({ my: 'top', at: 'top', of: window })
-                    .css({ 'margin-top': '5em' })
-                $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
-            },
-
-            close: function (event, ui) {
-                $(event.target).dialog('widget')
-                    .css({ 'margin-top': '0em' });
-            },
-
-            buttons: {
-                "Удалить опрос": function () {
-                    $(this).dialog("close");
-                    RemoveMessage();
-                    $.ajax({
-                        url: "/Admin/RemoveSurvey",
-                        type: "GET",
-                        data: { id: surveyid },
-                        success: function (data) {
-                            window.location.href = '@Url.Action("Index", "Admin")';
-                        }
-                    });
-                },
-                "Отмена": function () {
-                    $(this).dialog("close");
-                }
-            }
-        });
-    }
-
-    function AddAnother(id) {
-        $("#" + id + " #another").show();
-        $("#" + id + " #addnew label").hide();
-    }
-
-    function RemoveAnother(id) {
-        $("#" + id + " #another").hide();
-        $("#" + id + " #addnew label").show();
-    }
-
-    function AddQuestion() {
-
-
-        var newquestion = "\
-<div id=\"newquest{ID}\" class=\"box\" style=\"margin-top:1em;\">\
-\
-    <div style=\"justify-content: center;display: flex;margin-top:1em;\">\
-        <img id=\"movenewquest{ID}\" src=\"/images/questiondots.png\" style=\"cursor:move;\" width=\"20\" height=\"10\">\
-    </div>\
-\
-\
-    <div class=\"question-settings\">\
-        <div class=\"leftdiv\" style=\"position: relative;\">\
-            <textarea rows=\"1\" class=\"questiontitleinput\" type=\"text\" placeholder=\"\" required oninvalid=\"this.setCustomValidity('Введите название вопроса')\" oninput=\"setCustomValidity('')\"></textarea>\
-            <label class=\"questiontitlelabel\">Название вопроса</label>\
-        </div>\
-        <div class=\"rightdiv\">\
-            <select id=\"newquest{ID}select\" style=\"width:100%;display:none;\">\
-                <option value=\"0\" data-imagesrc=\"/images/text.png\" data-description=\" \">Текст</option>\
-                <option value=\"1\" data-imagesrc=\"/images/star.png\" data-description=\" \">Рейтинг</option>\
-                <option value=\"2\" selected=\"selected\" data-imagesrc=\"/images/radiobox.png\" data-description=\" \">Один из списка</option>\
-                <option value=\"3\" data-imagesrc=\"/images/checkbox.png\" data-description=\" \">Несколько из списка</option>\
-            </select>\
-        </div>\
-    </div>\
-\
-    <div id=\"optionsnewquest{ID}\" name=\"options\">\
-    </div>\
-\
-    <div id=\"textoption\" style=\"margin-top:1em;margin-left:5%;display:none\">\
-        <input style=\"width:94.5%;height: 30px;font-size: 15px;\" disabled type=\"text\" placeholder=\"Текстовый ответ\">\
-    </div>\
-\
-        <div id=\"ratingoption\" style=\"display:none\" class=\"ratingoption\">\
-                    <div class=\"minselectdiv\">\
-                        <select id=\"minselect\" class=\"minselect\">\
-                            <option>0</option>\
-                            <option>1</option>\
-                        </select>\
-                    </div>\
-                    <label style=\"margin-left:1em;\">—</label>\
-                    <div class=\"maxselectdiv\">\
-                        <select id=\"maxselect\" class=\"maxselect\">\
-                            <option>2</option>\
-                            <option>3</option>\
-                            <option>4</option>\
-                            <option>5</option>\
-                            <option>6</option>\
-                            <option>7</option>\
-                            <option>8</option>\
-                            <option>9</option>\
-                            <option>10</option>\
-                        </select>\
-                    </div>\
-                </div>\
-\
-    <div id=\"another\" style=\"display:none;\">\
-        <img id=\"image\" src=\"/images/radioboxoptions.png\" width=\"20\" height=\"20\" style=\"margin-left:5%;\">\
-        <input class=\"option-input\" style=\"width:87%;\" disabled type=\"text\" placeholder=\"Другое...\">\
-        <div title=\"Удалить другое\" name=\"picture\" style=\"background: url('/images/SurveyIcon.svg') no-repeat -5px -4061px; width: 14px; height: 14px; zoom:1.4; cursor: pointer;\" onclick=\"RemoveAnother('newquest{ID}')\"></div>\
-    </div>\
-\
-\
-    <div id=\"addnew\" class=\"addnew\" style=\"margin-top:1em\">\
-        <img id=\"image\" src=\"/images/radioboxoptions.png\" width=\"20\" height=\"20\" style=\"margin-left:5%;\">\
-        <input style=\"height: 30px;font-size: 15px;width:127px\" type=\"text\" placeholder=\"Добавить вариант\" onclick=\"AddOption('newquest{ID}')\"  onkeydown=\"OnChangeAdd('newquest{ID}')\">\
-        <label style=\"display:normal;font-weight:normal\"> или <a style=\"cursor:pointer;font-weight:bold\" onclick=\"AddAnother('newquest{ID}')\">ДОБАВИТЬ ВАРИАНТ \"ДРУГОЕ\"</a></label>\
-    </div>\
-\
-    <div class=\"hl\" style=\"margin-top:1em;\"></div>\
-\
-    <div class=\"beforequestionfooter\"></div>\
-    <div class=\"questionfooter\" style=\"margin-top:0.5em;margin-bottom:0.5em;\">\
-        <div title=\"Удалить вопрос\" name=\"picture\" style=\"background: url(/images/SurveyIcon.svg) no-repeat -5px -1203px; width: 14px; height: 18px;margin-right:2em;cursor: pointer;\" onclick=\"RemoveQuestion('newquest{ID}')\"></div>\
-        <div class=\"vl\" style=\"margin-right:2em\"></div>\
-        <div style=\"margin-right:0.5em\">\
-            <label style=\"color:rgba(51, 51, 51, 0.78);\">Обязательный вопрос</label>\
-        </div>\
-        <div>\
-            <input type=\"checkbox\" id=\"newquest{ID}required\" style=\"display:none\" />\
-            <label for=\"newquest{ID}required\" class=\"toggle\"><span name=\"span\"></span></label>\
-        </div>\
-    </div>\
-\
-</div>\
-";
-        newquestion = newquestion.replace("{ID}", addedquest)
-            .replace("{ID}", addedquest)
-            .replace("{ID}", addedquest)
-            .replace("{ID}", addedquest)
-            .replace("{ID}", addedquest)
-            .replace("{ID}", addedquest)
-            .replace("{ID}", addedquest)
-            .replace("{ID}", addedquest)
-            .replace("{ID}", addedquest)
-            .replace("{ID}", addedquest)
-            .replace("{ID}", addedquest);
-
-
-        $("#questions").append(newquestion);
-        $('#newquest' + addedquest + ' #minselect').ddslick({
-            width: 200,
-            onSelected: function (selectedData) {
-            }
-        });
-
-        $('#newquest' + addedquest + ' #maxselect').ddslick({
-            width: 200,
-            onSelected: function (selectedData) {
-            }
-        });
-        MakeSelectSlick('newquest' + addedquest + 'select');
-        autosize($('#newquest' + addedquest + ' div div textarea'));
-        $('#optionsnewquest' + addedquest).sortable({
-            axis: 'y',
-            containment: '#optionsnewquest' + addedquest,
-            opacity: 1,
-            tolerance: 'pointer'
-        });
-
-        addedquest++;
-
-        MarginHead();
-    }
-
-    function RemoveQuestion(surveyquestionid) {
-        $("#" + surveyquestionid).remove();
-        MarginHead();
-    }
-
-    function AddOption(surveyquestionid) {
-        AddOptionText(surveyquestionid, "");
-    }
-
-    function AddOptionText(surveyquestionid, text) {
-        var newoption = "\
-                <div id=\"newopt{ID}\" class=\"optionseparation\">\
-\
-                                <div class=\"optionleft\">\
-                                    <img id=\"movenewopt{ID}\" src=\"/images/optiondots.png\" width=\"10\" height=\"20\" style=\"cursor:move;\">\
-                                </div>\
-\
-                                <div class=\"optionright\">\
-                                    <img id=\"image\" src=\"{TYPE}\" width=\"20\" height=\"20\">\
-                                    <input class=\"option-input\" type=\"text\" placeholder=\"Ответ\" required=\"\" oninvalid=\"this.setCustomValidity('Введите ответ')\" oninput=\"setCustomValidity('')\" value=\"\">\
-                                    <div title=\"Удалить ответ\" name=\"picture\" style=\"background: url('/images/SurveyIcon.svg') no-repeat -5px -4061px; width: 14px; height: 14px; zoom:1.4; cursor: pointer;\" onclick=\"RemoveOption('newopt{ID}')\"></div>\
-                                </div>\
-\
-                            </div>";
-
-        newoption = newoption.replace("{ID}", addedopt)
-            .replace("{ID}", addedopt).replace("{ID}", addedopt).replace("{TYPE}", $("#" + surveyquestionid + " #addnew #image").attr('src'));
-
-        $("#options"+ surveyquestionid).append(newoption);
-
-        $('#newopt' + addedopt + ' input').val(text);
-        $('#newopt' + addedopt + ' input').focus();
-
-        $("#" + surveyquestionid + " #addnew input")[0].setCustomValidity('');
-
-        addedopt++;
-    }
-
-    function OnChangeAdd(surveyquestionid) {
-        var val = $("#" + surveyquestionid + " #addnew input").val();
-        $("#" + surveyquestionid + " #addnew input").val("");
-        AddOptionText(surveyquestionid, val);
-    }
-
-    function RemoveOption(optionid) {
-        $("#" + optionid).remove();
-    }
-
     function Save() {
 
         var surveyid = '@Model.Id';
+        var url = '@Url.Action("Edit", "Admin", new { id = "--ID--" })';
 
         $.ajax({
             url: "/Admin/GotAnswers",
             type: "GET",
-            data: { id: '@Model.Id' },
+            data: { id: surveyid },
             success: function (data) {
                 check = data;
 
@@ -870,220 +304,10 @@
                     ErrorMessage2(0);
                 }
                 else {
-                    if (!$('#SurveyForm')[0].checkValidity()) {
-                        $("#submitButton").prop("disabled", false);
-                        $('#submitButton').click();
-                        $("#submitButton").prop("disabled", true);
-                        return;
-                    }
-
-                    SaveMessage();
-
-                    var title = $("#SurveyName").val();
-                    var description = $("#SurveyDescription").val();
-
-                    var questions = [];
-
-                    var questiondivs = $("#questions").children();
-
-                    for (var i = 0; i < questiondivs.length; i++) {
-                        var question = [];
-                        var id = questiondivs[i].id;
-                        question.push(id);
-                        question.push($("#" + id + " div div textarea").val());
-                        
-                        var select = $("#" + id + "select").data('ddslick').selectedIndex;;
-                        var type;
-                        if (select === 0) {
-                            type = "2"
-                        }
-                        else if (select === 1) {
-                            type = "3"
-                        }
-                        else if (select === 2) {
-                            type = "0"
-                        }
-                        else if (select === 3) {
-                            type = "1"
-                        }
-
-                        question.push(type);
-
-                        if ($('#' + id + ' #addnew label').css('display') == 'none') {
-                            question.push("True");
-                        }
-                        else {
-                            question.push("False");
-                        }
-
-                        if ($("#" + id + "required")[0].checked) {
-                            question.push("True");
-                        }
-                        else {
-                            question.push("False");
-                        }
-                        if (select === 1) {
-                            var minselect = $("#" + id + " #minselect").data('ddslick').selectedIndex;
-                            var maxselect = $("#" + id + " #maxselect").data('ddslick').selectedIndex + 2;
-                            for (var j = minselect; j <= maxselect; j++) {
-                                question.push("newoption" + j);
-                                question.push(j);
-                            }
-                        }
-                        if (select === 2 || select === 3) {
-                            var options = $("#options" + id).children();
-                            for (var j = 0; j < options.length; j++) {
-                                var optionid = options[j].id;
-                                question.push(optionid);
-                                question.push($("#" + optionid + " div input").val());
-                            }
-                        }
-                        questions.push(question);
-                    }
-
-                    if (questions.length == 0) {
-                        $("#save-message").dialog("close");
-                        $("#savebutton").effect("bounce");
-                        ErrorMessage();
-                        return;
-                    }
-
-                    for (var i = 0; i < questions.length; i++) {
-                        if (questions[i].length <= 5 && questions[i][2] != "2") {
-                            $("#" + questions[i][0] + " #addnew input")[0].setCustomValidity('Необходимо добавить ответ');
-                        }
-
-                        if (questions[i][2] === "2") {
-                            $("#" + questions[i][0] + " #addnew input")[0].setCustomValidity('');
-                        }
-                    }
-
-                    if (!$('#SurveyForm')[0].checkValidity()) {
-                        $("#save-message").dialog("close");
-                        $("#submitButton").prop("disabled", false);
-                        $('#submitButton').click();
-                        $("#submitButton").prop("disabled", true);
-                        return;
-                    }
-
-
-                    /* var div = "<div id=\"screenshot\"></div>";
-                     $("body").append(div);
-                     //$("#screenshot").css("display", "none");
-                     $("#screenshot").css("width", "1000px");
-                     $("#screenshot").css("height", "1000px");
-                     $("#screenshot").append($("body").clone());
-                     $("#screenshot #left-menu").remove();*/
-
-                    $("span[name=span]").each(function () {
-                        var a = $(this).css('transform');
-                        if (a.indexOf("20") >= 0) {
-                            $(this).css('transform', 'translateX(10px)');
-                        }
-
-                    })
-
-
-
-                    html2canvas(document.body.querySelector(".container.body-content"), {
-                        onclone: function (clonedDoc) {
-
-                            $(".addnew", $(clonedDoc)).each(function () {
-                                $(this).css('display', 'none');
-                            })
-
-                            $('.questionfooter', $(clonedDoc)).each(function () {
-                                $(this).css('display', 'none');
-                            })
-
-                            $('.hl', $(clonedDoc)).each(function () {
-                                $(this).css('display', 'none');
-                            })
-
-                            $(".beforequestionfooter", $(clonedDoc)).each(function () {
-                                $(this).css('display', 'block');
-                            })
-
-                            $('#left-menu', $(clonedDoc)).remove();
-                            $(".container.body-content", $(clonedDoc)).css("zoom", "4");
-                            $(".container.body-content", $(clonedDoc)).css("width", "1000px");
-                            $(".container.body-content", $(clonedDoc)).css("height", "1000px");
-                            var color = $("body").css("background-color");
-                            $(".container.body-content", $(clonedDoc)).css("background-color", color);
-
-
-
-                            $("div[name=picture]", $(clonedDoc)).each(function () {
-                                $(this).css('zoom', '1');
-                            })
-                        }
-                    }).then(function (canvas) {
-
-                        $("span[name=span]").each(function () {
-                            var a = $(this).css('transform');
-                            if (a.indexOf("10") >= 0) {
-                                $(this).css('transform', '');
-                            }
-                        })
-
-                        //document.body.appendChild(canvas);
-
-                        canvas = crop(canvas, { x: 0, y: 0 }, { x: canvas.width, y: canvas.width });
-
-                        //document.body.appendChild(canvas);
-                        var img = canvas.toDataURL("image/png");
-                        img = img.replace('data:image/png;base64,', '');
-
-
-                        $.ajax(
-                            {
-                                url: '/Admin/Save',
-                                type: "POST",
-                                data: { 'id': surveyid, 'title': title, 'description': description, 'lines': questions, 'image': img },
-                                success: function (data) {
-                                    var url = '@Url.Action("Edit", "Admin", new { id = "--ID--" })';
-                                    url = url.replace("--ID--", data.id);
-                                    window.location.href = url;
-                                },
-                                error: function () {
-                                    $("#save-message").dialog("close");
-                                }
-                            });
-                        });
+                    SaveCommon(surveyid, url);
                 }
             }
         });
-
-        
-    }
-
-    function crop(can, a, b) {
-        // get your canvas and a context for it
-        var ctx = can.getContext('2d');
-
-        // get the image data you want to keep.
-        var imageData = ctx.getImageData(a.x, a.y, b.x, b.y);
-
-        // create a new cavnas same as clipped size and a context
-        var newCan = document.createElement('canvas');
-        newCan.width = b.x - a.x;
-        newCan.height = b.y - a.y;
-        var newCtx = newCan.getContext('2d');
-
-        // put the clipped image on the new canvas.
-        newCtx.putImageData(imageData, 0, 0);
-
-        return newCan;
-    }
-
-    function crop2() {
-        var image = document.getElementById("source");
-        ctx.drawImage(image, 0, 0);
-        var image1 = document.getElementById("texture1");
-        var ptrn = ctx.createPattern(image1, 'repeat');
-        ctx.fillStyle = ptrn;
-        ctx.fillRect(0, 0, 1500, 1500);
-
     }
 
 

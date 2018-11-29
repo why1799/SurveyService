@@ -24,5 +24,6 @@ namespace SurveyService.Models
 
         public ICollection<SurveyQuestion> SurveyQuestion { get; set; }
         public byte[] Image { get; set; }
+        public byte[] AddedImage { get; set; }
     }
 }

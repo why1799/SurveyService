@@ -1,4 +1,13 @@
-﻿a.dd-selected {
+﻿.form-container {
+    width: 660px;
+}
+
+.modal-box {
+    padding: 0px;
+    padding-bottom: 30px;
+}
+
+a.dd-selected {
     color: rgba(51, 51, 51, 0.78);
 }
 
@@ -116,7 +125,7 @@ textarea:focus {
 
 #left-menu {
     top: 60px;
-    right: -100px;
+    right: -90px;
     position: fixed;
     position: absolute;
     -webkit-transition: all .3s cubic-bezier(0.4,0.0,0.2,1);
@@ -384,3 +393,32 @@ div[name=picture] {
         padding-left: 9px;
         height: 35px;
     }
+
+
+.imagediv {
+    position: relative;
+}
+
+.imagediv img {
+    width: 100%;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+    .imagediv input{
+        display: none;
+    }
+
+    .imagediv div {
+        background: url(/images/delete-button.svg) no-repeat;
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        opacity: .54;
+        right: 0px;
+        position: absolute;
+    }
+
+        .imagediv div:hover {
+            opacity: 1;
+        }
