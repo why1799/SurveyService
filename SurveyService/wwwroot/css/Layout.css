@@ -19,7 +19,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border: solid 0.3px black;
+    /*border: solid 0.3px black;*/
 }
 
 .content-flex-continer {

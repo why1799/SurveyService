@@ -277,6 +277,8 @@ function OnReady() {
     addedopt = 0;
     autosize($('textarea'));
 
+    MakeDropImage(document.querySelector('.box__upload'));
+
     MakeQuestionSortable();
 
     OnScroll();
@@ -501,6 +503,16 @@ function SaveCommon(surveyid, url) {
     html2canvas(document.body.querySelector(".container.body-content"), {
         onclone: function (clonedDoc) {
 
+            if ($('.imagediv', $(clonedDoc)).css("display") === "none") {
+                $(".form-container", $(clonedDoc)).css("padding-top", "30px");
+            }
+
+            $('.modal-box', $(clonedDoc)).css("border", "solid 0.3px black");
+
+            $('#deleteimagebutton', $(clonedDoc)).remove();
+
+            $('#box__upload', $(clonedDoc)).remove();
+
             $(".addnew", $(clonedDoc)).each(function () {
                 $(this).css('display', 'none');
             })
@@ -518,7 +530,7 @@ function SaveCommon(surveyid, url) {
             })
 
             $('#left-menu', $(clonedDoc)).remove();
-            $(".container.body-content", $(clonedDoc)).css("zoom", "4");
+            //$(".container.body-content", $(clonedDoc)).css("zoom", "4");
             $(".container.body-content", $(clonedDoc)).css("width", "1000px");
             $(".container.body-content", $(clonedDoc)).css("height", "1000px");
             var color = $("body").css("background-color");
@@ -573,31 +585,109 @@ function SaveCommon(surveyid, url) {
     });
 }
 
-function previewFile() {
-    var preview = document.querySelector('#addedimage');
-    var file = document.querySelector('#uploadinput').files[0];
-    var reader = new FileReader();
-
-    reader.addEventListener("load", function () {
-        preview.src = reader.result;
-    }, false);
-
-    if (file) {
-        reader.readAsDataURL(file);
-        $(".imagediv").show();
-    }
-}
-
 function ImageLoaded() {
     $("#deleteimagebutton").show();
-    $(".form-container").css("padding-top", "");
+    //$(".form-container").css("padding-top", "");
 }
 
 function DeleteAddedImage() {
     $("#addedimage").attr('src', '');
     $("#deleteimagebutton").hide();
     $(".imagediv").hide();
-    $(".form-container").css("padding-top", "30px");
-    $('#uploadinput').val("")
+    //$(".form-container").css("padding-top", "30px");
+    $('#file').val("")
+    $(".box__upload").show();
 }
 
+function MakeDropImage(form) {
+    var input = form.querySelector('input[type="file"]'),
+        label = form.querySelector('label'),
+        errorMsg = form.querySelector('.box__error span')
+        droppedFiles = false,
+        triggerFormSubmit = function () {
+            var event = document.createEvent('HTMLEvents');
+            event.initEvent('submit', true, false);
+            form.dispatchEvent(event);
+        },
+        addFile = function (file) {
+            var preview = document.querySelector('#addedimage');
+            var reader = new FileReader();
+
+            reader.addEventListener("load", function () {
+                preview.src = reader.result;
+            }, false);
+
+            if (file) {
+                reader.readAsDataURL(file);
+                $(".imagediv").show();
+                $(".box__upload").hide();
+            }
+        },
+        isAdvancedUpload = function () {
+            var div = document.createElement('div');
+            return (('draggable' in div) || ('ondragstart' in div && 'ondrop' in div)) && 'FormData' in window && 'FileReader' in window;
+        }();
+
+    // automatically submit the form on file select
+    input.addEventListener('change', function (e) {
+        form.classList.remove('is-error');
+
+        var file = e.target.files[0];
+        var fileType = file["type"];
+        if (fileType.indexOf("image/") != 0) {
+            errorMsg.innerText = "Можно загружать только изображения.";
+            form.classList.add('is-error');
+            return;
+        }
+
+        addFile(e.target.files[0]);
+    });
+
+    // drag&drop files if the feature is available
+    if (isAdvancedUpload) {
+        form.classList.add('has-advanced-upload'); // letting the CSS part to know drag&drop is supported by the browser
+
+        ['drag', 'dragstart', 'dragend', 'dragover', 'dragenter', 'dragleave', 'drop'].forEach(function (event) {
+            form.addEventListener(event, function (e) {
+                // preventing the unwanted behaviours
+                e.preventDefault();
+                e.stopPropagation();
+            });
+        });
+        ['dragover', 'dragenter'].forEach(function (event) {
+            form.addEventListener(event, function () {
+                form.classList.add('is-dragover');
+                form.classList.remove('is-error');
+            });
+        });
+        ['dragleave', 'dragend', 'drop'].forEach(function (event) {
+            form.addEventListener(event, function () {
+                form.classList.remove('is-dragover');
+            });
+        });
+        form.addEventListener('drop', function (e) {
+            droppedFiles = e.dataTransfer.files; // the files that were dropped
+
+            if (droppedFiles.length > 1) {
+                errorMsg.innerText = "Нельзя загружать больше одного файла.";
+                form.classList.add('is-error');
+                return;
+            }
+
+            var file = droppedFiles[0];
+            var fileType = file["type"];
+            if (fileType.indexOf("image/") != 0) {
+                errorMsg.innerText = "Можно загружать только изображения.";
+                form.classList.add('is-error');
+                return;
+            }
+
+            addFile(droppedFiles[0]);
+        });
+    }
+
+    // Firefox focus bug fix for file input
+    input.addEventListener('focus', function () { input.classList.add('has-focus'); });
+    input.addEventListener('blur', function () { input.classList.remove('has-focus'); });
+
+}
