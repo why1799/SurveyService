@@ -562,22 +562,8 @@ div[name=picture] {
     cursor: pointer;
 }
 
-.box__button {
-    font-weight: 700;
-    color: #e5edf1;
-    background-color: #39bfd3;
-    display: none;
-    padding: 8px 16px;
-    margin: 40px auto 0;
-}
-
 .box__button__choose:hover {
     background-color: #4d90fe;
-}
-
-.box__button:hover,
-.box__button:focus {
-    background-color: #0f3c4b;
 }
 
 .box__input {

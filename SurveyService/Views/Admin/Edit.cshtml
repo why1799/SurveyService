@@ -16,7 +16,7 @@
 <link rel="stylesheet" href="~/lib/jquery-ui-1.12.1/jquery-ui.css" />
 <script src="~/js/EditCreatescripts.js"></script>
 <link rel="stylesheet" href="~/css/EditCreate.css" />
-<script src="~/js/Messages.js"></script>
+<script  src="~/js/Messages.js"></script>
 
 
 
@@ -63,7 +63,6 @@
                         <label class="box__label__drop">Перетащите изображение сюда</label>
                         <label class="box__label__or">или</label>
                         <label class="box__button__choose" for="file">Выберите изображение</label>
-                        <button type="submit" class="box__button">Upload</button>
                     </div>
 
                     <div class="box__error">Ошибка! <span></span></div>
@@ -114,34 +113,12 @@
                                     idhelper = surveyquestion.Id + "select";
                                 }
                                 <select id="@idhelper" class="typeselect">
-                                    @if (surveyquestion.Type == 0)
-                                    {
-                                        <option value="0" data-imagesrc="/images/text.png" data-description=" ">Текст</option>
-                                        <option value="1" data-imagesrc="/images/star.png" data-description=" ">Рейтинг</option>
-                                        <option value="2" selected="selected" data-imagesrc="/images/radiobox.png" data-description=" ">Один из списка</option>
-                                        <option value="3" data-imagesrc="/images/checkbox.png" data-description=" ">Несколько из списка</option>
-                                    }
-                                    else if (surveyquestion.Type == 1)
-                                    {
-                                        <option value="0" data-imagesrc="/images/text.png" data-description=" ">Текст</option>
-                                        <option value="1" data-imagesrc="/images/star.png" data-description=" ">Рейтинг</option>
-                                        <option value="2" data-imagesrc="/images/radiobox.png" data-description=" ">Один из списка</option>
-                                        <option value="3" selected="selected" data-imagesrc="/images/checkbox.png" data-description=" ">Несколько из списка</option>
-                                    }
-                                    else if (surveyquestion.Type == 2)
-                                    {
-                                        <option value="0" selected="selected" data-imagesrc="/images/text.png" data-description=" ">Текст</option>
-                                        <option value="1" data-imagesrc="/images/star.png" data-description=" ">Рейтинг</option>
-                                        <option value="2" data-imagesrc="/images/radiobox.png" data-description=" ">Один из списка</option>
-                                        <option value="3" data-imagesrc="/images/checkbox.png" data-description=" ">Несколько из списка</option>
-                                    }
-                                    else if (surveyquestion.Type == 3)
-                                    {
-                                        <option value="0" data-imagesrc="/images/text.png" data-description=" ">Текст</option>
-                                        <option value="1" selected="selected" data-imagesrc="/images/star.png" data-description=" ">Рейтинг</option>
-                                        <option value="2" data-imagesrc="/images/radiobox.png" data-description=" ">Один из списка</option>
-                                        <option value="3" data-imagesrc="/images/checkbox.png" data-description=" ">Несколько из списка</option>
-                                    }
+
+                                    <option value="0" selected="@(surveyquestion.Type == 2)" data-imagesrc="/images/text.png" data-description=" ">Текст</option>
+                                    <option value="1" selected="@(surveyquestion.Type == 3)" data-imagesrc="/images/star.png" data-description=" ">Рейтинг</option>
+                                    <option value="2" selected="@(surveyquestion.Type == 0)" data-imagesrc="/images/radiobox.png" data-description=" ">Один из списка</option>
+                                    <option value="3" selected="@(surveyquestion.Type == 1)" data-imagesrc="/images/checkbox.png" data-description=" ">Несколько из списка</option>
+
                                 </select>
                             </div>
                         </div>
